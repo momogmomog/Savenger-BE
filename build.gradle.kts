@@ -19,6 +19,8 @@ configurations {
 	}
 }
 
+val mapstructVersion by extra( "1.5.5.Final")
+
 repositories {
 	mavenCentral()
 }
@@ -28,10 +30,13 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.flywaydb:flyway-core")
 	implementation("org.flywaydb:flyway-mysql")
+	implementation ("org.mapstruct:mapstruct:${mapstructVersion}")
+
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.mysql:mysql-connector-j")
 	annotationProcessor("org.projectlombok:lombok")
+	annotationProcessor ("org.mapstruct:mapstruct-processor:${mapstructVersion}")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
