@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum ApiErrorCode {
     ERR_0001(HttpStatus.INTERNAL_SERVER_ERROR, "There was an error"),
     ERR_0002(HttpStatus.BAD_REQUEST, "Payload contains constraint violations"),
+    ERR_0003(HttpStatus.UNAUTHORIZED, "Invalid Credentials"),
     ;
 
     public final HttpStatus status;
