@@ -46,7 +46,6 @@ public class Revision {
 
     private String comment;
 
-
     private Long budgetId;
 
 }

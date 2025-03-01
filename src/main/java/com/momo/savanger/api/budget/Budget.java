@@ -49,7 +49,6 @@ public class Budget {
     @Column(nullable = false)
     private BigDecimal balance;
 
-    @Column(nullable = false)
     private BigDecimal budgetCap;
 
     @Column(nullable = false)

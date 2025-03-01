@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BudgetServiceImpl implements BudgetService {
+
     private final BudgetRepository budgetRepository;
 
     @Override

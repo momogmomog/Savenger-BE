@@ -17,14 +17,18 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Tag {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
     private Long id;
+
     @Column(nullable = false)
     private String name;
-    @Column(nullable = false)
+
     private BigDecimal budgetCap;
+
     @Column(nullable = false)
     private Long budgetId;
+
 }

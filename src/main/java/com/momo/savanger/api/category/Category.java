@@ -25,9 +25,9 @@ public class Category {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
     private BigDecimal budgetCap;
 
     @Column(nullable = false)
     private Long budgetId;
+
 }

@@ -11,6 +11,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category findById(Long id) {
-       return this.categoryRepository.findById(id).orElse(null);
+        return this.categoryRepository.findById(id).orElse(null);
     }
 }

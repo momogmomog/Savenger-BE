@@ -44,8 +44,8 @@ public class Transaction {
     @Column(nullable = false)
     private Long userId;
 
-//    @Column(nullable = false)
-//    private Long categoryId;
+    @Column(nullable = false)
+    private Long categoryId;
 
     @Column(nullable = false)
     private Long budgetId;
