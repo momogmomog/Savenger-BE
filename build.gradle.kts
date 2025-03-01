@@ -20,6 +20,7 @@ configurations {
 }
 
 val mapstructVersion by extra( "1.5.5.Final")
+val hibernateMetamodelGenVersion by extra("6.6.9.Final");
 
 repositories {
 	mavenCentral()
@@ -38,7 +39,8 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.mysql:mysql-connector-j")
 	annotationProcessor("org.projectlombok:lombok")
-	annotationProcessor ("org.mapstruct:mapstruct-processor:${mapstructVersion}")
+	annotationProcessor("org.mapstruct:mapstruct-processor:${mapstructVersion}")
+	annotationProcessor("org.hibernate.orm:hibernate-jpamodelgen:${hibernateMetamodelGenVersion}")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
