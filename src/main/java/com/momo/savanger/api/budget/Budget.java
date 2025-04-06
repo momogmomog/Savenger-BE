@@ -52,7 +52,7 @@ public class Budget {
     private BigDecimal budgetCap;
 
     @Column(nullable = false)
-    private BigDecimal autoRevise;
+    private Boolean autoRevise;
 
     @Column(nullable = false)
     private Long ownerId;

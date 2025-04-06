@@ -34,6 +34,7 @@ dependencies {
 	implementation("org.flywaydb:flyway-core")
 	implementation("org.flywaydb:flyway-mysql")
 	implementation("org.mapstruct:mapstruct:${mapstructVersion}")
+	implementation("org.dmfs:lib-recur:0.17.1")
 
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
