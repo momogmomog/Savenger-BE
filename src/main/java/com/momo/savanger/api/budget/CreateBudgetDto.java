@@ -18,7 +18,7 @@ public class CreateBudgetDto {
     private String budgetName;
 
     @NotNull
-    @Length(min = 1, max = Lengths.MAX_VARCHAR)
+    @Length(min = 1, max = Lengths.MAX_VARCHAR, message = ValidationMessages.TEXT_MUST_BE_BETWEEN)
     @RRule
     private String recurringRule;
 

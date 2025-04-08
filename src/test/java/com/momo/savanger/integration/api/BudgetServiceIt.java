@@ -1,5 +1,6 @@
 package com.momo.savanger.integration.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,8 +27,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@Sql("classpath:/sql/user-it-data.sql")
 @Sql("classpath:/sql/budget-it-data.sql")
 @Sql(value = "classpath:/sql/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/del-user-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 public class BudgetServiceIt {
 
     @Autowired
@@ -51,8 +54,10 @@ public class BudgetServiceIt {
 
         assertEquals(2, budgets.size());
 
-        assertArrayEquals(List.of("Food", "Test").toArray(),
-                budgets.stream().map(budget -> budget.getBudgetName()).toArray());
+        assertThat(List.of("Food", "Test"))
+                .hasSameElementsAs(
+                        budgets.stream().map(Budget::getBudgetName).toList()
+                );
     }
 
     @Test
@@ -64,7 +69,7 @@ public class BudgetServiceIt {
 
     @Test
     public void testFindBudgetById_validId_shouldReturnBudget() {
-        Budget budget = this.budgetService.findBudgetById(1L);
+        Budget budget = this.budgetService.findBudgetById(1001L);
 
         assertNotNull(budget);
         assertEquals("Food", budget.getBudgetName());
