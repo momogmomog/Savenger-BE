@@ -32,7 +32,7 @@ public class Budget {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String budgetName;
 
     @Column(nullable = false)
     private String recurringRule;

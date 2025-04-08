@@ -1,6 +1,5 @@
 package com.momo.savanger.conf;
 
-import org.dmfs.rfc5545.recur.RecurrenceRule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,5 +12,4 @@ public class BeanConfig {
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
-
 }

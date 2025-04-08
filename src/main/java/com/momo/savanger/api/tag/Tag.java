@@ -24,7 +24,7 @@ public class Tag {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String tagName;
 
     private BigDecimal budgetCap;
 
