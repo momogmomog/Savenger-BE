@@ -3,7 +3,6 @@ package com.momo.savanger.api.budget;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,10 +37,5 @@ public class BudgetServiceImpl implements BudgetService {
         this.budgetRepository.saveAndFlush(budget);
 
         return this.findById(budget.getId());
-    }
-
-    @Override
-    public List<Budget> findAll() {
-        return this.budgetRepository.findAll();
     }
 }

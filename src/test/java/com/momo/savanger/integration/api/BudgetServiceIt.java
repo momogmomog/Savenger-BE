@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.momo.savanger.api.budget.Budget;
+import com.momo.savanger.api.budget.BudgetRepository;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.CreateBudgetDto;
 import com.momo.savanger.error.ApiException;
@@ -37,6 +38,9 @@ public class BudgetServiceIt {
     @Autowired
     private BudgetService budgetService;
 
+    @Autowired
+    private BudgetRepository budgetRepository;
+
     @Test
     public void testCreate_validPayload_shouldCreate() {
         CreateBudgetDto createBudgetDto = new CreateBudgetDto();
@@ -51,7 +55,7 @@ public class BudgetServiceIt {
 
         assertNotNull(this.budgetService.create(createBudgetDto, 1L));
 
-        List<Budget> budgets = this.budgetService.findAll();
+        List<Budget> budgets = this.budgetRepository.findAll();
 
         assertEquals(2, budgets.size());
 
@@ -62,16 +66,16 @@ public class BudgetServiceIt {
     }
 
     @Test
-    public void testCreate_emptyPayload_shouldReturnNull() {
+    public void testCreate_emptyPayload_shouldThrowException() {
         CreateBudgetDto createBudgetDto = new CreateBudgetDto();
 
-       assertThrows(DataIntegrityViolationException.class, () -> {
-           this.budgetService.create(createBudgetDto, 1L);
-       });
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            this.budgetService.create(createBudgetDto, 1L);
+        });
     }
 
     @Test
-    public void testFindById_validId_shouldReturn() {
+    public void testFindById_validId_shouldReturnBudget() {
         Budget budget = this.budgetService.findById(1001L);
 
         assertNotNull(budget);
@@ -79,17 +83,10 @@ public class BudgetServiceIt {
     }
 
     @Test
-    public void testFindById_invalidId_shouldTrowException(){
+    public void testFindById_invalidId_shouldThrowException() {
         assertThrows(ApiException.class, () -> {
             this.budgetService.findById(213L);
         });
-    }
-
-    @Test
-    public void testFindAll_shouldReturnAll() {
-        List<Budget> budgets = this.budgetService.findAll();
-
-        assertEquals(1, budgets.size());
     }
 
 }

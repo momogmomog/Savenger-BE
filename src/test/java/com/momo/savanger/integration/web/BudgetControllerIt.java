@@ -59,7 +59,7 @@ public class BudgetControllerIt extends BaseControllerIt {
 
         super.postOK(Endpoints.BUDGETS, createBudgetDto);
 
-        List<Budget> budgets = this.budgetService.findAll();
+        List<Budget> budgets = this.budgetRepository.findAll();
 
         assertThat(List.of("Food", "Test"))
                 .hasSameElementsAs(
