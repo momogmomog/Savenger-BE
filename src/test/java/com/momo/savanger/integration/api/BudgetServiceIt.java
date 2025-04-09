@@ -1,14 +1,14 @@
 package com.momo.savanger.integration.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.CreateBudgetDto;
+import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +19,7 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -37,7 +38,7 @@ public class BudgetServiceIt {
     private BudgetService budgetService;
 
     @Test
-    public void testSaveBudget_validPayload_shouldSaveBudget() {
+    public void testCreate_validPayload_shouldCreate() {
         CreateBudgetDto createBudgetDto = new CreateBudgetDto();
         createBudgetDto.setBudgetName("Test");
         createBudgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
@@ -48,9 +49,9 @@ public class BudgetServiceIt {
         createBudgetDto.setActive(true);
         createBudgetDto.setAutoRevise(true);
 
-        assertNotNull(this.budgetService.saveBudget(createBudgetDto, 1L));
+        assertNotNull(this.budgetService.create(createBudgetDto, 1L));
 
-        List<Budget> budgets = this.budgetService.findAllBudgets();
+        List<Budget> budgets = this.budgetService.findAll();
 
         assertEquals(2, budgets.size());
 
@@ -61,23 +62,32 @@ public class BudgetServiceIt {
     }
 
     @Test
-    public void testSaveBudget_emptyPayload_shouldReturnNull() {
+    public void testCreate_emptyPayload_shouldReturnNull() {
         CreateBudgetDto createBudgetDto = new CreateBudgetDto();
 
-        assertNull(this.budgetService.saveBudget(createBudgetDto, 1L));
+       assertThrows(DataIntegrityViolationException.class, () -> {
+           this.budgetService.create(createBudgetDto, 1L);
+       });
     }
 
     @Test
-    public void testFindBudgetById_validId_shouldReturnBudget() {
-        Budget budget = this.budgetService.findBudgetById(1001L);
+    public void testFindById_validId_shouldReturn() {
+        Budget budget = this.budgetService.findById(1001L);
 
         assertNotNull(budget);
         assertEquals("Food", budget.getBudgetName());
     }
 
     @Test
-    public void testFindAllBudgets_shouldReturnAllBudgets() {
-        List<Budget> budgets = this.budgetService.findAllBudgets();
+    public void testFindById_invalidId_shouldTrowException(){
+        assertThrows(ApiException.class, () -> {
+            this.budgetService.findById(213L);
+        });
+    }
+
+    @Test
+    public void testFindAll_shouldReturnAll() {
+        List<Budget> budgets = this.budgetService.findAll();
 
         assertEquals(1, budgets.size());
     }

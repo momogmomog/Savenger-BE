@@ -28,7 +28,7 @@ public class BudgetController {
             @AuthenticationPrincipal User user) {
 
         return this.budgetMapper.toBudgetDto(
-                this.budgetService.saveBudget(createBudgetDto, user.getId())
+                this.budgetService.create(createBudgetDto, user.getId())
         );
     }
 }

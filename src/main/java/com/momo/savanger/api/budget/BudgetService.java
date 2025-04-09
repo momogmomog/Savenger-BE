@@ -4,9 +4,9 @@ import java.util.List;
 
 public interface BudgetService {
 
-    Budget findBudgetById(Long id);
+    Budget findById(Long id);
 
-    Budget saveBudget(CreateBudgetDto createBudgetDto, Long ownerId);
+    Budget create(CreateBudgetDto createBudgetDto, Long ownerId);
 
-    List<Budget> findAllBudgets();
+    List<Budget> findAll();
 }

@@ -1,5 +1,7 @@
 package com.momo.savanger.api.budget;
 
+import com.momo.savanger.error.ApiErrorCode;
+import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,14 +16,15 @@ public class BudgetServiceImpl implements BudgetService {
     private final BudgetMapper budgetMapper;
 
     @Override
-    public Budget findBudgetById(Long id) {
-        return this.budgetRepository.findById(id).orElse(null);
+    public Budget findById(Long id) {
+        return this.budgetRepository.findById(id)
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0004));
     }
 
     @Override
-    public Budget saveBudget(CreateBudgetDto createBudgetDto, Long ownerId) {
+    public Budget create(CreateBudgetDto createBudgetDto, Long ownerId) {
 
-        Budget budget = this.budgetMapper.toBudget(createBudgetDto);
+        final Budget budget = this.budgetMapper.toBudget(createBudgetDto);
 
         budget.setOwnerId(ownerId);
 
@@ -32,17 +35,13 @@ public class BudgetServiceImpl implements BudgetService {
             budget.setBalance(BigDecimal.ZERO);
         }
 
-        try {
-            this.budgetRepository.saveAndFlush(budget);
-        } catch (Exception e) {
-            return null;
-        }
+        this.budgetRepository.saveAndFlush(budget);
 
-        return budget;
+        return this.findById(budget.getId());
     }
 
     @Override
-    public List<Budget> findAllBudgets() {
+    public List<Budget> findAll() {
         return this.budgetRepository.findAll();
     }
 }

@@ -1,15 +1,19 @@
 package com.momo.savanger.integration.web;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetRepository;
+import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.CreateBudgetDto;
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +39,12 @@ public class BudgetControllerIt extends BaseControllerIt {
     @Autowired
     private BudgetRepository budgetRepository;
 
+    @Autowired
+    private  BudgetService budgetService;
+
     @Test
     @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
-    public void testSaveBudget_validPayload_shouldSaveBudget() throws Exception {
+    public void testCreate_validPayload_shouldSaveBudget() throws Exception {
 
         CreateBudgetDto createBudgetDto = new CreateBudgetDto();
         createBudgetDto.setBudgetName("Test");
@@ -51,11 +58,18 @@ public class BudgetControllerIt extends BaseControllerIt {
 
 
         super.postOK(Endpoints.BUDGETS, createBudgetDto);
+
+        List<Budget> budgets = this.budgetService.findAll();
+
+        assertThat(List.of("Food", "Test"))
+                .hasSameElementsAs(
+                        budgets.stream().map(Budget::getBudgetName).toList()
+                );
     }
 
     @Test
     @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
-    public void testCreateBudget_InvalidPayload() throws Exception {
+    public void testCreate_InvalidPayload() throws Exception {
         CreateBudgetDto createBudgetDto = new CreateBudgetDto();
 
         super.post(
@@ -104,7 +118,6 @@ public class BudgetControllerIt extends BaseControllerIt {
 
         createBudgetDto.setBudgetName("Test");
         createBudgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
-//        createBudgetDto.setDateStarted(LocalDateTime.parse("32-12-2012 00:00:00"));
 
         final var payloadMap = new HashMap<String, String>();
         payloadMap.put("dateStarted", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
