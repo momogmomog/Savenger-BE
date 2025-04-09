@@ -32,7 +32,7 @@ public class Budget {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String budgetName;
 
     @Column(nullable = false)
     private String recurringRule;
@@ -52,7 +52,7 @@ public class Budget {
     private BigDecimal budgetCap;
 
     @Column(nullable = false)
-    private BigDecimal autoRevise;
+    private Boolean autoRevise;
 
     @Column(nullable = false)
     private Long ownerId;

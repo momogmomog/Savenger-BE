@@ -23,7 +23,7 @@ public class Category {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String categoryName;
 
     private BigDecimal budgetCap;
 

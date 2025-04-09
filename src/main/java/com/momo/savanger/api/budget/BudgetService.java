@@ -2,5 +2,7 @@ package com.momo.savanger.api.budget;
 
 public interface BudgetService {
 
-    Budget findBudgetById(long id);
+    Budget findById(Long id);
+
+    Budget create(CreateBudgetDto createBudgetDto, Long ownerId);
 }
