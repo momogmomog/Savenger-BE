@@ -4,4 +4,6 @@ public interface TagService {
 
     Tag findById(Long id);
 
+    Tag create(CreateTagDto createTagDto);
+
 }
