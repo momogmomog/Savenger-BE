@@ -13,7 +13,6 @@ public class CreateCategoryDto {
     @LengthName
     private String categoryName;
 
-    @NotNull
     private BigDecimal budgetCap;
 
     @NotNull

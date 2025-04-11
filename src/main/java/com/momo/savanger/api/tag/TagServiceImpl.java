@@ -1,5 +1,7 @@
 package com.momo.savanger.api.tag;
 
+import com.momo.savanger.error.ApiErrorCode;
+import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +15,8 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Tag findById(Long id) {
-        return this.tagRepository.findById(id).orElse(null);
+        return this.tagRepository.findById(id)
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0004));
     }
 
     @Override

@@ -12,7 +12,7 @@ public class CreateTagDto {
     @NotNull
     @LengthName
     private String tagName;
-    
+
     private BigDecimal budgetCap;
 
     @NotNull
