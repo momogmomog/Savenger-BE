@@ -2,6 +2,8 @@ package com.momo.savanger.api.budget;
 
 import com.momo.savanger.constants.Lengths;
 import com.momo.savanger.constants.ValidationMessages;
+import com.momo.savanger.constraints.LengthName;
+import com.momo.savanger.constraints.MinValueZero;
 import com.momo.savanger.constraints.NotNull;
 import com.momo.savanger.constraints.RRule;
 import com.momo.savanger.converter.DateTimeConverter;
@@ -14,7 +16,7 @@ import org.hibernate.validator.constraints.Length;
 public class CreateBudgetDto {
 
     @NotNull
-    @Length(min = 1, max = Lengths.MAX_NAME, message = ValidationMessages.TEXT_MUST_BE_BETWEEN)
+    @LengthName
     private String budgetName;
 
     @NotNull
@@ -33,8 +35,10 @@ public class CreateBudgetDto {
     @NotNull
     private Boolean active;
 
+    @MinValueZero
     private BigDecimal balance;
 
+    @MinValueZero
     private BigDecimal budgetCap;
 
     @NotNull

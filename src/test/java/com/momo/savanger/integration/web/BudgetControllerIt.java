@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetRepository;
-import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.CreateBudgetDto;
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
@@ -39,9 +38,6 @@ public class BudgetControllerIt extends BaseControllerIt {
     @Autowired
     private BudgetRepository budgetRepository;
 
-    @Autowired
-    private  BudgetService budgetService;
-
     @Test
     @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
     public void testCreate_validPayload_shouldSaveBudget() throws Exception {
@@ -55,7 +51,6 @@ public class BudgetControllerIt extends BaseControllerIt {
         createBudgetDto.setBudgetCap(BigDecimal.valueOf(323));
         createBudgetDto.setActive(true);
         createBudgetDto.setAutoRevise(true);
-
 
         super.postOK(Endpoints.BUDGETS, createBudgetDto);
 
@@ -76,22 +71,31 @@ public class BudgetControllerIt extends BaseControllerIt {
                 Endpoints.BUDGETS,
                 createBudgetDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(7)),
-                jsonPath("fieldErrors.[?(@.field == \"budgetName\" && @.constraintName == \"NotNull\")]").exists(),
-                jsonPath("fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"NotNull\")]").exists(),
-                jsonPath("fieldErrors.[?(@.field == \"dateStarted\" && @.constraintName == \"NotNull\")]").exists(),
-                jsonPath("fieldErrors.[?(@.field == \"dueDate\" && @.constraintName == \"NotNull\")]").exists(),
-                jsonPath("fieldErrors.[?(@.field == \"active\" && @.constraintName == \"NotNull\")]").exists(),
-                jsonPath("fieldErrors.[?(@.field == \"autoRevise\" && @.constraintName == \"NotNull\")]").exists(),
-                jsonPath("fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"RRule\")]").exists()
+                jsonPath("fieldErrors.length()", is(8)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetName\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetName\" && @.constraintName == \"LengthName\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"dateStarted\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"dueDate\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"active\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"autoRevise\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"RRule\")]").exists()
         );
 
         createBudgetDto.setBudgetName("Test");
         createBudgetDto.setRecurringRule("FREuQ=DAILY;INTERVAL=1");
         createBudgetDto.setDateStarted(LocalDateTime.now());
         createBudgetDto.setDueDate(LocalDateTime.now().plusMonths(5));
-        createBudgetDto.setBalance(BigDecimal.valueOf(243.4));
-        createBudgetDto.setBudgetCap(BigDecimal.valueOf(323));
+        createBudgetDto.setBalance(BigDecimal.valueOf(-4));
+        createBudgetDto.setBudgetCap(BigDecimal.valueOf(-323));
         createBudgetDto.setActive(true);
         createBudgetDto.setAutoRevise(true);
 
@@ -99,21 +103,32 @@ public class BudgetControllerIt extends BaseControllerIt {
                 Endpoints.BUDGETS,
                 createBudgetDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(1)),
-                jsonPath("fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"RRule\")]").exists()
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"balance\" && @.constraintName == \"MinValueZero\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetCap\" && @.constraintName == \"MinValueZero\")]").exists(),
+
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"RRule\")]").exists()
         );
 
         createBudgetDto.setRecurringRule("");
         createBudgetDto.setBudgetName("");
+        createBudgetDto.setBalance(BigDecimal.valueOf(4));
+        createBudgetDto.setBudgetCap(BigDecimal.valueOf(323));
 
         super.post(
                 Endpoints.BUDGETS,
                 createBudgetDto,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(3)),
-                jsonPath("fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"RRule\")]").exists(),
-                jsonPath("fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"Length\")]").exists(),
-                jsonPath("fieldErrors.[?(@.field == \"budgetName\" && @.constraintName == \"Length\")]").exists()
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"RRule\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"Length\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetName\" && @.constraintName == \"LengthName\")]").exists()
         );
 
         createBudgetDto.setBudgetName("Test");
@@ -125,7 +140,8 @@ public class BudgetControllerIt extends BaseControllerIt {
                 Endpoints.BUDGETS,
                 payloadMap,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.[?(@.field == \"dateStarted\" && @.constraintName == \"NotNull\")]").doesNotExist()
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"dateStarted\" && @.constraintName == \"NotNull\")]").doesNotExist()
 
         );
 
@@ -135,7 +151,8 @@ public class BudgetControllerIt extends BaseControllerIt {
                 Endpoints.BUDGETS,
                 payloadMap,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.[?(@.field == \"dateStarted\" && @.constraintName == \"NotNull\")]").exists()
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"dateStarted\" && @.constraintName == \"NotNull\")]").exists()
 
         );
     }
