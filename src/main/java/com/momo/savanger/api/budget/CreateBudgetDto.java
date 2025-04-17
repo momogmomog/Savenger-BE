@@ -3,6 +3,7 @@ package com.momo.savanger.api.budget;
 import com.momo.savanger.constants.Lengths;
 import com.momo.savanger.constants.ValidationMessages;
 import com.momo.savanger.constraints.LengthName;
+import com.momo.savanger.constraints.MinValueZero;
 import com.momo.savanger.constraints.NotNull;
 import com.momo.savanger.constraints.RRule;
 import com.momo.savanger.converter.DateTimeConverter;
@@ -34,8 +35,10 @@ public class CreateBudgetDto {
     @NotNull
     private Boolean active;
 
+    @MinValueZero
     private BigDecimal balance;
 
+    @MinValueZero
     private BigDecimal budgetCap;
 
     @NotNull

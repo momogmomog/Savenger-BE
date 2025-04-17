@@ -125,6 +125,8 @@ public class BudgetServiceIt {
 
         this.budgetService.create(budgetDto, 1L);
 
+        assertTrue(this.budgetRepository.findById(1L).isPresent());
+
         boolean isBudgetValid = this.budgetService.isBudgetValid(1L);
 
         assertFalse(isBudgetValid);
@@ -135,9 +137,9 @@ public class BudgetServiceIt {
 
         User user = this.userRepository.findByUsername("Ignat");
 
-        boolean isBudgetValid = this.budgetService.isUserPermitted(user, 1001L);
+        boolean isUserPermitted = this.budgetService.isUserPermitted(user, 1001L);
 
-        assertTrue(isBudgetValid);
+        assertTrue(isUserPermitted);
     }
 
     @Test
@@ -145,9 +147,9 @@ public class BudgetServiceIt {
 
         User user = this.userRepository.findByUsername("Roza");
 
-        boolean isBudgetValid = this.budgetService.isUserPermitted(user, 1001L);
+        boolean isUserPermitted = this.budgetService.isUserPermitted(user, 1001L);
 
-        assertFalse(isBudgetValid);
+        assertFalse(isUserPermitted);
 
     }
 

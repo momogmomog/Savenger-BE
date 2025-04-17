@@ -39,7 +39,7 @@ public class CategoryControllerIt extends BaseControllerIt {
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
-    public void testCreate_validPayload_shouldSaveBudget() throws Exception {
+    public void testCreate_validPayload_shouldSaveCategory() throws Exception {
 
         CreateCategoryDto categoryDto = new CreateCategoryDto();
         categoryDto.setCategoryName("Test");
@@ -54,6 +54,17 @@ public class CategoryControllerIt extends BaseControllerIt {
                 .hasSameElementsAs(
                         categories.stream().map(Category::getCategoryName).toList()
                 );
+    }
+
+    @Test
+    public void testCreate_withAnonymousUser_shouldReturnException() throws Exception {
+
+        CreateCategoryDto categoryDto = new CreateCategoryDto();
+        categoryDto.setCategoryName("Test");
+        categoryDto.setBudgetCap(BigDecimal.valueOf(323));
+        categoryDto.setBudgetId(1001L);
+
+        super.post(Endpoints.CATEGORIES, categoryDto, HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -81,13 +92,16 @@ public class CategoryControllerIt extends BaseControllerIt {
     public void testCreate_InvalidPayload() throws Exception {
         CreateCategoryDto categoryDto = new CreateCategoryDto();
         categoryDto.setCategoryName("");
+        categoryDto.setBudgetCap(BigDecimal.valueOf(-2));
         categoryDto.setBudgetId(1001L);
 
         super.post(
                 Endpoints.CATEGORIES,
                 categoryDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(2)),
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetCap\" && @.constraintName == \"MinValueZero\")]").exists(),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"categoryName\" && @.constraintName == \"LengthName\")]").exists(),
                 jsonPath(

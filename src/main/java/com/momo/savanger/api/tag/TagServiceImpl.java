@@ -21,7 +21,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Tag create(CreateTagDto createTagDto) {
-        Tag tag = this.tagMapper.toTag(createTagDto);
+        final Tag tag = this.tagMapper.toTag(createTagDto);
 
         if (tag.getBudgetCap() == null) {
             tag.setBudgetCap(BigDecimal.ZERO);

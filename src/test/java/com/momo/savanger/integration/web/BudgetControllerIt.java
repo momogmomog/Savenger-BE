@@ -94,8 +94,8 @@ public class BudgetControllerIt extends BaseControllerIt {
         createBudgetDto.setRecurringRule("FREuQ=DAILY;INTERVAL=1");
         createBudgetDto.setDateStarted(LocalDateTime.now());
         createBudgetDto.setDueDate(LocalDateTime.now().plusMonths(5));
-        createBudgetDto.setBalance(BigDecimal.valueOf(243.4));
-        createBudgetDto.setBudgetCap(BigDecimal.valueOf(323));
+        createBudgetDto.setBalance(BigDecimal.valueOf(-4));
+        createBudgetDto.setBudgetCap(BigDecimal.valueOf(-323));
         createBudgetDto.setActive(true);
         createBudgetDto.setAutoRevise(true);
 
@@ -103,13 +103,20 @@ public class BudgetControllerIt extends BaseControllerIt {
                 Endpoints.BUDGETS,
                 createBudgetDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"balance\" && @.constraintName == \"MinValueZero\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetCap\" && @.constraintName == \"MinValueZero\")]").exists(),
+
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"RRule\")]").exists()
         );
 
         createBudgetDto.setRecurringRule("");
         createBudgetDto.setBudgetName("");
+        createBudgetDto.setBalance(BigDecimal.valueOf(4));
+        createBudgetDto.setBudgetCap(BigDecimal.valueOf(323));
 
         super.post(
                 Endpoints.BUDGETS,

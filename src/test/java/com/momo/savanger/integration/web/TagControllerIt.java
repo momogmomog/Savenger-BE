@@ -39,7 +39,7 @@ public class TagControllerIt extends BaseControllerIt {
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
-    public void testCreate_validPayload_shouldSaveBudget() throws Exception {
+    public void testCreate_validPayload_shouldSaveTag() throws Exception {
 
         CreateTagDto tagDto = new CreateTagDto();
         tagDto.setTagName("Test");
@@ -82,12 +82,16 @@ public class TagControllerIt extends BaseControllerIt {
         CreateTagDto tagDto = new CreateTagDto();
         tagDto.setTagName("");
         tagDto.setBudgetId(1001L);
+        tagDto.setBudgetCap(BigDecimal.valueOf(-43));
 
         super.post(
                 Endpoints.TAGS,
                 tagDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(2)),
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetCap\" && @.constraintName == \"MinValueZero\")]").exists(),
+
                 jsonPath(
                         "fieldErrors.[?(@.field == \"tagName\" && @.constraintName == \"LengthName\")]").exists(),
                 jsonPath(

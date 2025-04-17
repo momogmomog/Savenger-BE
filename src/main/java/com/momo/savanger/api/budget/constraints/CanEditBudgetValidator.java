@@ -2,10 +2,10 @@ package com.momo.savanger.api.budget.constraints;
 
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.user.User;
+import com.momo.savanger.api.util.SecurityUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @RequiredArgsConstructor
 public class CanEditBudgetValidator implements ConstraintValidator<CanEditBudget, Long> {
@@ -19,8 +19,7 @@ public class CanEditBudgetValidator implements ConstraintValidator<CanEditBudget
             return true;
         }
 
-        final User user = (User) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
+        User user = SecurityUtils.getCurrentUser();
 
         return this.budgetService.isUserPermitted(user, budgetId);
     }
