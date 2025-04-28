@@ -17,7 +17,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category findById(Long id) {
         return this.categoryRepository.findById(id)
-                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0004));
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0005));
     }
 
     @Override

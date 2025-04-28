@@ -16,7 +16,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public Tag findById(Long id) {
         return this.tagRepository.findById(id)
-                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0004));
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0006));
     }
 
     @Override
