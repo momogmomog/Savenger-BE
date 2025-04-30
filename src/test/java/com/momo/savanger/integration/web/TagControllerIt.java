@@ -120,4 +120,25 @@ public class TagControllerIt extends BaseControllerIt {
         );
 
     }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.THIRD_USER_USERNAME)
+    public void testCreate_zeroBudgetCap() throws Exception {
+        CreateTagDto tagDto = new CreateTagDto();
+        tagDto.setTagName("");
+        tagDto.setBudgetId(1001L);
+        tagDto.setBudgetCap(BigDecimal.valueOf(0));
+
+        super.post(
+                Endpoints.TAGS,
+                tagDto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(2)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"tagName\" && @.constraintName == \"LengthName\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanEditBudget\")]").exists()
+        );
+
+    }
 }

@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.momo.savanger.api.category.Category;
 import com.momo.savanger.api.category.CategoryRepository;
 import com.momo.savanger.api.category.CreateCategoryDto;
+import com.momo.savanger.api.tag.CreateTagDto;
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
 import java.util.List;
@@ -57,6 +58,7 @@ public class CategoryControllerIt extends BaseControllerIt {
                         categories.stream().map(Category::getCategoryName).toList()
                 );
     }
+
     @Test
     @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
     public void testCreate_validPayloadWithLoggedParticipant_shouldSaveCategory() throws Exception {
@@ -122,6 +124,27 @@ public class CategoryControllerIt extends BaseControllerIt {
                 jsonPath("fieldErrors.length()", is(3)),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"budgetCap\" && @.constraintName == \"MinValueZero\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"categoryName\" && @.constraintName == \"LengthName\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanEditBudget\")]").exists()
+        );
+
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.THIRD_USER_USERNAME)
+    public void testCreate_zeroBudgetCap() throws Exception {
+        CreateCategoryDto categoryDto = new CreateCategoryDto();
+        categoryDto.setCategoryName("");
+        categoryDto.setBudgetId(1001L);
+        categoryDto.setBudgetCap(BigDecimal.valueOf(0));
+
+        super.post(
+                Endpoints.CATEGORIES,
+                categoryDto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(2)),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"categoryName\" && @.constraintName == \"LengthName\")]").exists(),
                 jsonPath(

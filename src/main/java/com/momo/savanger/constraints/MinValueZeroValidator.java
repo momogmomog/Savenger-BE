@@ -17,6 +17,6 @@ public class MinValueZeroValidator implements ConstraintValidator<MinValueZero, 
         if (bigDecimal == null) {
             return true;
         }
-        return bigDecimal.compareTo(BigDecimal.ZERO) > 0;
+        return bigDecimal.compareTo(BigDecimal.ZERO) >= 0;
     }
 }
