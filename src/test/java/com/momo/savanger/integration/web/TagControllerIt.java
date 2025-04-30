@@ -29,6 +29,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Sql("classpath:/sql/user-it-data.sql")
 @Sql("classpath:/sql/budget-it-data.sql")
 @Sql("classpath:/sql/tag-it-data.sql")
+@Sql("classpath:/sql/budgets_participants-it-data.sql")
+@Sql(value = "classpath:/sql/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-tag-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-user-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -39,7 +41,26 @@ public class TagControllerIt extends BaseControllerIt {
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
-    public void testCreate_validPayload_shouldSaveTag() throws Exception {
+    public void testCreate_validPayloadWithLoggedOwner_shouldSaveTag() throws Exception {
+
+        CreateTagDto tagDto = new CreateTagDto();
+        tagDto.setTagName("Test");
+        tagDto.setBudgetCap(BigDecimal.valueOf(323));
+        tagDto.setBudgetId(1001L);
+
+        super.postOK(Endpoints.TAGS, tagDto);
+
+        List<Tag> tags = this.tagRepository.findAll();
+
+        assertThat(List.of("DM", "Test"))
+                .hasSameElementsAs(
+                        tags.stream().map(Tag::getTagName).toList()
+                );
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    public void testCreate_validPayloadWithLoggedParticipant_shouldSaveTag() throws Exception {
 
         CreateTagDto tagDto = new CreateTagDto();
         tagDto.setTagName("Test");
@@ -77,7 +98,7 @@ public class TagControllerIt extends BaseControllerIt {
     }
 
     @Test
-    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    @WithLocalMockedUser(username = Constants.THIRD_USER_USERNAME)
     public void testCreate_InvalidPayload() throws Exception {
         CreateTagDto tagDto = new CreateTagDto();
         tagDto.setTagName("");

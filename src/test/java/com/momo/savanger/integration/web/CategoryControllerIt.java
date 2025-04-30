@@ -29,6 +29,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Sql("classpath:/sql/user-it-data.sql")
 @Sql("classpath:/sql/budget-it-data.sql")
 @Sql("classpath:/sql/category-it-data.sql")
+@Sql("classpath:/sql/budgets_participants-it-data.sql")
+@Sql(value = "classpath:/sql/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-category-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-user-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -39,7 +41,25 @@ public class CategoryControllerIt extends BaseControllerIt {
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
-    public void testCreate_validPayload_shouldSaveCategory() throws Exception {
+    public void testCreate_validPayloadWithLoggedOwner_shouldSaveCategory() throws Exception {
+
+        CreateCategoryDto categoryDto = new CreateCategoryDto();
+        categoryDto.setCategoryName("Test");
+        categoryDto.setBudgetCap(BigDecimal.valueOf(323));
+        categoryDto.setBudgetId(1001L);
+
+        super.postOK(Endpoints.CATEGORIES, categoryDto);
+
+        List<Category> categories = this.categoryRepository.findAll();
+
+        assertThat(List.of("Home", "Test"))
+                .hasSameElementsAs(
+                        categories.stream().map(Category::getCategoryName).toList()
+                );
+    }
+    @Test
+    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    public void testCreate_validPayloadWithLoggedParticipant_shouldSaveCategory() throws Exception {
 
         CreateCategoryDto categoryDto = new CreateCategoryDto();
         categoryDto.setCategoryName("Test");
@@ -88,7 +108,7 @@ public class CategoryControllerIt extends BaseControllerIt {
     }
 
     @Test
-    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    @WithLocalMockedUser(username = Constants.THIRD_USER_USERNAME)
     public void testCreate_InvalidPayload() throws Exception {
         CreateCategoryDto categoryDto = new CreateCategoryDto();
         categoryDto.setCategoryName("");

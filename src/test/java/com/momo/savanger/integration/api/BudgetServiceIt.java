@@ -28,6 +28,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -35,6 +36,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @Sql("classpath:/sql/user-it-data.sql")
 @Sql("classpath:/sql/budget-it-data.sql")
+@Sql("classpath:/sql/budgets_participants-it-data.sql")
+@Sql(value = "classpath:/sql/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-user-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 public class BudgetServiceIt {
@@ -133,7 +136,7 @@ public class BudgetServiceIt {
     }
 
     @Test
-    public void testIsUserPermitted_validId_shouldReturnTrue() {
+    public void testIsUserPermitted_validOwnerId_shouldReturnTrue() {
 
         User user = this.userRepository.findByUsername("Ignat");
 
@@ -143,13 +146,25 @@ public class BudgetServiceIt {
     }
 
     @Test
+    @Transactional
     public void testIsUserPermitted_invalidId_shouldReturnFalse() {
 
-        User user = this.userRepository.findByUsername("Roza");
+        User user = this.userRepository.findByUsername("Coco");
 
         boolean isUserPermitted = this.budgetService.isUserPermitted(user, 1001L);
 
         assertFalse(isUserPermitted);
+
+    }
+
+    @Test
+    @Transactional
+    public void testIsUserPermitted_validParticipantId_shouldReturnTrue() {
+
+        User user = this.userRepository.findByUsername("Roza");
+
+        boolean isUserPermitted = this.budgetService.isUserPermitted(user, 1001L);
+        assertTrue(isUserPermitted);
 
     }
 
