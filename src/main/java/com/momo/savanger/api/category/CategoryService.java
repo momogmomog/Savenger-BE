@@ -4,4 +4,6 @@ public interface CategoryService {
 
     Category findById(Long id);
 
+    Category create(CreateCategoryDto categoryDto);
+
 }

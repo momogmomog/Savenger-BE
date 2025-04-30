@@ -2,13 +2,17 @@ package com.momo.savanger.integration.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetRepository;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.CreateBudgetDto;
+import com.momo.savanger.api.user.User;
+import com.momo.savanger.api.user.UserRepository;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,6 +28,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -31,6 +36,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @Sql("classpath:/sql/user-it-data.sql")
 @Sql("classpath:/sql/budget-it-data.sql")
+@Sql("classpath:/sql/budgets_participants-it-data.sql")
+@Sql(value = "classpath:/sql/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-user-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 public class BudgetServiceIt {
@@ -40,6 +47,9 @@ public class BudgetServiceIt {
 
     @Autowired
     private BudgetRepository budgetRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     public void testCreate_validPayload_shouldCreate() {
@@ -87,6 +97,75 @@ public class BudgetServiceIt {
         assertThrows(ApiException.class, () -> {
             this.budgetService.findById(213L);
         });
+    }
+
+    @Test
+    public void testIsBudgetValid_validId_shouldReturnTrue() {
+
+        boolean isBudgetValid = this.budgetService.isBudgetValid(1001L);
+
+        assertTrue(isBudgetValid);
+    }
+
+    @Test
+    public void testIsBudgetValid_invalidId_shouldReturnFalse() {
+
+        boolean isBudgetValid = this.budgetService.isBudgetValid(1002L);
+
+        assertFalse(isBudgetValid);
+
+    }
+
+    @Test
+    public void testIsBudgetValid_notActive_shouldReturnFalse() {
+        CreateBudgetDto budgetDto = new CreateBudgetDto();
+        budgetDto.setBudgetName("Test");
+        budgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
+        budgetDto.setDateStarted(LocalDateTime.now());
+        budgetDto.setDueDate(LocalDateTime.now().plusMonths(5));
+        budgetDto.setActive(false);
+        budgetDto.setAutoRevise(true);
+
+        this.budgetService.create(budgetDto, 1L);
+
+        assertTrue(this.budgetRepository.findById(1L).isPresent());
+
+        boolean isBudgetValid = this.budgetService.isBudgetValid(1L);
+
+        assertFalse(isBudgetValid);
+    }
+
+    @Test
+    public void testIsUserPermitted_validOwnerId_shouldReturnTrue() {
+
+        User user = this.userRepository.findByUsername("Ignat");
+
+        boolean isUserPermitted = this.budgetService.isUserPermitted(user, 1001L);
+
+        assertTrue(isUserPermitted);
+    }
+
+    @Test
+    @Transactional
+    public void testIsUserPermitted_invalidId_shouldReturnFalse() {
+
+        User user = this.userRepository.findByUsername("Coco");
+
+        boolean isUserPermitted = this.budgetService.isUserPermitted(user, 1001L);
+
+        assertFalse(isUserPermitted);
+
+    }
+
+    @Test
+    @Transactional
+    public void testIsUserPermitted_validParticipantId_shouldReturnTrue() {
+
+        User user = this.userRepository.findByUsername("Roza");
+
+        boolean isUserPermitted = this.budgetService.isUserPermitted(user, 1001L);
+        assertTrue(isUserPermitted);
+
     }
 
 }

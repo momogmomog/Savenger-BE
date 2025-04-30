@@ -12,6 +12,10 @@ public enum ApiErrorCode {
     ERR_0002(HttpStatus.BAD_REQUEST, "Payload contains constraint violations"),
     ERR_0003(HttpStatus.UNAUTHORIZED, "Invalid Credentials"),
     ERR_0004(HttpStatus.NOT_FOUND, "Budget not found"),
+    ERR_0005(HttpStatus.NOT_FOUND, "Category not found"),
+    ERR_0006(HttpStatus.NOT_FOUND, "Tag not found"),
+    ERR_007(HttpStatus.UNAUTHORIZED, "Unauthorized"),
+    ERR_008(HttpStatus.BAD_REQUEST, "User is not logged in"),
     ;
 
     public final HttpStatus status;
