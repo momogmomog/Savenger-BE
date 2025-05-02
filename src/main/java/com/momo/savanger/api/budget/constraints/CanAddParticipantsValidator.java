@@ -17,8 +17,11 @@ public class CanAddParticipantsValidator implements
     }
 
     @Override
-    public boolean isValid(Budget budgetDto,
+    public boolean isValid(Budget budget,
             ConstraintValidatorContext constraintValidatorContext) {
-        return Objects.equals(budgetDto.getOwnerId(), SecurityUtils.getCurrentUser().getId());
+        if (budget == null) {
+            return true;
+        }
+        return Objects.equals(budget.getOwnerId(), SecurityUtils.getCurrentUser().getId());
     }
 }

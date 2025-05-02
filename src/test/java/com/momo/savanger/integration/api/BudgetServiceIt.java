@@ -7,10 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.momo.savanger.api.budget.AssignParticipantDto;
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetRepository;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.CreateBudgetDto;
+import com.momo.savanger.api.budget.UnassignParticipantDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserRepository;
 import com.momo.savanger.error.ApiException;
@@ -166,6 +168,36 @@ public class BudgetServiceIt {
         boolean isUserPermitted = this.budgetService.isUserPermitted(user, 1001L);
         assertTrue(isUserPermitted);
 
+    }
+
+    @Test
+    @Transactional
+    public void testAddParticipant_validPayload_shouldAddParticipant() {
+
+        Budget budget = this.budgetService.findById(1001L);
+
+        AssignParticipantDto participantDto = new AssignParticipantDto();
+        participantDto.setParticipantId(3L);
+        participantDto.setBudgetRef(budget);
+
+        this.budgetService.addParticipant(participantDto);
+
+        assertEquals(2, this.budgetService.findById(1001L).getParticipants().size());
+    }
+
+    @Test
+    @Transactional
+    public void testDeleteParticipant_validPayload_shouldDeleteParticipant() {
+
+        Budget budget = this.budgetService.findById(1001L);
+
+        UnassignParticipantDto participantDto = new UnassignParticipantDto();
+        participantDto.setParticipantId(2L);
+        participantDto.setBudgetRef(budget);
+
+        this.budgetService.deleteParticipant(participantDto);
+
+        assertEquals(0, this.budgetService.findById(1001L).getParticipants().size());
     }
 
 }

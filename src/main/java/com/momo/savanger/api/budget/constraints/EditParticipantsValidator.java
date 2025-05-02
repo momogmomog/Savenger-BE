@@ -2,7 +2,7 @@ package com.momo.savanger.api.budget.constraints;
 
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetService;
-import com.momo.savanger.api.budget.converter.IAssignParticipantDto;
+import com.momo.savanger.api.budget.IAssignParticipantDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
 import com.momo.savanger.constants.ValidationMessages;

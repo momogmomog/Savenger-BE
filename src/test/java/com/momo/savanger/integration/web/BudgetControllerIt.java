@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetRepository;
+import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.CreateBudgetDto;
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +33,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @Sql("classpath:/sql/user-it-data.sql")
 @Sql("classpath:/sql/budget-it-data.sql")
+@Sql("classpath:/sql/budgets_participants-it-data.sql")
+@Sql(value = "classpath:/sql/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-user-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 public class BudgetControllerIt extends BaseControllerIt {
 
     @Autowired
     private BudgetRepository budgetRepository;
+    @Autowired
+    private BudgetService budgetService;
 
     @Test
     @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
@@ -142,7 +148,6 @@ public class BudgetControllerIt extends BaseControllerIt {
                 HttpStatus.BAD_REQUEST,
                 jsonPath(
                         "fieldErrors.[?(@.field == \"dateStarted\" && @.constraintName == \"NotNull\")]").doesNotExist()
-
         );
 
         payloadMap.put("dateStarted", "el data");
@@ -153,8 +158,163 @@ public class BudgetControllerIt extends BaseControllerIt {
                 HttpStatus.BAD_REQUEST,
                 jsonPath(
                         "fieldErrors.[?(@.field == \"dateStarted\" && @.constraintName == \"NotNull\")]").exists()
-
         );
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testAddParticipant_validPayload_shouldAddParticipantToBudget() throws Exception {
+
+        Map<String, Long> data = new HashMap<>();
+        data.put("participantId", 3L);
+        data.put("budgetId", 1001L);
+
+        super.postOK("/budgets/1001/participants", data);
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    public void testAddParticipant_invalidBudgetOwner_shouldThrowException() throws Exception {
+
+        Map<String, Long> data = new HashMap<>();
+        data.put("participantId", 3L);
+        data.put("budgetId", 1001L);
+
+        super.post("/budgets/1001/participants",
+                data,
+                HttpStatus.BAD_REQUEST,
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetRef\" && @.constraintName == \"CanAddParticipants\")]").exists());
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testAddParticipant_InvalidPayload_shouldThrowException() throws Exception {
+
+        Map<String, Long> data = new HashMap<>();
+
+        data.put("participantId", 3L);
+        data.put("budgetId", 100L);
+
+        super.post("/budgets/100/participants",
+                data,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(2)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"EditParticipants\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetRef\" && @.constraintName == \"NotNull\")]").exists()
+        );
+
+        data.put("participantId", 4L);
+        data.put("budgetId", 1001L);
+
+        super.post("/budgets/1001/participants",
+                data,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"EditParticipants\")]").exists()
+        );
+
+        data.put("participantId", 1L);
+
+        super.post("/budgets/1001/participants",
+                data,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"EditParticipants\")]").exists()
+        );
+
+        data.put("participantId", 2L);
+
+        super.post("/budgets/1001/participants",
+                data,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"EditParticipants\")]").exists()
+        );
+
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testDeleteParticipant_validPayload_shouldDeleteParticipantSuccessfully() throws Exception {
+
+        Map<String, Long> data = new HashMap<>();
+        data.put("participantId", 2L);
+        data.put("budgetId", 1001L);
+
+        super.postOK("/budgets/1001/participants/delete", data);
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    public void testDeleteParticipant_invalidBudgetOwner_shouldThrowException() throws Exception {
+
+        Map<String, Long> data = new HashMap<>();
+        data.put("participantId", 3L);
+        data.put("budgetId", 1001L);
+
+        super.post("/budgets/1001/participants",
+                data,
+                HttpStatus.BAD_REQUEST,
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetRef\" && @.constraintName == \"CanAddParticipants\")]").exists());
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testDeleteParticipant_InvalidPayload_shouldThrowException() throws Exception {
+
+        Map<String, Long> data = new HashMap<>();
+
+        data.put("participantId", 3L);
+        data.put("budgetId", 100L);
+
+        super.post("/budgets/100/participants/delete",
+                data,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(2)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"EditParticipants\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetRef\" && @.constraintName == \"NotNull\")]").exists()
+        );
+
+        data.put("participantId", 4L);
+        data.put("budgetId", 1001L);
+
+        super.post("/budgets/1001/participants/delete",
+                data,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"EditParticipants\")]").exists()
+        );
+
+        data.put("participantId", 1L);
+
+        super.post("/budgets/1001/participants/delete",
+                data,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"EditParticipants\")]").exists()
+        );
+
+        data.put("participantId", 3L);
+
+        super.post("/budgets/1001/participants/delete",
+                data,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"EditParticipants\")]").exists()
+        );
+
     }
 
 }
