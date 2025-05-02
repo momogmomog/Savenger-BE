@@ -7,4 +7,6 @@ public class Endpoints {
     public static final String BUDGETS = "/budgets";
     public static final String CATEGORIES = "/categories";
     public static final String TAGS = "/tags";
+    public static final String ASSIGN_PARTICIPANT = "/budgets/{id}/participants";
+    public static final String UNASSIGN_PARTICIPANT = "/budgets/{id}/participants/delete";
 }
