@@ -1,4 +1,4 @@
-package com.momo.savanger.api.budget;
+package com.momo.savanger.api.budget.dto;
 
 import com.momo.savanger.converter.DateTimeConverter;
 import java.math.BigDecimal;

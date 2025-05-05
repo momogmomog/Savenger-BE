@@ -99,21 +99,22 @@ public abstract class BaseControllerIt {
                 .andExpect(matchAll(matchers));
     }
 
-    protected void deleteOK(String endpoint, ResultMatcher... matchers) throws Exception {
-        this.delete(endpoint, HttpStatus.OK, matchers);
+    protected void deleteOK(String endpoint, Object body, ResultMatcher... matchers) throws Exception {
+        this.delete(endpoint, body, HttpStatus.OK, matchers);
     }
 
-    protected void delete(String endpoint, HttpStatus status, ResultMatcher... matchers)
+    protected void delete(String endpoint, Object body, HttpStatus status, ResultMatcher... matchers)
             throws Exception {
-        this.delete(endpoint, status, new HttpHeaders(), matchers);
+        this.delete(endpoint, body, status, new HttpHeaders(), matchers);
     }
 
-    protected void delete(String endpoint, HttpStatus status,
+    protected void delete(String endpoint, Object body, HttpStatus status,
             HttpHeaders headers, ResultMatcher... matchers) throws Exception {
         this.mvc.perform(MockMvcRequestBuilders
                         .delete(endpoint, this.pathVariables.toArray())
                         .params(this.params)
                         .headers(headers)
+                        .content(this.writeObject(body))
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andExpect(status().is(status.value()))
                 .andExpect(matchAll(matchers));

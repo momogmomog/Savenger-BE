@@ -8,16 +8,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Constraint(validatedBy = EditParticipantsValidator.class)
-public @interface EditParticipants {
+@Target(ElementType.FIELD)
+@Constraint(validatedBy = IsBudgetOwnerValidator.class)
+public @interface IsBudgetOwner {
 
-    String message() default "The participant cannot be added or edited";
+    String message() default "User is not allowed to add participants";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
-    boolean expectedResult();
-
 }

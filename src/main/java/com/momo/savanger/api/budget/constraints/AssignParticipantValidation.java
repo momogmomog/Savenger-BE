@@ -8,13 +8,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-@Constraint(validatedBy = CanAddParticipantsValidator.class)
-public @interface CanAddParticipants {
+@Target(ElementType.TYPE)
+@Constraint(validatedBy = AssignParticipantValidationValidator.class)
+public @interface AssignParticipantValidation {
 
-    String message() default "User is not allowed to add participants";
+    String message() default "The participant cannot be added or edited";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
+    boolean requireUserAssigned();
+
 }

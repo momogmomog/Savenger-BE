@@ -2,40 +2,37 @@ package com.momo.savanger.api.budget.constraints;
 
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetService;
-import com.momo.savanger.api.budget.IAssignParticipantDto;
+import com.momo.savanger.api.budget.dto.IAssignParticipantDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
 import com.momo.savanger.constants.ValidationMessages;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
 @RequiredArgsConstructor
-public class EditParticipantsValidator implements
-        ConstraintValidator<EditParticipants, IAssignParticipantDto> {
+public class AssignParticipantValidationValidator implements
+        ConstraintValidator<AssignParticipantValidation, IAssignParticipantDto> {
 
-    private String message;
-    private boolean expectedResult;
+    private boolean requiredUserAssigned;
 
     private final BudgetService budgetService;
 
     private final UserService userService;
 
     @Override
-    public void initialize(EditParticipants constraintAnnotation) {
-        message = constraintAnnotation.message();
-        expectedResult = constraintAnnotation.expectedResult();
+    public void initialize(AssignParticipantValidation constraintAnnotation) {
+        requiredUserAssigned = constraintAnnotation.requireUserAssigned();
     }
 
     @Override
     public boolean isValid(IAssignParticipantDto dto,
             ConstraintValidatorContext context) {
-
-        boolean valid = true;
 
         try {
             if (dto.getBudgetRef() == null) {
@@ -44,11 +41,14 @@ public class EditParticipantsValidator implements
 
             final Budget budget = dto.getBudgetRef();
 
-            final User participant = this.userService.findById(dto.getParticipantId());
+            final Optional<User> maybeParticipant = this.userService.findById(
+                    dto.getParticipantId());
 
-            if (participant == null) {
+            if (maybeParticipant.isEmpty()) {
                 return this.fail(context, ValidationMessages.USER_DOESNT_EXIST);
             }
+
+            final User participant = maybeParticipant.get();
 
             if (Objects.equals(participant.getId(), budget.getOwnerId())) {
                 return this.fail(context, ValidationMessages.OWNER_CANNOT_BE_EDIT);
@@ -56,17 +56,16 @@ public class EditParticipantsValidator implements
 
             boolean isParticipantExist = budget.getParticipants().contains(participant);
 
-            if (!expectedResult && isParticipantExist) {
+            if (!requiredUserAssigned && isParticipantExist) {
                 return this.fail(context, ValidationMessages.ALREADY_PARTICIPANT);
-            } else if (expectedResult && !isParticipantExist) {
+            } else if (requiredUserAssigned && !isParticipantExist) {
                 return this.fail(context, ValidationMessages.PARTICIPANT_NOT_EXIST);
             }
 
         } catch (Exception ignored) {
         }
 
-        return valid;
-
+        return true;
     }
 
     private boolean fail(ConstraintValidatorContext context, String msg) {

@@ -16,7 +16,7 @@ public enum ApiErrorCode {
     ERR_0006(HttpStatus.NOT_FOUND, "Tag not found"),
     ERR_007(HttpStatus.UNAUTHORIZED, "Unauthorized"),
     ERR_008(HttpStatus.BAD_REQUEST, "User is not logged in"),
-    ;
+    ERR_009(HttpStatus.NOT_FOUND, "User not found");
 
     public final HttpStatus status;
     public final String message;

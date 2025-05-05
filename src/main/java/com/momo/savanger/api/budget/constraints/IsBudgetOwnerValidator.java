@@ -8,11 +8,11 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class CanAddParticipantsValidator implements
-        ConstraintValidator<CanAddParticipants, Budget> {
+public class IsBudgetOwnerValidator implements
+        ConstraintValidator<IsBudgetOwner, Budget> {
 
     @Override
-    public void initialize(CanAddParticipants constraintAnnotation) {
+    public void initialize(IsBudgetOwner constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 

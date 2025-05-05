@@ -1,14 +1,15 @@
-package com.momo.savanger.api.budget;
+package com.momo.savanger.api.budget.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.momo.savanger.api.budget.constraints.CanAddParticipants;
-import com.momo.savanger.api.budget.constraints.EditParticipants;
+import com.momo.savanger.api.budget.Budget;
+import com.momo.savanger.api.budget.constraints.AssignParticipantValidation;
+import com.momo.savanger.api.budget.constraints.IsBudgetOwner;
 import com.momo.savanger.api.budget.converter.ValidBudgetConverter;
 import com.momo.savanger.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@EditParticipants(expectedResult = false)
+@AssignParticipantValidation(requireUserAssigned = false)
 public class AssignParticipantDto implements IAssignParticipantDto {
 
     @NotNull
@@ -17,6 +18,6 @@ public class AssignParticipantDto implements IAssignParticipantDto {
     @NotNull
     @JsonProperty("budgetId")
     @ValidBudgetConverter
-    @CanAddParticipants
+    @IsBudgetOwner
     private Budget budgetRef;
 }

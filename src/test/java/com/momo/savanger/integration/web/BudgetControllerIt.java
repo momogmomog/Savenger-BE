@@ -2,12 +2,14 @@ package com.momo.savanger.integration.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetRepository;
 import com.momo.savanger.api.budget.BudgetService;
-import com.momo.savanger.api.budget.CreateBudgetDto;
+import com.momo.savanger.api.budget.dto.CreateBudgetDto;
+import com.momo.savanger.api.user.User;
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -165,11 +167,15 @@ public class BudgetControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testAddParticipant_validPayload_shouldAddParticipantToBudget() throws Exception {
 
+        assertEquals(1, this.budgetService.findIfValid(1001L).get().getParticipants().size());
+
         Map<String, Long> data = new HashMap<>();
         data.put("participantId", 3L);
         data.put("budgetId", 1001L);
 
         super.postOK("/budgets/1001/participants", data);
+
+        assertEquals(2, this.budgetService.findIfValid(1001L).get().getParticipants().size());
     }
 
     @Test
@@ -184,7 +190,7 @@ public class BudgetControllerIt extends BaseControllerIt {
                 data,
                 HttpStatus.BAD_REQUEST,
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"budgetRef\" && @.constraintName == \"CanAddParticipants\")]").exists());
+                        "fieldErrors.[?(@.field == \"budgetRef\" && @.constraintName == \"IsBudgetOwner\")]").exists());
     }
 
     @Test
@@ -201,20 +207,20 @@ public class BudgetControllerIt extends BaseControllerIt {
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(2)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"EditParticipants\")]").exists(),
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"AssignParticipantValidation\" && @.message == \"Missing or invalid budget\")]").exists(),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"budgetRef\" && @.constraintName == \"NotNull\")]").exists()
         );
 
-        data.put("participantId", 4L);
         data.put("budgetId", 1001L);
+        data.put("participantId", 4L);
 
         super.post("/budgets/1001/participants",
                 data,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"EditParticipants\")]").exists()
+                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"AssignParticipantValidation\" && @.message == \"User does not exist.\")]").exists()
         );
 
         data.put("participantId", 1L);
@@ -224,7 +230,7 @@ public class BudgetControllerIt extends BaseControllerIt {
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"EditParticipants\")]").exists()
+                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"AssignParticipantValidation\" && @.message == \"Owner cannot be edit.\")]").exists()
         );
 
         data.put("participantId", 2L);
@@ -234,7 +240,7 @@ public class BudgetControllerIt extends BaseControllerIt {
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"EditParticipants\")]").exists()
+                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"AssignParticipantValidation\" && @.message == \"This user is already a participant.\")]").exists()
         );
 
     }
@@ -243,11 +249,15 @@ public class BudgetControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testDeleteParticipant_validPayload_shouldDeleteParticipantSuccessfully() throws Exception {
 
+        assertEquals(1, this.budgetService.findIfValid(1001L).get().getParticipants().size());
+
         Map<String, Long> data = new HashMap<>();
         data.put("participantId", 2L);
         data.put("budgetId", 1001L);
 
-        super.postOK("/budgets/1001/participants/delete", data);
+        super.deleteOK("/budgets/1001/participants", data);
+
+        assertEquals(0, this.budgetService.findIfValid(1001L).get().getParticipants().size());
     }
 
     @Test
@@ -255,14 +265,15 @@ public class BudgetControllerIt extends BaseControllerIt {
     public void testDeleteParticipant_invalidBudgetOwner_shouldThrowException() throws Exception {
 
         Map<String, Long> data = new HashMap<>();
-        data.put("participantId", 3L);
+        data.put("participantId", 2L);
         data.put("budgetId", 1001L);
 
-        super.post("/budgets/1001/participants",
+        super.delete("/budgets/1001/participants",
                 data,
                 HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"budgetRef\" && @.constraintName == \"CanAddParticipants\")]").exists());
+                        "fieldErrors.[?(@.field == \"budgetRef\" && @.constraintName == \"IsBudgetOwner\")]").exists());
     }
 
     @Test
@@ -274,45 +285,45 @@ public class BudgetControllerIt extends BaseControllerIt {
         data.put("participantId", 3L);
         data.put("budgetId", 100L);
 
-        super.post("/budgets/100/participants/delete",
+        super.delete("/budgets/100/participants",
                 data,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(2)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"EditParticipants\")]").exists(),
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"AssignParticipantValidation\" && @.message == \"Missing or invalid budget\")]").exists(),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"budgetRef\" && @.constraintName == \"NotNull\")]").exists()
         );
 
-        data.put("participantId", 4L);
         data.put("budgetId", 1001L);
+        data.put("participantId", 4L);
 
-        super.post("/budgets/1001/participants/delete",
+        super.delete("/budgets/1001/participants",
                 data,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"EditParticipants\")]").exists()
+                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"AssignParticipantValidation\" && @.message == \"User does not exist.\")]").exists()
         );
 
         data.put("participantId", 1L);
 
-        super.post("/budgets/1001/participants/delete",
+        super.delete("/budgets/1001/participants",
                 data,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"EditParticipants\")]").exists()
+                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"AssignParticipantValidation\" && @.message == \"Owner cannot be edit.\")]").exists()
         );
 
         data.put("participantId", 3L);
 
-        super.post("/budgets/1001/participants/delete",
+        super.delete("/budgets/1001/participants",
                 data,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"EditParticipants\")]").exists()
+                        "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"AssignParticipantValidation\" && @.message == \"Participant does not exist.\")]").exists()
         );
 
     }

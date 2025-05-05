@@ -1,18 +1,19 @@
 package com.momo.savanger.web;
 
-import com.momo.savanger.api.budget.AssignParticipantDto;
 import com.momo.savanger.api.budget.Budget;
-import com.momo.savanger.api.budget.BudgetDto;
 import com.momo.savanger.api.budget.BudgetMapper;
 import com.momo.savanger.api.budget.BudgetService;
-import com.momo.savanger.api.budget.CreateBudgetDto;
-import com.momo.savanger.api.budget.UnassignParticipantDto;
+import com.momo.savanger.api.budget.dto.AssignParticipantDto;
+import com.momo.savanger.api.budget.dto.BudgetDto;
+import com.momo.savanger.api.budget.dto.CreateBudgetDto;
+import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.constants.Endpoints;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,7 +48,7 @@ public class BudgetController {
         return budget.getParticipants().size();
     }
 
-    @PostMapping(Endpoints.UNASSIGN_PARTICIPANT)
+    @DeleteMapping(Endpoints.ASSIGN_PARTICIPANT)
     public Integer unassignParticipants(@PathVariable Long id,
             @Valid @RequestBody UnassignParticipantDto dto) {
 

@@ -2,8 +2,12 @@ package com.momo.savanger.api.budget;
 
 import static com.momo.savanger.api.budget.BudgetSpecifications.ownerIdEquals;
 
+import com.momo.savanger.api.budget.dto.AssignParticipantDto;
+import com.momo.savanger.api.budget.dto.CreateBudgetDto;
+import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
+import com.momo.savanger.constants.EntityGraphs;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
@@ -35,7 +39,10 @@ public class BudgetServiceImpl implements BudgetService {
         final Specification<Budget> specification = BudgetSpecifications.idEquals(id)
                 .and(BudgetSpecifications.isActive());
 
-        final List<Budget> budgets = this.budgetRepository.findAll(specification, null);
+        final List<Budget> budgets = this.budgetRepository.findAll(
+                specification,
+                EntityGraphs.BUDGET_ALL
+        );
         return budgets.stream().findFirst();
     }
 
@@ -84,7 +91,7 @@ public class BudgetServiceImpl implements BudgetService {
     public void addParticipant(AssignParticipantDto dto) {
         final Budget budget = this.findById(dto.getBudgetRef().getId());
 
-        final User participant = this.userService.findById(dto.getParticipantId());
+        final User participant = this.userService.getById(dto.getParticipantId());
 
         budget.getParticipants().add(participant);
 
@@ -96,7 +103,7 @@ public class BudgetServiceImpl implements BudgetService {
     public void deleteParticipant(UnassignParticipantDto dto) {
         final Budget budget = this.findById(dto.getBudgetRef().getId());
 
-        final User participant = this.userService.findById(dto.getParticipantId());
+        final User participant = this.userService.getById(dto.getParticipantId());
 
         budget.getParticipants().remove(participant);
 
