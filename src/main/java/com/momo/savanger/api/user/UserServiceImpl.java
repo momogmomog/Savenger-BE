@@ -1,5 +1,8 @@
 package com.momo.savanger.api.user;
 
+import com.momo.savanger.error.ApiErrorCode;
+import com.momo.savanger.error.ApiException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,5 +22,16 @@ public class UserServiceImpl implements UserService {
         }
 
         return user;
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return this.userRepository.findById(id);
+    }
+
+    @Override
+    public User getById(Long id) {
+        return this.userRepository.findById(id)
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_009));
     }
 }

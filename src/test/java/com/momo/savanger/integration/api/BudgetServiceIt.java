@@ -10,13 +10,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetRepository;
 import com.momo.savanger.api.budget.BudgetService;
-import com.momo.savanger.api.budget.CreateBudgetDto;
+import com.momo.savanger.api.budget.dto.AssignParticipantDto;
+import com.momo.savanger.api.budget.dto.CreateBudgetDto;
+import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserRepository;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -166,6 +169,54 @@ public class BudgetServiceIt {
         boolean isUserPermitted = this.budgetService.isUserPermitted(user, 1001L);
         assertTrue(isUserPermitted);
 
+    }
+
+    @Test
+    @Transactional
+    public void testAddParticipant_validPayload_shouldAddParticipant() {
+
+        assertEquals(1, this.budgetService.findById(1001L).getParticipants().size());
+
+        Budget budget = this.budgetService.findById(1001L);
+
+        AssignParticipantDto participantDto = new AssignParticipantDto();
+        participantDto.setParticipantId(3L);
+        participantDto.setBudgetRef(budget);
+
+        this.budgetService.addParticipant(participantDto);
+
+        assertEquals(2, this.budgetService.findById(1001L).getParticipants().size());
+    }
+
+    @Test
+    @Transactional
+    public void testDeleteParticipant_validPayload_shouldDeleteParticipant() {
+
+        assertEquals(1, this.budgetService.findById(1001L).getParticipants().size());
+
+        Budget budget = this.budgetService.findById(1001L);
+
+        UnassignParticipantDto participantDto = new UnassignParticipantDto();
+        participantDto.setParticipantId(2L);
+        participantDto.setBudgetRef(budget);
+
+        this.budgetService.deleteParticipant(participantDto);
+
+        assertEquals(0, this.budgetService.findById(1001L).getParticipants().size());
+    }
+
+    @Test
+    public void testFindIfValid_validId_shouldReturnBudget() {
+        Optional<Budget> budget = this.budgetService.findIfValid(1001L);
+
+        assertNotNull(budget);
+    }
+
+    @Test
+    public void testFindIfValid_invalidId_shouldReturnBudget() {
+        Optional<Budget> budget = this.budgetService.findIfValid(1003L);
+
+        assertTrue(budget.isEmpty());
     }
 
 }
