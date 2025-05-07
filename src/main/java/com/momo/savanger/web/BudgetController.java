@@ -37,7 +37,7 @@ public class BudgetController {
         );
     }
 
-    @PostMapping(Endpoints.ASSIGN_PARTICIPANT)
+    @PostMapping(Endpoints.PARTICIPANTS)
     public Integer assignParticipants(@PathVariable Long id,
             @Valid @RequestBody AssignParticipantDto dto) {
 
@@ -48,7 +48,7 @@ public class BudgetController {
         return budget.getParticipants().size();
     }
 
-    @DeleteMapping(Endpoints.ASSIGN_PARTICIPANT)
+    @DeleteMapping(Endpoints.PARTICIPANTS)
     public Integer unassignParticipants(@PathVariable Long id,
             @Valid @RequestBody UnassignParticipantDto dto) {
 
