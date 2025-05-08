@@ -2,7 +2,6 @@ package com.momo.savanger.api.transaction;
 
 import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.user.User;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,10 +33,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         transaction.setUserId(user.getId());
         transaction.setRevised(false);
-
-        if (transaction.getAmount() == null) {
-            transaction.setAmount(BigDecimal.ZERO);
-        }
 
         if (!dto.getTagIds().isEmpty()) {
             transaction.setTags(this.tagService.findByBudgetAndIdContaining(

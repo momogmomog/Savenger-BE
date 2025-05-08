@@ -37,15 +37,13 @@ public class ValidTransactionDtoValidator implements
                     ValidationMessages.FIELD_IS_NULL_OR_INVALID);
         }
 
-        boolean valid = this.categoryService.isCategoryValid(dto.getCategoryId(), dto.getBudgetId());
-
-
         if (!this.categoryService.isCategoryValid(dto.getCategoryId(), dto.getBudgetId())) {
             return this.fail(constraintValidatorContext, "categoryId",
                     ValidationMessages.CATEGORY_NOT_EXIST);
         }
 
-        List<Tag> tags = this.tagService.findByBudgetAndIdContaining(dto.getTagIds(), dto.getBudgetId());
+        final List<Tag> tags = this.tagService.findByBudgetAndIdContaining(dto.getTagIds(),
+                dto.getBudgetId());
 
         if (tags.size() != dto.getTagIds().size()) {
             final List<Long> invalidIds = dto
@@ -55,7 +53,7 @@ public class ValidTransactionDtoValidator implements
                     .toList();
 
             return this.fail(constraintValidatorContext, "tags",
-                    String.format("Invalid tags: %s", String.join(",", invalidIds.toString())));
+                    String.format("Invalid tags: %s", invalidIds));
         }
 
         return true;

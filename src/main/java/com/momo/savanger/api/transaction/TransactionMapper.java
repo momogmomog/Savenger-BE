@@ -1,6 +1,5 @@
 package com.momo.savanger.api.transaction;
 
-import com.momo.savanger.api.tag.Tag;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

@@ -38,7 +38,6 @@ public class CreateTransactionDto {
     @CanEditBudget
     private Long budgetId;
 
-    @NotNull
     private List<Long> tagIds;
 
     public List<Long> getTagIds() {
