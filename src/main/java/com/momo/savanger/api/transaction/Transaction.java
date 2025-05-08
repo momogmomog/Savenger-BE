@@ -1,18 +1,25 @@
 package com.momo.savanger.api.transaction;
 
+import com.momo.savanger.api.tag.Tag;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.ToString.Exclude;
 
 @Entity
 @Table(name = "transactions")
@@ -49,5 +56,12 @@ public class Transaction {
 
     @Column(nullable = false)
     private Long budgetId;
+
+    @Exclude
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "transactions_tags",
+            joinColumns = @JoinColumn(name = "transaction_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
+    private List<Tag> tags;
 
 }

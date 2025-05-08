@@ -3,7 +3,9 @@ package com.momo.savanger.api.tag;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,5 +32,13 @@ public class TagServiceImpl implements TagService {
         this.tagRepository.saveAndFlush(tag);
 
         return this.findById(tag.getId());
+    }
+
+    @Override
+    public List<Tag> findByBudgetAndIdContaining(List<Long> tagId, Long budgetId) {
+        final Specification<Tag> specification = TagSpecification.idIn(tagId)
+                .and(TagSpecification.budgetIdEquals(budgetId));
+
+        return this.tagRepository.findAll(specification, null);
     }
 }

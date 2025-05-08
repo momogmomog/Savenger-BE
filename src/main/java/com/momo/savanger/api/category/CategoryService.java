@@ -6,4 +6,5 @@ public interface CategoryService {
 
     Category create(CreateCategoryDto categoryDto);
 
+    boolean isCategoryValid(Long categoryId, Long budgetId);
 }
