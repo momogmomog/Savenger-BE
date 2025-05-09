@@ -82,7 +82,6 @@ public class BudgetServiceImpl implements BudgetService {
                         ownerIdEquals(user.getId())
                                 .or(BudgetSpecifications.containsParticipant(user.getId()))
                 );
-
         return this.budgetRepository.exists(specification);
     }
 

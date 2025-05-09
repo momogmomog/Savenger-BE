@@ -8,4 +8,5 @@ public class Endpoints {
     public static final String CATEGORIES = "/categories";
     public static final String TAGS = "/tags";
     public static final String PARTICIPANTS = "/budgets/{id}/participants";
+    public static final String TRANSACTIONS = "/transactions";
 }

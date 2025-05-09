@@ -4,6 +4,7 @@ import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,5 +33,13 @@ public class CategoryServiceImpl implements CategoryService {
         this.categoryRepository.saveAndFlush(category);
 
         return this.findById(category.getId());
+    }
+
+    @Override
+    public boolean isCategoryValid(Long categoryId, Long budgetId) {
+        final Specification<Category> specification = CategorySpecification.idEquals(categoryId)
+                .and(CategorySpecification.budgetIdEquals(budgetId));
+
+        return this.categoryRepository.exists(specification);
     }
 }

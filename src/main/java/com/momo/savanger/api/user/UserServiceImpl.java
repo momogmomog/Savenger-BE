@@ -32,6 +32,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getById(Long id) {
         return this.userRepository.findById(id)
-                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_009));
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0009));
     }
 }
