@@ -44,14 +44,14 @@ public class TagServiceIt {
     @Test
     public void testCreate_validPayload_shouldSaveTag() {
         CreateTagDto tagDto = new CreateTagDto();
-        tagDto.setTagName("Tok");
+        tagDto.setTagName("Voda");
         tagDto.setBudgetId(1001L);
 
         this.tagService.create(tagDto);
 
         List<Tag> tags = this.tagRepository.findAll();
 
-        assertThat(List.of("DM", "Tok"))
+        assertThat(List.of("DM", "Tok", "Voda"))
                 .hasSameElementsAs(
                         tags.stream().map(Tag::getTagName).toList()
                 );

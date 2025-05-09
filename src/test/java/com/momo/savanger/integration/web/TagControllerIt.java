@@ -37,7 +37,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 public class TagControllerIt extends BaseControllerIt {
 
     @Autowired
-    TagRepository tagRepository;
+    private TagRepository tagRepository;
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
@@ -52,7 +52,7 @@ public class TagControllerIt extends BaseControllerIt {
 
         List<Tag> tags = this.tagRepository.findAll();
 
-        assertThat(List.of("DM", "Test"))
+        assertThat(List.of("DM", "Test", "Tok"))
                 .hasSameElementsAs(
                         tags.stream().map(Tag::getTagName).toList()
                 );
@@ -71,7 +71,7 @@ public class TagControllerIt extends BaseControllerIt {
 
         List<Tag> tags = this.tagRepository.findAll();
 
-        assertThat(List.of("DM", "Test"))
+        assertThat(List.of("DM", "Test", "Tok"))
                 .hasSameElementsAs(
                         tags.stream().map(Tag::getTagName).toList()
                 );

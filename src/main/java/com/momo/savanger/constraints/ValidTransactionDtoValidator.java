@@ -32,11 +32,6 @@ public class ValidTransactionDtoValidator implements
             return true;
         }
 
-        if (dto.getCategoryId() == null) {
-            return this.fail(constraintValidatorContext, "categoryId",
-                    ValidationMessages.FIELD_IS_NULL_OR_INVALID);
-        }
-
         if (!this.categoryService.isCategoryValid(dto.getCategoryId(), dto.getBudgetId())) {
             return this.fail(constraintValidatorContext, "categoryId",
                     ValidationMessages.CATEGORY_NOT_EXIST);
@@ -52,7 +47,7 @@ public class ValidTransactionDtoValidator implements
                     .filter(tid -> tags.stream().noneMatch(tag -> tag.getId().equals(tid)))
                     .toList();
 
-            return this.fail(constraintValidatorContext, "tags",
+            return this.fail(constraintValidatorContext, "tagIds",
                     String.format("Invalid tags: %s", invalidIds));
         }
 

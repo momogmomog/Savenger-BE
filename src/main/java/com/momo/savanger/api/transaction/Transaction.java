@@ -41,7 +41,7 @@ public class Transaction {
     private BigDecimal amount;
 
     @Column(nullable = false)
-    private LocalDateTime date;
+    private LocalDateTime dateCreated;
 
     private String comment;
 

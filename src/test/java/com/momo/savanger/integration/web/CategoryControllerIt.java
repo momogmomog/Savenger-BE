@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.momo.savanger.api.category.Category;
 import com.momo.savanger.api.category.CategoryRepository;
 import com.momo.savanger.api.category.CreateCategoryDto;
-import com.momo.savanger.api.tag.CreateTagDto;
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
 import java.util.List;
@@ -38,7 +37,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 public class CategoryControllerIt extends BaseControllerIt {
 
     @Autowired
-    CategoryRepository categoryRepository;
+    private CategoryRepository categoryRepository;
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)

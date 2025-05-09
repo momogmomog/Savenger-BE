@@ -11,6 +11,6 @@ public class ValidationMessages {
     public static final String ALREADY_PARTICIPANT = "This user is already a participant.";
     public static final String PARTICIPANT_NOT_EXIST = "Participant does not exist.";
     public static final String INVALID_BUDGET = "Missing or invalid budget";
-    public static final String CATEGORY_NOT_EXIST = "Category does not exist.";
+    public static final String CATEGORY_NOT_EXIST = "Category does not exist or budget is not valid.";
 
 }

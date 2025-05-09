@@ -14,13 +14,13 @@ public class SecurityUtils {
                 .getAuthentication();
 
         if (authentication == null) {
-            throw ApiException.with(ApiErrorCode.ERR_007);
+            throw ApiException.with(ApiErrorCode.ERR_0007);
         }
 
         final var principal = authentication.getPrincipal();
 
         if (!(principal instanceof User)) {
-            throw ApiException.with(ApiErrorCode.ERR_008);
+            throw ApiException.with(ApiErrorCode.ERR_0008);
         }
 
         return (User) principal;

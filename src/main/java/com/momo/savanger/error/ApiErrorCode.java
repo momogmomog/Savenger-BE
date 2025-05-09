@@ -14,9 +14,10 @@ public enum ApiErrorCode {
     ERR_0004(HttpStatus.NOT_FOUND, "Budget not found"),
     ERR_0005(HttpStatus.NOT_FOUND, "Category not found"),
     ERR_0006(HttpStatus.NOT_FOUND, "Tag not found"),
-    ERR_007(HttpStatus.UNAUTHORIZED, "Unauthorized"),
-    ERR_008(HttpStatus.BAD_REQUEST, "User is not logged in"),
-    ERR_009(HttpStatus.NOT_FOUND, "User not found");
+    ERR_0007(HttpStatus.UNAUTHORIZED, "Unauthorized"),
+    ERR_0008(HttpStatus.BAD_REQUEST, "User is not logged in"),
+    ERR_0009(HttpStatus.NOT_FOUND, "User not found"),
+    ERR_0010(HttpStatus.NOT_FOUND, "Transaction not found");
 
     public final HttpStatus status;
     public final String message;

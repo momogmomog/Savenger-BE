@@ -2,6 +2,8 @@ package com.momo.savanger.api.transaction;
 
 import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.user.User;
+import com.momo.savanger.error.ApiErrorCode;
+import com.momo.savanger.error.ApiException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction findById(Long id) {
-        return this.transactionRepository.findById(id).orElse(null);
+        return this.transactionRepository.findById(id).orElseThrow(() -> ApiException.with(
+                ApiErrorCode.ERR_0010));
     }
 
     @Override
@@ -27,8 +30,8 @@ public class TransactionServiceImpl implements TransactionService {
     public Transaction create(CreateTransactionDto dto, User user) {
         final Transaction transaction = this.transactionMapper.toTransaction(dto);
 
-        if (transaction.getDate() == null) {
-            transaction.setDate(LocalDateTime.now());
+        if (transaction.getDateCreated() == null) {
+            transaction.setDateCreated(LocalDateTime.now());
         }
 
         transaction.setUserId(user.getId());
