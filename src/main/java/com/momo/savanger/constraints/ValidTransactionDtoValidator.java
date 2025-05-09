@@ -34,7 +34,7 @@ public class ValidTransactionDtoValidator implements
 
         if (!this.categoryService.isCategoryValid(dto.getCategoryId(), dto.getBudgetId())) {
             return this.fail(constraintValidatorContext, "categoryId",
-                    ValidationMessages.CATEGORY_NOT_EXIST);
+                    ValidationMessages.CATEGORY_DOES_NOT_EXIST_OR_BUDGET_IS_NOT_VALID);
         }
 
         final List<Tag> tags = this.tagService.findByBudgetAndIdContaining(dto.getTagIds(),

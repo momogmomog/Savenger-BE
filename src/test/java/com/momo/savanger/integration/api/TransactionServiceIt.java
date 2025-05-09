@@ -2,6 +2,7 @@ package com.momo.savanger.integration.api;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -83,7 +84,14 @@ public class TransactionServiceIt {
         Transaction transaction = this.transactionService.findById(1L);
 
         assertNotNull(transaction);
+
+        assertEquals("EXPENSE", transaction.getType().toString());
+        assertEquals(BigDecimal.valueOf(43.33), transaction.getAmount());
+        assertEquals(1001L, transaction.getBudgetId());
+        assertEquals(1001L, transaction.getCategoryId());
         assertEquals(2, transaction.getTags().size());
+        assertEquals(user.getId(), transaction.getUserId());
+        assertFalse(transaction.getRevised());
     }
 
     @Test

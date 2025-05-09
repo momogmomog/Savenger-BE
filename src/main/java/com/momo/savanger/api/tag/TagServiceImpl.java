@@ -35,8 +35,8 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<Tag> findByBudgetAndIdContaining(List<Long> tagId, Long budgetId) {
-        final Specification<Tag> specification = TagSpecification.idIn(tagId)
+    public List<Tag> findByBudgetAndIdContaining(List<Long> tagIds, Long budgetId) {
+        final Specification<Tag> specification = TagSpecification.idIn(tagIds)
                 .and(TagSpecification.budgetIdEquals(budgetId));
 
         return this.tagRepository.findAll(specification, null);
