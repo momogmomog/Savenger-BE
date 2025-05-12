@@ -8,6 +8,7 @@ import com.momo.savanger.api.user.User;
 import com.momo.savanger.constants.Endpoints;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,4 +33,8 @@ public class TransactionController {
                 this.transactionService.create(transactionDto, user));
     }
 
+    @PostMapping(Endpoints.TRANSACTIONS_SEARCH)
+    public PagedModel<TransactionDto> searchTransactions() {
+
+    }
 }

@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-@Constraint(validatedBy = CanEditBudgetValidator.class)
-public @interface CanEditBudget {
+@Constraint(validatedBy = CanAccessBudgetValidator.class)
+public @interface CanAccessBudget {
 
     String message() default "Invalid budget ID!";
 

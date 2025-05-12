@@ -1,6 +1,6 @@
 package com.momo.savanger.api.transaction;
 
-import com.momo.savanger.api.budget.constraints.CanEditBudget;
+import com.momo.savanger.api.budget.constraints.CanAccessBudget;
 import com.momo.savanger.constants.Lengths;
 import com.momo.savanger.constants.ValidationMessages;
 import com.momo.savanger.constraints.MinValueZero;
@@ -35,7 +35,7 @@ public class CreateTransactionDto {
     private Long categoryId;
 
     @NotNull
-    @CanEditBudget
+    @CanAccessBudget
     private Long budgetId;
 
     private List<Long> tagIds;
