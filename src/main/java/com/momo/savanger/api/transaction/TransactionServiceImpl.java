@@ -54,7 +54,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public PagedModel<Transaction> searchTransactions(TransactionSearchQuery query) {
         final Specification<Transaction> specification = TransactionSpecifications
-                .budgetIdEquals(query.getBudgetId());
+                .budgetIdEquals(query.getBudgetId())
+                .and(TransactionSpecifications.sort(query.getSort()))
+                .and(TransactionSpecifications.betweenAmount(query.getAmount()))
+                .and(TransactionSpecifications.maybeRevised(query.getRevised()))
+                .and(TransactionSpecifications.maybeContainsComment(query.getComment()));
         // TODO: add all fields
 
         return new PagedModel<>(

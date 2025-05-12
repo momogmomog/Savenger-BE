@@ -1,6 +1,10 @@
 package com.momo.savanger.api.transaction;
 
+import com.momo.savanger.api.util.BetweenQuery;
 import com.momo.savanger.api.util.QuerySpecifications;
+import com.momo.savanger.api.util.ReflectionUtils;
+import com.momo.savanger.api.util.SortQuery;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -11,4 +15,31 @@ public final class TransactionSpecifications {
     public static Specification<Transaction> budgetIdEquals(final Long budgetId) {
         return QuerySpecifications.equal(Transaction_.budgetId, budgetId);
     }
+
+    public static Specification<Transaction> betweenAmount(final BetweenQuery<BigDecimal> query) {
+        return QuerySpecifications.between(Transaction_.amount, query);
+    }
+
+    public static Specification<Transaction> maybeContainsComment(final String comment) {
+        return QuerySpecifications.containsIfPresent(Transaction_.comment, comment);
+    }
+
+    public static Specification<Transaction> maybeRevised(final Boolean revised) {
+        return QuerySpecifications.equalIfPresent(Transaction_.revised, revised);
+    }
+
+    public static Specification<Transaction> sort(SortQuery sortQuery) {
+        if (!ReflectionUtils.fieldExists(Transaction.class, sortQuery.getField())) {
+            sortQuery.setField(Transaction_.ID);
+        }
+
+        return (root, query, criteriaBuilder)
+                -> QuerySpecifications.sort(
+                        Transaction.class,
+                        root.get(sortQuery.getField()),
+                        sortQuery.getDirection()
+                )
+                .toPredicate(root, query, criteriaBuilder);
+    }
+
 }
