@@ -6,8 +6,8 @@ import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +52,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public PagedModel<Transaction> searchTransactions(TransactionSearchQuery query) {
+    public Page<Transaction> searchTransactions(TransactionSearchQuery query, User user) {
         final Specification<Transaction> specification = TransactionSpecifications
                 .budgetIdEquals(query.getBudgetId())
                 .and(TransactionSpecifications.sort(query.getSort()))
@@ -61,8 +61,6 @@ public class TransactionServiceImpl implements TransactionService {
                 .and(TransactionSpecifications.maybeContainsComment(query.getComment()));
         // TODO: add all fields
 
-        return new PagedModel<>(
-                this.transactionRepository.findAll(specification, query.getPage(), null)
-        );
+        return this.transactionRepository.findAll(specification, query.getPage(), null);
     }
 }

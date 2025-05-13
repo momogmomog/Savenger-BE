@@ -3,6 +3,7 @@ package com.momo.savanger.web;
 import com.momo.savanger.api.transaction.CreateTransactionDto;
 import com.momo.savanger.api.transaction.TransactionDto;
 import com.momo.savanger.api.transaction.TransactionMapper;
+import com.momo.savanger.api.transaction.TransactionSearchQuery;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.constants.Endpoints;
@@ -34,7 +35,12 @@ public class TransactionController {
     }
 
     @PostMapping(Endpoints.TRANSACTIONS_SEARCH)
-    public PagedModel<TransactionDto> searchTransactions() {
-
+    public PagedModel<TransactionDto> searchTransactions(
+            @Valid @RequestBody TransactionSearchQuery query,
+            @AuthenticationPrincipal User user) {
+        return new PagedModel<>(this.transactionService
+                .searchTransactions(query, user)
+                .map(this.transactionMapper::toTransactionDto)
+        );
     }
 }

@@ -1,9 +1,14 @@
 package com.momo.savanger.api.transaction;
 
+import static com.momo.savanger.api.util.QuerySpecificationUtils.getOrCreateJoin;
+
+import com.momo.savanger.api.tag.Tag;
+import com.momo.savanger.api.tag.Tag_;
 import com.momo.savanger.api.util.BetweenQuery;
 import com.momo.savanger.api.util.QuerySpecifications;
 import com.momo.savanger.api.util.ReflectionUtils;
 import com.momo.savanger.api.util.SortQuery;
+import jakarta.persistence.criteria.Join;
 import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -26,6 +31,17 @@ public final class TransactionSpecifications {
 
     public static Specification<Transaction> maybeRevised(final Boolean revised) {
         return QuerySpecifications.equalIfPresent(Transaction_.revised, revised);
+    }
+
+    public static Specification<Transaction> isLinkedToTag(final String tagId) {
+        if (tagId == null) {
+            return Specification.where(null);
+        }
+
+        return (root, query, criteriaBuilder) -> {
+            final Join<Transaction, Tag> join = getOrCreateJoin(root, Transaction_.tags);
+            return criteriaBuilder.equal(join.get(Tag_.id), tagId);
+        };
     }
 
     public static Specification<Transaction> sort(SortQuery sortQuery) {

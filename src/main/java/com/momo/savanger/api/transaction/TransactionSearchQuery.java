@@ -35,6 +35,8 @@ public class TransactionSearchQuery {
 
     private Long userId;
 
+    private Boolean myTransactions;
+
     @NotNull
     @CanAccessBudget
     private Long budgetId;
