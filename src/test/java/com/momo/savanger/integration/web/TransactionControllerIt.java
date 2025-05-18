@@ -7,7 +7,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.momo.savanger.api.transaction.CreateTransactionDto;
 import com.momo.savanger.api.transaction.TransactionRepository;
+import com.momo.savanger.api.transaction.TransactionSearchQuery;
 import com.momo.savanger.api.transaction.TransactionType;
+import com.momo.savanger.api.util.BetweenQuery;
+import com.momo.savanger.api.util.PageQuery;
+import com.momo.savanger.api.util.SortDirection;
+import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -48,7 +53,7 @@ public class TransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testCreate_validPayload_shouldSaveTransaction() throws Exception {
 
-        assertEquals(1, this.transactionRepository.findAll().size());
+        assertEquals(3, this.transactionRepository.findAll().size());
 
         CreateTransactionDto dto = new CreateTransactionDto();
         dto.setType(TransactionType.EXPENSE);
@@ -63,7 +68,7 @@ public class TransactionControllerIt extends BaseControllerIt {
         dto.setTagIds(ids);
         super.postOK(Endpoints.TRANSACTIONS, dto);
 
-        assertEquals(2, this.transactionRepository.findAll().size());
+        assertEquals(4, this.transactionRepository.findAll().size());
 
     }
 
@@ -100,7 +105,7 @@ public class TransactionControllerIt extends BaseControllerIt {
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"amount\" && @.constraintName == \"MinValueZero\")]").exists()
-                );
+        );
 
         dto.setAmount(BigDecimal.valueOf(0));
         dto.setBudgetId(1002L);
@@ -110,8 +115,9 @@ public class TransactionControllerIt extends BaseControllerIt {
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(2)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanEditBudget\")]").exists(),
-                jsonPath("fieldErrors.[?(@.field == \"categoryId\" && @.constraintName == \"ValidTransactionDto\")]").exists()
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"categoryId\" && @.constraintName == \"ValidTransactionDto\")]").exists()
         );
 
         dto.setBudgetId(1001L);
@@ -143,5 +149,86 @@ public class TransactionControllerIt extends BaseControllerIt {
                         + "&& @.message == \"Invalid tags: [1003]\")]").exists()
         );
 
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testSearchTransactions_validPayload_shouldReturnTransactions() throws Exception {
+
+        TransactionSearchQuery query = new TransactionSearchQuery();
+
+        PageQuery pageQuery = new PageQuery(0, 1);
+
+        SortQuery sortQuery = new SortQuery("id", SortDirection.ASC);
+
+        BetweenQuery<BigDecimal> amount = new BetweenQuery<>(BigDecimal.valueOf(0),
+                BigDecimal.valueOf(1000));
+
+        query.setSort(sortQuery);
+        query.setPage(pageQuery);
+        query.setAmount(amount);
+        query.setCategoryId(1001L);
+        query.setBudgetId(1001L);
+        query.setUserId(1L);
+        query.setType(TransactionType.INCOME);
+
+        super.postOK(Endpoints.TRANSACTIONS_SEARCH, query);
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testSearchTransactions_invalidPayload_shouldThrowExceptions() throws Exception {
+
+        TransactionSearchQuery query = new TransactionSearchQuery();
+
+        super.post(Endpoints.TRANSACTIONS_SEARCH,
+                query,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"page\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"sort\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"NotNull\")]").exists()
+        );
+
+        PageQuery pageQuery = new PageQuery(-1, 0);
+
+        SortQuery sortQuery = new SortQuery("id", SortDirection.ASC);
+
+        query.setPage(pageQuery);
+        query.setSort(sortQuery);
+        query.setBudgetId(1002L);
+
+        super.post(Endpoints.TRANSACTIONS_SEARCH,
+                query,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"page.pageNumber\" && @.constraintName == \"Min\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"page.pageSize\" && @.constraintName == \"Min\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
+        );
+
+        pageQuery.setPageNumber(0);
+        pageQuery.setPageSize(1);
+        query.setBudgetId(1001L);
+
+        sortQuery = new SortQuery();
+
+        query.setSort(sortQuery);
+
+        super.post(Endpoints.TRANSACTIONS_SEARCH,
+                query,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(2)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"sort.field\" && @.constraintName == \"NotEmpty\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"sort.direction\" && @.constraintName == \"NotNull\")]").exists()
+        );
     }
 }

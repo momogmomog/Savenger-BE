@@ -58,8 +58,12 @@ public class TransactionServiceImpl implements TransactionService {
                 .and(TransactionSpecifications.sort(query.getSort()))
                 .and(TransactionSpecifications.betweenAmount(query.getAmount()))
                 .and(TransactionSpecifications.maybeRevised(query.getRevised()))
-                .and(TransactionSpecifications.maybeContainsComment(query.getComment()));
-        // TODO: add all fields
+                .and(TransactionSpecifications.maybeContainsComment(query.getComment()))
+                .and(TransactionSpecifications.betweenDate(query.getDateCreated()))
+                .and(TransactionSpecifications.categoryIdEquals(query.getCategoryId()))
+                .and(TransactionSpecifications.typeEquals(query.getType()))
+                .and(TransactionSpecifications.userIdEquals(query.getUserId()))
+                .and(TransactionSpecifications.isLinkedToTag(query.getTagId()));
 
         return this.transactionRepository.findAll(specification, query.getPage(), null);
     }

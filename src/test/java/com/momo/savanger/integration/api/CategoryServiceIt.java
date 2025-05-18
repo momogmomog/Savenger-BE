@@ -51,7 +51,7 @@ public class CategoryServiceIt {
 
         List<Category> categories = this.categoryRepository.findAll();
 
-        assertThat(List.of("Home", "Smetki"))
+        assertThat(List.of("Home", "Smetki", "Dom"))
                 .hasSameElementsAs(
                         categories.stream().map(Category::getCategoryName).toList()
                 );

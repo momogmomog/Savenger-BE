@@ -10,6 +10,7 @@ import com.momo.savanger.api.util.ReflectionUtils;
 import com.momo.savanger.api.util.SortQuery;
 import jakarta.persistence.criteria.Join;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,7 +34,30 @@ public final class TransactionSpecifications {
         return QuerySpecifications.equalIfPresent(Transaction_.revised, revised);
     }
 
-    public static Specification<Transaction> isLinkedToTag(final String tagId) {
+    public static Specification<Transaction> categoryIdEquals(final Long categoryId) {
+        if (categoryId == null) {
+            return Specification.where(null);
+        }
+
+        return QuerySpecifications.equal(Transaction_.categoryId, categoryId);
+    }
+
+    public static Specification<Transaction> typeEquals(final TransactionType type) {
+        return QuerySpecifications.equal(Transaction_.type, type);
+    }
+
+    public static Specification<Transaction> betweenDate(final BetweenQuery<LocalDateTime> query) {
+        return QuerySpecifications.between(Transaction_.dateCreated, query);
+    }
+
+    public static Specification<Transaction> userIdEquals(final Long userId) {
+        if (userId == null) {
+            return Specification.where(null);
+        }
+        return QuerySpecifications.equal(Transaction_.userId, userId);
+    }
+
+    public static Specification<Transaction> isLinkedToTag(final Long tagId) {
         if (tagId == null) {
             return Specification.where(null);
         }

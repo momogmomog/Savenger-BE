@@ -9,7 +9,6 @@ import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetRepository;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
-import com.momo.savanger.api.user.User;
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -247,7 +246,8 @@ public class BudgetControllerIt extends BaseControllerIt {
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
-    public void testDeleteParticipant_validPayload_shouldDeleteParticipantSuccessfully() throws Exception {
+    public void testDeleteParticipant_validPayload_shouldDeleteParticipantSuccessfully()
+            throws Exception {
 
         assertEquals(1, this.budgetService.findIfValid(1001L).get().getParticipants().size());
 

@@ -13,7 +13,7 @@ public class TransactionDto {
 
     private BigDecimal amount;
 
-    private LocalDateTime date;
+    private LocalDateTime dateCreated;
 
     private String comment;
 
