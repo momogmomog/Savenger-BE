@@ -138,6 +138,8 @@ public class TransactionServiceIt {
 
         User user = this.userService.getById(1L);
 
+
+        // Search by budgetId and Type
         query.setSort(sortQuery);
         query.setPage(pageQuery);
         query.setBudgetId(1001L);
@@ -152,9 +154,35 @@ public class TransactionServiceIt {
         assertEquals(1002L, transactions.getContent().get(1).getId());
         assertEquals(1003L, transactions.getContent().get(2).getId());
 
+        //Test page 2
+        pageQuery.setPageNumber(2);
+        pageQuery.setPageSize(1);
+
+        query.setPage(pageQuery);
+
+        transactions = this.transactionService.searchTransactions(query, user);
+
+        assertEquals(1003L, transactions.getContent().getFirst().getId());
+
+        //Test page 0
+
+        pageQuery.setPageNumber(0);
+        pageQuery.setPageSize(1);
+
+        query.setPage(pageQuery);
+
+        transactions = this.transactionService.searchTransactions(query, user);
+
+        assertEquals(1001L, transactions.getContent().getFirst().getId());
+
+        pageQuery.setPageSize(3);
+
+        // Search by budgetId, Type and Revised
         query.setRevised(true);
 
         sortQuery = new SortQuery("id", SortDirection.ASC);
+
+        query.setSort(sortQuery);
 
         transactions = this.transactionService.searchTransactions(query, user);
 
@@ -163,6 +191,7 @@ public class TransactionServiceIt {
 
         query.setRevised(null);
 
+        // Search by budgetId, Type and comment
         query.setComment("Hrana");
 
         transactions = this.transactionService.searchTransactions(query, user);
@@ -175,6 +204,8 @@ public class TransactionServiceIt {
         BetweenQuery<BigDecimal> amount = new BetweenQuery<>(BigDecimal.valueOf(0),
                 BigDecimal.valueOf(500));
 
+
+        // Search by budgetId, Type and amount
         query.setAmount(amount);
 
         transactions = this.transactionService.searchTransactions(query, user);
@@ -183,6 +214,7 @@ public class TransactionServiceIt {
         assertEquals(1001L, transactions.getContent().getFirst().getId());
         assertEquals(1002L, transactions.getContent().get(1).getId());
 
+        // Search by budgetId, Type, amount and tag
         query.setTagId(1001L);
 
         transactions = this.transactionService.searchTransactions(query, user);
@@ -193,6 +225,8 @@ public class TransactionServiceIt {
         BetweenQuery<LocalDateTime> dateCreated = new BetweenQuery<>(LocalDateTime.of(2025, 1, 1, 0,
                 0, 0), LocalDateTime.now());
 
+
+        // Search by budgetId, Type, amount and date
         query.setDateCreated(dateCreated);
         query.setTagId(null);
 
@@ -201,6 +235,8 @@ public class TransactionServiceIt {
         assertEquals(1, transactions.getTotalElements());
         assertEquals(1002L, transactions.getContent().getFirst().getId());
 
+
+        // Search by budgetId, type, amount, date and categoryId
         query.setCategoryId(1002L);
         amount = new BetweenQuery<>(BigDecimal.ZERO, BigDecimal.valueOf(600));
         query.setAmount(amount);

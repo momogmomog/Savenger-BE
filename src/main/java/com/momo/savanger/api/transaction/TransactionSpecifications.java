@@ -35,15 +35,11 @@ public final class TransactionSpecifications {
     }
 
     public static Specification<Transaction> categoryIdEquals(final Long categoryId) {
-        if (categoryId == null) {
-            return Specification.where(null);
-        }
-
-        return QuerySpecifications.equal(Transaction_.categoryId, categoryId);
+        return QuerySpecifications.equalIfPresent(Transaction_.categoryId, categoryId);
     }
 
     public static Specification<Transaction> typeEquals(final TransactionType type) {
-        return QuerySpecifications.equal(Transaction_.type, type);
+        return QuerySpecifications.equalIfPresent(Transaction_.type, type);
     }
 
     public static Specification<Transaction> betweenDate(final BetweenQuery<LocalDateTime> query) {
@@ -51,10 +47,7 @@ public final class TransactionSpecifications {
     }
 
     public static Specification<Transaction> userIdEquals(final Long userId) {
-        if (userId == null) {
-            return Specification.where(null);
-        }
-        return QuerySpecifications.equal(Transaction_.userId, userId);
+        return QuerySpecifications.equalIfPresent(Transaction_.userId, userId);
     }
 
     public static Specification<Transaction> isLinkedToTag(final Long tagId) {
