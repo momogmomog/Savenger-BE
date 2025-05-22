@@ -1,6 +1,6 @@
 package com.momo.savanger.api.category;
 
-import com.momo.savanger.api.budget.constraints.CanEditBudget;
+import com.momo.savanger.api.budget.constraints.CanAccessBudget;
 import com.momo.savanger.constraints.LengthName;
 import com.momo.savanger.constraints.MinValueZero;
 import com.momo.savanger.constraints.NotNull;
@@ -18,7 +18,7 @@ public class CreateCategoryDto {
     private BigDecimal budgetCap;
 
     @NotNull
-    @CanEditBudget
+    @CanAccessBudget
     private Long budgetId;
 
 }

@@ -8,7 +8,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class CanEditBudgetValidator implements ConstraintValidator<CanEditBudget, Long> {
+public class CanAccessBudgetValidator implements ConstraintValidator<CanAccessBudget, Long> {
 
     private final BudgetService budgetService;
 
@@ -19,13 +19,13 @@ public class CanEditBudgetValidator implements ConstraintValidator<CanEditBudget
             return true;
         }
 
-        User user = SecurityUtils.getCurrentUser();
+        final User user = SecurityUtils.getCurrentUser();
 
         return this.budgetService.isUserPermitted(user, budgetId);
     }
 
     @Override
-    public void initialize(CanEditBudget constraintAnnotation) {
+    public void initialize(CanAccessBudget constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 }

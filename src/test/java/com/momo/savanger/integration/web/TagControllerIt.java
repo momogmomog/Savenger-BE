@@ -116,7 +116,7 @@ public class TagControllerIt extends BaseControllerIt {
                 jsonPath(
                         "fieldErrors.[?(@.field == \"tagName\" && @.constraintName == \"LengthName\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanEditBudget\")]").exists()
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
         );
 
     }
@@ -137,7 +137,7 @@ public class TagControllerIt extends BaseControllerIt {
                 jsonPath(
                         "fieldErrors.[?(@.field == \"tagName\" && @.constraintName == \"LengthName\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanEditBudget\")]").exists()
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
         );
 
     }

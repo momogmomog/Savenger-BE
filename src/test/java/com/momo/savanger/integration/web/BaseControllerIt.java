@@ -99,11 +99,13 @@ public abstract class BaseControllerIt {
                 .andExpect(matchAll(matchers));
     }
 
-    protected void deleteOK(String endpoint, Object body, ResultMatcher... matchers) throws Exception {
+    protected void deleteOK(String endpoint, Object body, ResultMatcher... matchers)
+            throws Exception {
         this.delete(endpoint, body, HttpStatus.OK, matchers);
     }
 
-    protected void delete(String endpoint, Object body, HttpStatus status, ResultMatcher... matchers)
+    protected void delete(String endpoint, Object body, HttpStatus status,
+            ResultMatcher... matchers)
             throws Exception {
         this.delete(endpoint, body, status, new HttpHeaders(), matchers);
     }

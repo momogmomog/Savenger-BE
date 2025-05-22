@@ -52,7 +52,7 @@ public class CategoryControllerIt extends BaseControllerIt {
 
         List<Category> categories = this.categoryRepository.findAll();
 
-        assertThat(List.of("Home", "Test"))
+        assertThat(List.of("Home", "Dom", "Test"))
                 .hasSameElementsAs(
                         categories.stream().map(Category::getCategoryName).toList()
                 );
@@ -71,7 +71,7 @@ public class CategoryControllerIt extends BaseControllerIt {
 
         List<Category> categories = this.categoryRepository.findAll();
 
-        assertThat(List.of("Home", "Test"))
+        assertThat(List.of("Home", "Dom", "Test"))
                 .hasSameElementsAs(
                         categories.stream().map(Category::getCategoryName).toList()
                 );
@@ -126,7 +126,7 @@ public class CategoryControllerIt extends BaseControllerIt {
                 jsonPath(
                         "fieldErrors.[?(@.field == \"categoryName\" && @.constraintName == \"LengthName\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanEditBudget\")]").exists()
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
         );
 
     }
@@ -147,7 +147,7 @@ public class CategoryControllerIt extends BaseControllerIt {
                 jsonPath(
                         "fieldErrors.[?(@.field == \"categoryName\" && @.constraintName == \"LengthName\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanEditBudget\")]").exists()
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
         );
 
     }
