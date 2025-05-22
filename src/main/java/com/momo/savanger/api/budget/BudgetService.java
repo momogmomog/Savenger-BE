@@ -10,6 +10,8 @@ public interface BudgetService {
 
     Budget findById(Long id);
 
+    Budget findByIdFetchAll(Long id);
+
     Optional<Budget> findIfValid(Long id);
 
     Budget create(CreateBudgetDto createBudgetDto, Long ownerId);

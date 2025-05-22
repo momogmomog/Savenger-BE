@@ -6,7 +6,9 @@ import com.momo.savanger.api.util.SecurityUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
 @RequiredArgsConstructor
 public class CanAccessBudgetValidator implements ConstraintValidator<CanAccessBudget, Long> {
 
