@@ -1,8 +1,10 @@
 package com.momo.savanger.api.budget.dto;
 
+import com.momo.savanger.api.user.UserDto;
 import com.momo.savanger.converter.DateTimeConverter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -29,4 +31,6 @@ public class BudgetDto {
     private Boolean autoRevise;
 
     private Long ownerId;
+
+    private List<UserDto> participants;
 }

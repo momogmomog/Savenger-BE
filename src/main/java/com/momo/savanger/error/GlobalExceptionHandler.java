@@ -1,6 +1,8 @@
 package com.momo.savanger.error;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,46 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(response.getStatus())
                 .body(response);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ConstratintViolationErrorResponse> handleValidationException(
+            ConstraintViolationException ex,
+            HttpServletRequest request) {
+
+        final List<FieldErrorDto> fieldErrors = ex.getConstraintViolations()
+                .stream()
+                .map(violation -> {
+                    final String field = this.extractFieldName(violation);
+                    final String constraintName = violation.getConstraintDescriptor()
+                            .getAnnotation()
+                            .annotationType()
+                            .getSimpleName();
+
+                    return new FieldErrorDto(
+                            violation.getMessage(),
+                            field,
+                            violation.getInvalidValue(),
+                            false,
+                            constraintName
+                    );
+                })
+                .collect(Collectors.toList());
+
+        final ConstratintViolationErrorResponse response = new ConstratintViolationErrorResponse(
+                request.getRequestURI(),
+                fieldErrors
+        );
+
+        return ResponseEntity
+                .status(response.getStatus())
+                .body(response);
+    }
+
+    // Helper method to extract the field name from the violation's property path
+    private String extractFieldName(ConstraintViolation<?> violation) {
+        String propertyPath = violation.getPropertyPath().toString();
+        return propertyPath.substring(propertyPath.lastIndexOf('.') + 1);
     }
 
     @ExceptionHandler(ApiException.class)

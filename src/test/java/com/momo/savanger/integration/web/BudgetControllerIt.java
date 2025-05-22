@@ -63,7 +63,7 @@ public class BudgetControllerIt extends BaseControllerIt {
 
         List<Budget> budgets = this.budgetRepository.findAll();
 
-        assertThat(List.of("Food", "Test"))
+        assertThat(List.of("Food","sdf", "Test"))
                 .hasSameElementsAs(
                         budgets.stream().map(Budget::getBudgetName).toList()
                 );
@@ -326,6 +326,66 @@ public class BudgetControllerIt extends BaseControllerIt {
                         "fieldErrors.[?(@.field == \"participantId\" && @.constraintName == \"AssignParticipantValidation\" && @.message == \"Participant does not exist.\")]").exists()
         );
 
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testAddParticipant_invalidBudgetId_shouldThrowException() throws Exception {
+
+        Map<String, Long> data = new HashMap<>();
+        data.put("participantId", 2L);
+        data.put("budgetId", 1001L);
+
+        super.delete("/budgets/1006/participants",
+                data,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"id\" && @.constraintName == \"ValidBudget\")]").exists());
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testDeleteParticipant_invalidBudgetId_shouldThrowException() throws Exception {
+
+        Map<String, Long> data = new HashMap<>();
+        data.put("participantId", 2L);
+        data.put("budgetId", 1001L);
+
+        super.delete("/budgets/1006/participants",
+                data,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"id\" && @.constraintName == \"ValidBudget\")]").exists());
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testAddParticipant_differentIds_shouldThrowException() throws Exception {
+
+        Map<String, Long> data = new HashMap<>();
+        data.put("participantId", 2L);
+        data.put("budgetId", 1001L);
+
+        super.delete("/budgets/1002/participants",
+                data,
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                jsonPath("$.errorCode", is("ERR_0001")));
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testDeleteParticipant_differentIds_shouldThrowException() throws Exception {
+
+        Map<String, Long> data = new HashMap<>();
+        data.put("participantId", 2L);
+        data.put("budgetId", 1001L);
+
+        super.delete("/budgets/1002/participants",
+                data,
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                jsonPath("$.errorCode", is("ERR_0001")));
     }
 
 }

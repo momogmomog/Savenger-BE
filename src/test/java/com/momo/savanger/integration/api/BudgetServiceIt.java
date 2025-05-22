@@ -70,9 +70,9 @@ public class BudgetServiceIt {
 
         List<Budget> budgets = this.budgetRepository.findAll();
 
-        assertEquals(2, budgets.size());
+        assertEquals(3, budgets.size());
 
-        assertThat(List.of("Food", "Test"))
+        assertThat(List.of("Food", "sdf", "Test"))
                 .hasSameElementsAs(
                         budgets.stream().map(Budget::getBudgetName).toList()
                 );
@@ -113,7 +113,7 @@ public class BudgetServiceIt {
     @Test
     public void testIsBudgetValid_invalidId_shouldReturnFalse() {
 
-        boolean isBudgetValid = this.budgetService.isBudgetValid(1002L);
+        boolean isBudgetValid = this.budgetService.isBudgetValid(1006L);
 
         assertFalse(isBudgetValid);
 
@@ -217,6 +217,19 @@ public class BudgetServiceIt {
         Optional<Budget> budget = this.budgetService.findIfValid(1003L);
 
         assertTrue(budget.isEmpty());
+    }
+
+    @Test
+    public void testFindByIdAndFetchAll_validId_shouldReturnBudget() {
+
+        Budget budget = this.budgetService.findByIdFetchAll(1001L);
+
+        assertNotNull(budget);
+    }
+
+    @Test
+    public void testFindByIdAndFetchAll_invalidId_shouldThrowException() {
+        assertThrows(ApiException.class, () -> this.budgetService.findByIdFetchAll(1005L));
     }
 
 }
