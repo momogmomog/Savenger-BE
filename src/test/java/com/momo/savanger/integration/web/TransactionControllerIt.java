@@ -108,7 +108,7 @@ public class TransactionControllerIt extends BaseControllerIt {
         );
 
         dto.setAmount(BigDecimal.valueOf(0));
-        dto.setBudgetId(1002L);
+        dto.setBudgetId(1006L);
 
         super.post(Endpoints.TRANSACTIONS,
                 dto,
@@ -199,7 +199,7 @@ public class TransactionControllerIt extends BaseControllerIt {
 
         query.setPage(pageQuery);
         query.setSort(sortQuery);
-        query.setBudgetId(1002L);
+        query.setBudgetId(1007L);
 
         super.post(Endpoints.TRANSACTIONS_SEARCH,
                 query,

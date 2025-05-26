@@ -35,6 +35,15 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
+    public Budget findByIdFetchAll(Long id) {
+        return this.budgetRepository.findAll(BudgetSpecifications.idEquals(id),
+                        EntityGraphs.BUDGET_ALL)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0004));
+    }
+
+    @Override
     public Optional<Budget> findIfValid(Long id) {
         final Specification<Budget> specification = BudgetSpecifications.idEquals(id)
                 .and(BudgetSpecifications.isActive());
