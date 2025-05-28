@@ -6,6 +6,7 @@ import com.momo.savanger.api.budget.constraints.CanAccessBudget;
 import com.momo.savanger.api.budget.constraints.ValidBudget;
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.budget.dto.BudgetDto;
+import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.user.User;
@@ -14,6 +15,7 @@ import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.web.PagedModel;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -68,6 +70,15 @@ public class BudgetController {
         }
         this.budgetService.deleteParticipant(dto);
         return this.budgetMapper.toBudgetDto(this.budgetService.findByIdFetchAll(id));
+    }
+
+    @PostMapping(Endpoints.BUDGET_SEARCH)
+    public PagedModel<BudgetDto> searchBudget(@Valid @RequestBody BudgetSearchQuery query
+            , @AuthenticationPrincipal User user) {
+
+        return new PagedModel<>(this.budgetService
+                .searchBudget(query, user)
+                .map(this.budgetMapper::toBudgetDto));
     }
 
 

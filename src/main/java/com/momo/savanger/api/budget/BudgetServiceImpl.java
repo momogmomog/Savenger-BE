@@ -3,6 +3,7 @@ package com.momo.savanger.api.budget;
 import static com.momo.savanger.api.budget.BudgetSpecifications.ownerIdEquals;
 
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
+import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.user.User;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,5 +118,21 @@ public class BudgetServiceImpl implements BudgetService {
         budget.getParticipants().remove(participant);
 
         this.budgetRepository.save(budget);
+    }
+
+    @Override
+    public Page<Budget> searchBudget(BudgetSearchQuery query, User user) {
+        final Specification<Budget> specification = BudgetSpecifications.ownerIdEquals(user.getId())
+                .or(BudgetSpecifications.containsParticipant(user.getId()))
+                .and(BudgetSpecifications.sort(query.getSort()))
+                .and(BudgetSpecifications.isActive(query.getActive()))
+                .and(BudgetSpecifications.budgetNameEquals(query.getBudgetName()))
+                .and(BudgetSpecifications.betweenDateStarted(query.getDateStarted()))
+                .and(BudgetSpecifications.betweenDueDate(query.getDueDate()))
+                .and(BudgetSpecifications.betweenBalance(query.getBalance()))
+                .and(BudgetSpecifications.betweenBudgetCap(query.getBudgetCap()))
+                .and(BudgetSpecifications.isAutoRevise(query.getAutoRevise()));
+
+        return this.budgetRepository.findAll(specification, query.getPage(), null);
     }
 }

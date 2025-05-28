@@ -1,10 +1,12 @@
 package com.momo.savanger.api.budget;
 
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
+import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.user.User;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 
 public interface BudgetService {
 
@@ -23,4 +25,6 @@ public interface BudgetService {
     void addParticipant(AssignParticipantDto dto);
 
     void deleteParticipant(UnassignParticipantDto dto);
+
+    Page<Budget> searchBudget(BudgetSearchQuery query, User user);
 }

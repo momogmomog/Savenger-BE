@@ -11,4 +11,5 @@ public class Endpoints {
     public static final String PARTICIPANTS = "/budgets/{id}/participants";
     public static final String TRANSACTIONS = "/transactions";
     public static final String TRANSACTIONS_SEARCH = "/transactions/search";
+    public static final String BUDGET_SEARCH = "/budgets/search";
 }

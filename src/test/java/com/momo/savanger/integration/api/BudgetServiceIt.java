@@ -11,10 +11,16 @@ import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetRepository;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
+import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserRepository;
+import com.momo.savanger.api.user.UserService;
+import com.momo.savanger.api.util.BetweenQuery;
+import com.momo.savanger.api.util.PageQuery;
+import com.momo.savanger.api.util.SortDirection;
+import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,6 +34,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -54,6 +61,9 @@ public class BudgetServiceIt {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserService userService;
+
     @Test
     public void testCreate_validPayload_shouldCreate() {
         CreateBudgetDto createBudgetDto = new CreateBudgetDto();
@@ -70,9 +80,9 @@ public class BudgetServiceIt {
 
         List<Budget> budgets = this.budgetRepository.findAll();
 
-        assertEquals(3, budgets.size());
+        assertEquals(5, budgets.size());
 
-        assertThat(List.of("Food", "sdf", "Test"))
+        assertThat(List.of("Food", "sdf", "Food", "Home", "Test"))
                 .hasSameElementsAs(
                         budgets.stream().map(Budget::getBudgetName).toList()
                 );
@@ -214,7 +224,7 @@ public class BudgetServiceIt {
 
     @Test
     public void testFindIfValid_invalidId_shouldReturnBudget() {
-        Optional<Budget> budget = this.budgetService.findIfValid(1003L);
+        Optional<Budget> budget = this.budgetService.findIfValid(10043L);
 
         assertTrue(budget.isEmpty());
     }
@@ -230,6 +240,132 @@ public class BudgetServiceIt {
     @Test
     public void testFindByIdAndFetchAll_invalidId_shouldThrowException() {
         assertThrows(ApiException.class, () -> this.budgetService.findByIdFetchAll(1005L));
+    }
+
+    @Test
+    @Transactional
+    public void testSearchBudget_validPayload_shouldReturnBudget() {
+        BudgetSearchQuery query = new BudgetSearchQuery();
+        SortQuery sortQuery = new SortQuery("id", SortDirection.ASC);
+        PageQuery pageQuery = new PageQuery(0, 2);
+        User user = this.userService.getById(1L);
+
+        query.setSort(sortQuery);
+        query.setPage(pageQuery);
+
+        //Search by name
+        query.setBudgetName("Food");
+
+        Page<Budget> budgets = this.budgetService.searchBudget(query, user);
+
+        assertEquals(1, budgets.getTotalElements());
+        assertEquals(1001L, budgets.getContent().getFirst().getId());
+
+        query.setBudgetName(null);
+
+        //Search by budgetCap
+
+        BetweenQuery<BigDecimal> bigDecimalBetweenQuery = new BetweenQuery<>(BigDecimal.valueOf(20),
+                BigDecimal.valueOf(100));
+        query.setBudgetCap(bigDecimalBetweenQuery);
+
+        budgets = this.budgetService.searchBudget(query, user);
+
+        assertEquals(1, budgets.getTotalElements());
+        assertEquals(1001L, budgets.getContent().getFirst().getId());
+
+        query.setBudgetCap(null);
+
+        //Search by balance
+
+        query.setBalance(bigDecimalBetweenQuery);
+
+        budgets = this.budgetService.searchBudget(query, user);
+
+        assertEquals(2, budgets.getTotalElements());
+        assertEquals(1001L, budgets.getContent().getFirst().getId());
+        assertEquals(1004L, budgets.getContent().get(1).getId());
+
+        query.setBalance(null);
+
+        //Search by active
+        query.setActive(true);
+
+        budgets = this.budgetService.searchBudget(query, user);
+
+        assertEquals(3, budgets.getTotalElements());
+        assertEquals(1001L, budgets.getContent().getFirst().getId());
+        assertEquals(1002L, budgets.getContent().get(1).getId());
+
+        // Test page 1
+        pageQuery.setPageNumber(1);
+        budgets = this.budgetService.searchBudget(query, user);
+
+        assertEquals(1004L, budgets.getContent().getLast().getId());
+
+        //Search active and autoRevise
+
+        pageQuery.setPageNumber(0);
+        query.setPage(pageQuery);
+        query.setAutoRevise(true);
+
+        budgets = this.budgetService.searchBudget(query, user);
+
+        assertEquals(2, budgets.getTotalElements());
+        assertEquals(1001L, budgets.getContent().getFirst().getId());
+        assertEquals(1002L, budgets.getContent().getLast().getId());
+
+        //Search by dateStarted
+
+        BetweenQuery<LocalDateTime> localDateTimeBetweenQuery = new BetweenQuery<>(
+                LocalDateTime.of(2019, 1, 1, 0,
+                        0, 0), LocalDateTime.now()
+        );
+
+        query.setAutoRevise(null);
+        query.setActive(null);
+        query.setDateStarted(localDateTimeBetweenQuery);
+        budgets = this.budgetService.searchBudget(query, user);
+
+        assertEquals(2, budgets.getTotalElements());
+        assertEquals(1002L, budgets.getContent().getFirst().getId());
+        assertEquals(1004L, budgets.getContent().getLast().getId());
+
+        //Search by dueDate
+
+        query.setDateStarted(null);
+
+        localDateTimeBetweenQuery = new BetweenQuery<>(
+                LocalDateTime.of(2020, 1, 1, 0,
+                        0, 0), LocalDateTime.now());
+
+        query.setDueDate(localDateTimeBetweenQuery);
+
+        budgets = this.budgetService.searchBudget(query, user);
+
+        assertEquals(1, budgets.getTotalElements());
+        assertEquals(1004L, budgets.getContent().getFirst().getId());
+
+        //Search by dueDate and autoRevise
+
+        query.setAutoRevise(true);
+
+        budgets = this.budgetService.searchBudget(query, user);
+
+        assertEquals(0, budgets.getTotalElements());
+
+        //Test user 2
+
+        query.setDueDate(null);
+        query.setAutoRevise(null);
+
+        user = this.userService.getById(3L);
+
+        budgets = this.budgetService.searchBudget(query, user);
+
+        assertEquals(1, budgets.getTotalElements());
+        assertEquals(1003L, budgets.getContent().getFirst().getId());
+
     }
 
 }
