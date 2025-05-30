@@ -40,7 +40,7 @@ public final class BudgetSpecifications {
         return QuerySpecifications.equalIfPresent(Budget_.autoRevise, autoRevise);
     }
 
-    public static Specification<Budget> budgetNameEquals(final String name) {
+    public static Specification<Budget> budgetNameContains(final String name) {
         return QuerySpecifications.equalIfPresent(Budget_.budgetName, name);
     }
 
