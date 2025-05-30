@@ -8,7 +8,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetRepository;
 import com.momo.savanger.api.budget.BudgetService;
+import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
+import com.momo.savanger.api.util.PageQuery;
+import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -63,7 +66,7 @@ public class BudgetControllerIt extends BaseControllerIt {
 
         List<Budget> budgets = this.budgetRepository.findAll();
 
-        assertThat(List.of("Food","sdf", "Test"))
+        assertThat(List.of("Food", "sdf", "Food", "Home", "Test"))
                 .hasSameElementsAs(
                         budgets.stream().map(Budget::getBudgetName).toList()
                 );
@@ -386,6 +389,50 @@ public class BudgetControllerIt extends BaseControllerIt {
                 data,
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 jsonPath("$.errorCode", is("ERR_0001")));
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testSearchBudget_invalidPayload_shouldThrowException() throws Exception {
+
+        BudgetSearchQuery query = new BudgetSearchQuery();
+
+        super.post(Endpoints.BUDGET_SEARCH, query, HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(2)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"page\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"sort\" && @.constraintName == \"NotNull\")]").exists());
+
+        PageQuery pageQuery = new PageQuery();
+        pageQuery.setPageNumber(-1);
+        pageQuery.setPageSize(0);
+
+        query.setPage(pageQuery);
+
+        super.post(Endpoints.BUDGET_SEARCH, query, HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"page.pageNumber\" && @.constraintName == \"Min\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"page.pageSize\" && @.constraintName == \"Min\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"sort\" && @.constraintName == \"NotNull\")]").exists()
+        );
+
+        query.setPage(null);
+
+        SortQuery sortQuery = new SortQuery();
+
+        query.setSort(sortQuery);
+
+        super.post(Endpoints.BUDGET_SEARCH, query, HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"sort.field\" && @.constraintName == \"NotEmpty\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"sort.direction\" && @.constraintName == \"NotNull\")]").exists());
+
     }
 
 }
