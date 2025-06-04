@@ -126,7 +126,7 @@ public class BudgetServiceImpl implements BudgetService {
                 .or(BudgetSpecifications.containsParticipant(user.getId()))
                 .and(BudgetSpecifications.sort(query.getSort()))
                 .and(BudgetSpecifications.isActive(query.getActive()))
-                .and(BudgetSpecifications.budgetNameEquals(query.getBudgetName()))
+                .and(BudgetSpecifications.budgetNameContains(query.getBudgetName()))
                 .and(BudgetSpecifications.betweenDateStarted(query.getDateStarted()))
                 .and(BudgetSpecifications.betweenDueDate(query.getDueDate()))
                 .and(BudgetSpecifications.betweenBalance(query.getBalance()))

@@ -1,6 +1,7 @@
-package com.momo.savanger.api.transaction;
+package com.momo.savanger.api.transaction.dto;
 
 import com.momo.savanger.api.budget.constraints.CanAccessBudget;
+import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.util.BetweenQuery;
 import com.momo.savanger.api.util.PageQuery;
 import com.momo.savanger.api.util.SortQuery;

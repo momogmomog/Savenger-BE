@@ -1,4 +1,4 @@
-package com.momo.savanger.constraints;
+package com.momo.savanger.api.transaction.constraints;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

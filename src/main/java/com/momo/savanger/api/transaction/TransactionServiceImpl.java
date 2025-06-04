@@ -1,6 +1,9 @@
 package com.momo.savanger.api.transaction;
 
 import com.momo.savanger.api.tag.TagService;
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
+import com.momo.savanger.api.transaction.dto.EditTransactionDto;
+import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
@@ -66,5 +69,54 @@ public class TransactionServiceImpl implements TransactionService {
                 .and(TransactionSpecifications.isLinkedToTag(query.getTagId()));
 
         return this.transactionRepository.findAll(specification, query.getPage(), null);
+    }
+
+    @Override
+    public Transaction edit(Long id, EditTransactionDto dto) {
+
+        Transaction transaction = this.findById(id);
+
+        transaction = this.mergeTransactions(transaction, dto);
+
+        if (!dto.getTagIds().isEmpty()) {
+            transaction.setTags(this.tagService.findByBudgetAndIdContaining(
+                    dto.getTagIds(),
+                    dto.getBudgetId()
+            ));
+        }
+
+        this.transactionRepository.save(transaction);
+
+        return transaction;
+    }
+
+    private Transaction mergeTransactions(
+            Transaction transaction, EditTransactionDto dto) {
+
+        if (dto.getType() != null) {
+            transaction.setType(dto.getType());
+        }
+
+        if (dto.getAmount() != null) {
+            transaction.setAmount(dto.getAmount());
+        }
+
+        if (dto.getDateCreated() != null) {
+            transaction.setDateCreated(dto.getDateCreated());
+        }
+
+        if (dto.getComment() != null) {
+            transaction.setComment(dto.getComment());
+        }
+
+        if (dto.getCategoryId() != null) {
+            transaction.setCategoryId(dto.getCategoryId());
+        }
+
+        if (dto.getBudgetId() != null) {
+            transaction.setBudgetId(dto.getBudgetId());
+        }
+
+        return transaction;
     }
 }
