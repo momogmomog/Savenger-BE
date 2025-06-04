@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -90,6 +91,20 @@ public class GlobalExceptionHandler {
                 ),
                 ex
         );
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleMessageNotReadable(
+            HttpMessageNotReadableException ex,
+            HttpServletRequest request) {
+        log.warn("Error during parsing request: {}", request.getRequestURL(), ex);
+        final ErrorResponse response = new ErrorResponse(
+                ApiErrorCode.ERR_0011,
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     private ResponseEntity<ErrorResponse> logAndReturn(ErrorResponse response, Exception ex) {
