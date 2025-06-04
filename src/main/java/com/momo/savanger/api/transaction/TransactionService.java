@@ -14,5 +14,5 @@ public interface TransactionService {
 
     Page<Transaction> searchTransactions(TransactionSearchQuery query, User user);
 
-    Transaction edit (Long id, EditTransactionDto dto);
+    Transaction edit(Long id, EditTransactionDto dto);
 }

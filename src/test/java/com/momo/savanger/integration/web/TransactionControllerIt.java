@@ -5,10 +5,11 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.TransactionRepository;
-import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.transaction.TransactionType;
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
+import com.momo.savanger.api.transaction.dto.EditTransactionDto;
+import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.util.BetweenQuery;
 import com.momo.savanger.api.util.PageQuery;
 import com.momo.savanger.api.util.SortDirection;
@@ -63,7 +64,6 @@ public class TransactionControllerIt extends BaseControllerIt {
 
         List<Long> ids = new ArrayList<>();
         ids.add(1001L);
-        ids.add(1002L);
 
         dto.setTagIds(ids);
         super.postOK(Endpoints.TRANSACTIONS, dto);
@@ -230,5 +230,69 @@ public class TransactionControllerIt extends BaseControllerIt {
                 jsonPath(
                         "fieldErrors.[?(@.field == \"sort.direction\" && @.constraintName == \"NotNull\")]").exists()
         );
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testEdit_invalidPayload() throws Exception {
+
+        EditTransactionDto dto = new EditTransactionDto();
+
+        dto.setType(TransactionType.EXPENSE);
+        dto.setAmount(BigDecimal.valueOf(-43.33));
+        dto.setCategoryId(1001L);
+        dto.setBudgetId(1001L);
+
+        super.post("/transactions/1001/edit",
+                dto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"amount\" && @.constraintName == \"MinValueZero\")]").exists()
+        );
+
+        dto.setAmount(BigDecimal.ZERO);
+        dto.setBudgetId(1003L);
+        super.post("/transactions/1001/edit",
+                dto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(2)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"categoryId\" && @.constraintName == \"ValidTransactionDto\")]").exists()
+
+        );
+
+        dto.setBudgetId(1001L);
+
+        List<Long> ids = new ArrayList<>();
+        ids.add(1001L);
+        ids.add(1003L);
+
+        dto.setTagIds(ids);
+
+        super.post("/transactions/1001/edit",
+                dto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath("fieldErrors.[?(@.field == \"tagIds\" "
+                        + "&& @.constraintName == \"ValidTransactionDto\" "
+                        + "&& @.message == \"Invalid tags: [1003]\")]").exists()
+        );
+
+        ids.remove(1003L);
+        dto.setTagIds(ids);
+
+        super.post("/transactions/1003/edit",
+                dto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"id\" && @.constraintName == \"TransactionRevised\")]").exists()
+
+        );
+
+
     }
 }
