@@ -50,7 +50,7 @@ public class TransactionController {
         );
     }
 
-    @PutMapping(Endpoints.TRANSACTION_EDIT)
+    @PutMapping(Endpoints.TRANSACTION)
     public TransactionDto edit(@PathVariable @TransactionNotRevised Long id,
             @Valid @RequestBody EditTransactionDto dto) {
 
