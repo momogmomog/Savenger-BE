@@ -1,6 +1,9 @@
 package com.momo.savanger.api.transaction;
 
 import com.momo.savanger.api.tag.TagService;
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
+import com.momo.savanger.api.transaction.dto.EditTransactionDto;
+import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
@@ -66,5 +69,29 @@ public class TransactionServiceImpl implements TransactionService {
                 .and(TransactionSpecifications.isLinkedToTag(query.getTagId()));
 
         return this.transactionRepository.findAll(specification, query.getPage(), null);
+    }
+
+    @Override
+    @Transactional
+    public Transaction edit(Long id, EditTransactionDto dto) {
+
+        final Transaction transaction = this.transactionMapper.mergeIntoTransaction(dto,
+                this.findById(id));
+
+        if (!dto.getTagIds().isEmpty()) {
+            transaction.setTags(this.tagService.findByBudgetAndIdContaining(
+                    dto.getTagIds(),
+                    dto.getBudgetId()
+            ));
+        }
+
+        this.transactionRepository.save(transaction);
+
+        return transaction;
+    }
+
+    @Override
+    public Boolean existsByIdAndRevisedFalse(Long id) {
+        return this.transactionRepository.existsByIdAndRevisedFalse(id);
     }
 }

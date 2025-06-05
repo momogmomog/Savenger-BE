@@ -5,16 +5,18 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import com.momo.savanger.api.transaction.CreateTransactionDto;
 import com.momo.savanger.api.transaction.TransactionRepository;
-import com.momo.savanger.api.transaction.TransactionSearchQuery;
 import com.momo.savanger.api.transaction.TransactionType;
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
+import com.momo.savanger.api.transaction.dto.EditTransactionDto;
+import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.util.BetweenQuery;
 import com.momo.savanger.api.util.PageQuery;
 import com.momo.savanger.api.util.SortDirection;
 import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -63,7 +65,6 @@ public class TransactionControllerIt extends BaseControllerIt {
 
         List<Long> ids = new ArrayList<>();
         ids.add(1001L);
-        ids.add(1002L);
 
         dto.setTagIds(ids);
         super.postOK(Endpoints.TRANSACTIONS, dto);
@@ -230,5 +231,91 @@ public class TransactionControllerIt extends BaseControllerIt {
                 jsonPath(
                         "fieldErrors.[?(@.field == \"sort.direction\" && @.constraintName == \"NotNull\")]").exists()
         );
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testEdit_invalidPayload() throws Exception {
+
+        EditTransactionDto dto = new EditTransactionDto();
+
+        super.put("/transactions/1001",
+                dto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(5)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"type\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"amount\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"dateCreated\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"categoryId\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"NotNull\")]").exists());
+
+        dto.setType(TransactionType.EXPENSE);
+        dto.setAmount(BigDecimal.valueOf(-43.33));
+        dto.setCategoryId(1001L);
+        dto.setBudgetId(1001L);
+
+        super.put("/transactions/1001",
+                dto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(2)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"amount\" && @.constraintName == \"MinValueZero\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"dateCreated\" && @.constraintName == \"NotNull\")]").exists()
+        );
+
+        dto.setAmount(BigDecimal.ZERO);
+        dto.setBudgetId(1003L);
+        super.put("/transactions/1001",
+                dto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"categoryId\" && @.constraintName == \"ValidTransactionDto\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"dateCreated\" && @.constraintName == \"NotNull\")]").exists()
+
+        );
+
+        dto.setBudgetId(1001L);
+
+        List<Long> ids = new ArrayList<>();
+        ids.add(1001L);
+        ids.add(1003L);
+
+        dto.setTagIds(ids);
+
+        super.put("/transactions/1001",
+                dto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(2)),
+                jsonPath("fieldErrors.[?(@.field == \"tagIds\" "
+                        + "&& @.constraintName == \"ValidTransactionDto\" "
+                        + "&& @.message == \"Invalid tags: [1003]\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"dateCreated\" && @.constraintName == \"NotNull\")]").exists()
+        );
+
+        ids.remove(1003L);
+        dto.setTagIds(ids);
+        dto.setDateCreated(LocalDateTime.now());
+
+        super.put("/transactions/1003",
+                dto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"id\" && @.constraintName == \"TransactionRevised\")]").exists()
+
+        );
+
+
     }
 }

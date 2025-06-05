@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 public interface TransactionRepository extends JpaRepository<Transaction, Long>,
         TransactionRepositoryFragment {
 
+    boolean existsByIdAndRevisedFalse(Long id);
 }

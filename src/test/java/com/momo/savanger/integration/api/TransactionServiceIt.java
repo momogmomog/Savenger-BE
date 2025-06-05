@@ -1,17 +1,20 @@
 package com.momo.savanger.integration.api;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.momo.savanger.api.transaction.CreateTransactionDto;
+import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.transaction.Transaction;
 import com.momo.savanger.api.transaction.TransactionRepository;
-import com.momo.savanger.api.transaction.TransactionSearchQuery;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.TransactionType;
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
+import com.momo.savanger.api.transaction.dto.EditTransactionDto;
+import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
 import com.momo.savanger.api.util.BetweenQuery;
@@ -77,7 +80,6 @@ public class TransactionServiceIt {
 
         List<Long> ids = new ArrayList<>();
         ids.add(1001L);
-        ids.add(1002L);
 
         dto.setTagIds(ids);
 
@@ -95,7 +97,7 @@ public class TransactionServiceIt {
         assertEquals(BigDecimal.valueOf(43.33), transaction.getAmount());
         assertEquals(1001L, transaction.getBudgetId());
         assertEquals(1001L, transaction.getCategoryId());
-        assertEquals(2, transaction.getTags().size());
+        assertEquals(1, transaction.getTags().size());
         assertEquals(user.getId(), transaction.getUserId());
         assertFalse(transaction.getRevised());
     }
@@ -241,5 +243,31 @@ public class TransactionServiceIt {
 
         assertEquals(1, transactions.getTotalElements());
         assertEquals(1003L, transactions.getContent().getFirst().getId());
+    }
+
+    @Test
+    @Transactional
+    public void testEditTransaction_validPayload_shouldEditTransaction() {
+        EditTransactionDto dto = new EditTransactionDto();
+        dto.setType(TransactionType.EXPENSE);
+        dto.setAmount(BigDecimal.valueOf(254.99));
+        dto.setComment("Kupih si vafli");
+        dto.setCategoryId(1002L);
+        dto.setDateCreated(LocalDateTime.now());
+        dto.setBudgetId(1002L);
+        dto.setTagIds(List.of(1002L));
+
+        Transaction transaction = this.transactionService.edit(1001L, dto);
+
+        assertEquals(TransactionType.EXPENSE, transaction.getType());
+        assertEquals(BigDecimal.valueOf(254.99), transaction.getAmount());
+        assertEquals("Kupih si vafli", transaction.getComment());
+        assertEquals(1002L, transaction.getBudgetId());
+        assertEquals(1002L, transaction.getCategoryId());
+        assertEquals(1, transaction.getTags().size());
+        assertThat(List.of(1002L))
+                .hasSameElementsAs(
+                        transaction.getTags().stream().map(Tag::getId).toList()
+                );
     }
 }
