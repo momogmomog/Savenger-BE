@@ -6,6 +6,7 @@ import com.momo.savanger.api.transaction.constraints.ValidTransactionDto;
 import com.momo.savanger.constants.Lengths;
 import com.momo.savanger.constants.ValidationMessages;
 import com.momo.savanger.constraints.MinValueZero;
+import com.momo.savanger.constraints.NotNull;
 import com.momo.savanger.converter.DateTimeConverter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,19 +19,24 @@ import org.hibernate.validator.constraints.Length;
 @ValidTransactionDto
 public class EditTransactionDto implements ITransactionDto {
 
+    @NotNull
     private TransactionType type;
 
+    @NotNull
     @MinValueZero
     private BigDecimal amount;
 
+    @NotNull
     @DateTimeConverter
     private LocalDateTime dateCreated;
 
     @Length(max = Lengths.MAX_VARCHAR, message = ValidationMessages.TEXT_MUST_BE_BETWEEN)
     private String comment;
 
+    @NotNull
     private Long categoryId;
 
+    @NotNull
     @CanAccessBudget
     private Long budgetId;
 

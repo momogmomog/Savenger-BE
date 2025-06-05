@@ -16,6 +16,7 @@ import com.momo.savanger.api.util.SortDirection;
 import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -238,29 +239,48 @@ public class TransactionControllerIt extends BaseControllerIt {
 
         EditTransactionDto dto = new EditTransactionDto();
 
+        super.put("/transactions/1001",
+                dto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(5)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"type\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"amount\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"dateCreated\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"categoryId\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"NotNull\")]").exists());
+
         dto.setType(TransactionType.EXPENSE);
         dto.setAmount(BigDecimal.valueOf(-43.33));
         dto.setCategoryId(1001L);
         dto.setBudgetId(1001L);
 
-        super.post("/transactions/1001/edit",
-                dto,
-                HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(1)),
-                jsonPath(
-                        "fieldErrors.[?(@.field == \"amount\" && @.constraintName == \"MinValueZero\")]").exists()
-        );
-
-        dto.setAmount(BigDecimal.ZERO);
-        dto.setBudgetId(1003L);
-        super.post("/transactions/1001/edit",
+        super.put("/transactions/1001",
                 dto,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(2)),
                 jsonPath(
+                        "fieldErrors.[?(@.field == \"amount\" && @.constraintName == \"MinValueZero\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"dateCreated\" && @.constraintName == \"NotNull\")]").exists()
+        );
+
+        dto.setAmount(BigDecimal.ZERO);
+        dto.setBudgetId(1003L);
+        super.put("/transactions/1001",
+                dto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
                         "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"categoryId\" && @.constraintName == \"ValidTransactionDto\")]").exists()
+                        "fieldErrors.[?(@.field == \"categoryId\" && @.constraintName == \"ValidTransactionDto\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"dateCreated\" && @.constraintName == \"NotNull\")]").exists()
 
         );
 
@@ -272,19 +292,22 @@ public class TransactionControllerIt extends BaseControllerIt {
 
         dto.setTagIds(ids);
 
-        super.post("/transactions/1001/edit",
+        super.put("/transactions/1001",
                 dto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath("fieldErrors.length()", is(2)),
                 jsonPath("fieldErrors.[?(@.field == \"tagIds\" "
                         + "&& @.constraintName == \"ValidTransactionDto\" "
-                        + "&& @.message == \"Invalid tags: [1003]\")]").exists()
+                        + "&& @.message == \"Invalid tags: [1003]\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"dateCreated\" && @.constraintName == \"NotNull\")]").exists()
         );
 
         ids.remove(1003L);
         dto.setTagIds(ids);
+        dto.setDateCreated(LocalDateTime.now());
 
-        super.post("/transactions/1003/edit",
+        super.put("/transactions/1003",
                 dto,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),

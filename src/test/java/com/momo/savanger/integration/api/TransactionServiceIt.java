@@ -270,23 +270,4 @@ public class TransactionServiceIt {
                         transaction.getTags().stream().map(Tag::getId).toList()
                 );
     }
-
-    @Test
-    @Transactional
-    public void testEditTransaction_emptyPayload_shouldEditTransaction() {
-        EditTransactionDto dto = new EditTransactionDto();
-
-        Transaction transaction = this.transactionService.edit(1001L, dto);
-
-        assertEquals(TransactionType.INCOME, transaction.getType());
-        assertEquals(BigDecimal.valueOf(23.32), transaction.getAmount().setScale(2));
-        assertEquals("Vaza", transaction.getComment());
-        assertEquals(1001L, transaction.getBudgetId());
-        assertEquals(1001L, transaction.getCategoryId());
-        assertEquals(1, transaction.getTags().size());
-        assertThat(List.of(1001L))
-                .hasSameElementsAs(
-                        transaction.getTags().stream().map(Tag::getId).toList()
-                );
-    }
 }

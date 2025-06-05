@@ -5,6 +5,7 @@ import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.user.User;
+import com.momo.savanger.api.util.ModelMerger;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.time.LocalDateTime;
@@ -23,6 +24,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper transactionMapper;
 
     private final TagService tagService;
+
+    private final ModelMerger modelMerger;
 
     @Override
     public Transaction findById(Long id) {
@@ -74,9 +77,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Transaction edit(Long id, EditTransactionDto dto) {
 
-        Transaction transaction = this.findById(id);
-
-        transaction = this.mergeTransactions(transaction, dto);
+        final Transaction transaction = this.modelMerger.merge(dto, this.findById(id));
 
         if (!dto.getTagIds().isEmpty()) {
             transaction.setTags(this.tagService.findByBudgetAndIdContaining(
@@ -86,36 +87,6 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         this.transactionRepository.save(transaction);
-
-        return transaction;
-    }
-
-    private Transaction mergeTransactions(
-            Transaction transaction, EditTransactionDto dto) {
-
-        if (dto.getType() != null) {
-            transaction.setType(dto.getType());
-        }
-
-        if (dto.getAmount() != null) {
-            transaction.setAmount(dto.getAmount());
-        }
-
-        if (dto.getDateCreated() != null) {
-            transaction.setDateCreated(dto.getDateCreated());
-        }
-
-        if (dto.getComment() != null) {
-            transaction.setComment(dto.getComment());
-        }
-
-        if (dto.getCategoryId() != null) {
-            transaction.setCategoryId(dto.getCategoryId());
-        }
-
-        if (dto.getBudgetId() != null) {
-            transaction.setBudgetId(dto.getBudgetId());
-        }
 
         return transaction;
     }
