@@ -89,4 +89,9 @@ public class TransactionServiceImpl implements TransactionService {
 
         return transaction;
     }
+
+    @Override
+    public Boolean existsByIdAndRevisedFalse(Long id) {
+        return this.transactionRepository.existsByIdAndRevisedFalse(id);
+    }
 }

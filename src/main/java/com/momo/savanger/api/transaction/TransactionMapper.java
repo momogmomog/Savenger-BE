@@ -11,8 +11,6 @@ public interface TransactionMapper {
 
     Transaction toTransaction(CreateTransactionDto createCategoryDto);
 
-    Transaction toTransaction(EditTransactionDto editTransactionDto);
-
     TransactionDto toTransactionDto(Transaction transaction);
 
     Transaction mergeIntoTransaction(EditTransactionDto dto,

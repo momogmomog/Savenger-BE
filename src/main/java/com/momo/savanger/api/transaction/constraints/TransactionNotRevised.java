@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-@Constraint(validatedBy = TransactionRevisedValidator.class)
-public @interface TransactionRevised {
+@Constraint(validatedBy = TransactionNotRevisedValidator.class)
+public @interface TransactionNotRevised {
 
     String message() default ValidationMessages.TRANSACTION_IS_REVISED;
 

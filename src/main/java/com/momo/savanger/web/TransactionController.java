@@ -2,7 +2,7 @@ package com.momo.savanger.web;
 
 import com.momo.savanger.api.transaction.TransactionMapper;
 import com.momo.savanger.api.transaction.TransactionService;
-import com.momo.savanger.api.transaction.constraints.TransactionRevised;
+import com.momo.savanger.api.transaction.constraints.TransactionNotRevised;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionDto;
@@ -51,7 +51,7 @@ public class TransactionController {
     }
 
     @PutMapping(Endpoints.TRANSACTION_EDIT)
-    public TransactionDto edit(@PathVariable @TransactionRevised Long id,
+    public TransactionDto edit(@PathVariable @TransactionNotRevised Long id,
             @Valid @RequestBody EditTransactionDto dto) {
 
         return this.transactionMapper.toTransactionDto(
