@@ -1,6 +1,6 @@
 package com.momo.savanger.api.transaction.constraints;
 
-import com.momo.savanger.api.transaction.Transaction;
+import com.momo.savanger.api.transaction.TransactionRepository;
 import com.momo.savanger.api.transaction.TransactionService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -14,6 +14,8 @@ public class TransactionRevisedValidator implements
 
     private final TransactionService transactionService;
 
+    private final TransactionRepository transactionRepository;
+
     @Override
     public void initialize(TransactionRevised constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
@@ -21,8 +23,6 @@ public class TransactionRevisedValidator implements
 
     @Override
     public boolean isValid(Long id, ConstraintValidatorContext constraintValidatorContext) {
-        Transaction transaction = this.transactionService.findById(id);
-
-        return !transaction.getRevised();
+        return this.transactionRepository.existsByIdAndRevisedFalse(id);
     }
 }

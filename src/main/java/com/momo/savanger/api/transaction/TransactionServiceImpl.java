@@ -5,7 +5,6 @@ import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.user.User;
-import com.momo.savanger.api.util.ModelMerger;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.time.LocalDateTime;
@@ -24,8 +23,6 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper transactionMapper;
 
     private final TagService tagService;
-
-    private final ModelMerger modelMerger;
 
     @Override
     public Transaction findById(Long id) {
@@ -75,9 +72,11 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public Transaction edit(Long id, EditTransactionDto dto) {
 
-        final Transaction transaction = this.modelMerger.merge(dto, this.findById(id));
+        final Transaction transaction = this.transactionMapper.mergeIntoTransaction(dto,
+                this.findById(id));
 
         if (!dto.getTagIds().isEmpty()) {
             transaction.setTags(this.tagService.findByBudgetAndIdContaining(

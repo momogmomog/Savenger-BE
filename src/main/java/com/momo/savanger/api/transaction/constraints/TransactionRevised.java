@@ -1,5 +1,6 @@
 package com.momo.savanger.api.transaction.constraints;
 
+import com.momo.savanger.constants.ValidationMessages;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.ElementType;
@@ -12,7 +13,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = TransactionRevisedValidator.class)
 public @interface TransactionRevised {
 
-    String message() default "Transaction is already revised and cannot be edit.";
+    String message() default ValidationMessages.TRANSACTION_IS_REVISED;
 
     Class<?>[] groups() default {};
 
