@@ -10,9 +10,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CanAccessTransactionValidator implements ConstraintValidator<CanAccessTransaction, Long> {
+public class CanAccessTransactionValidator implements
+        ConstraintValidator<CanAccessTransaction, Long> {
 
     private final TransactionService transactionService;
+
     @Override
     public void initialize(CanAccessTransaction constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
@@ -25,4 +27,5 @@ public class CanAccessTransactionValidator implements ConstraintValidator<CanAcc
 
         return this.transactionService.canAccessTransaction(id, user);
     }
+
 }

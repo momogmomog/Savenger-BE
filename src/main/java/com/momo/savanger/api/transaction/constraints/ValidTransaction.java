@@ -14,7 +14,9 @@ import java.lang.annotation.Target;
 public @interface ValidTransaction {
 
     String message() default ValidationMessages.TRANSACTION_DOES_NOT_EXIST;
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 
 }

@@ -18,7 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TransactionSpecifications {
 
-    public static Specification<Transaction> idEquals(final Long id){
+    public static Specification<Transaction> idEquals(final Long id) {
         return QuerySpecifications.equal(Transaction_.id, id);
     }
 

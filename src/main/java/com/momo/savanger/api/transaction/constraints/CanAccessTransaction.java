@@ -12,7 +12,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 @Constraint(validatedBy = CanAccessTransactionValidator.class)
 public @interface CanAccessTransaction {
+
     String message() default ValidationMessages.INVALID_TRANSACTION;
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

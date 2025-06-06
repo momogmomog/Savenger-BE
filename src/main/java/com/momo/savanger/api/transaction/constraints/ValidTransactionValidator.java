@@ -1,6 +1,5 @@
 package com.momo.savanger.api.transaction.constraints;
 
-import com.momo.savanger.api.transaction.Transaction;
 import com.momo.savanger.api.transaction.TransactionService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

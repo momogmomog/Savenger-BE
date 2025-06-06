@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.transaction.Transaction;
@@ -270,4 +271,55 @@ public class TransactionServiceIt {
                         transaction.getTags().stream().map(Tag::getId).toList()
                 );
     }
+
+    @Test
+    @Transactional
+    public void testDeleteTransaction_validId_shouldDeleteTransaction() {
+
+        List<Transaction> transactions = this.transactionRepository.findAll();
+
+        assertEquals(3, transactions.size());
+
+        this.transactionService.deleteById(1001L);
+
+        transactions = this.transactionRepository.findAll();
+
+        assertEquals(2, transactions.size());
+    }
+
+    @Test
+    public void testCanAccessTransaction() {
+
+        //Test with valid parameters
+        User user = this.userService.getById(1L);
+
+        assertTrue(this.transactionService.canAccessTransaction(1001L, user));
+
+        //Test with revised "true"
+
+        assertFalse(this.transactionService.canAccessTransaction(1003L, user));
+
+        //Test with invalid id
+
+        assertFalse(this.transactionService.canAccessTransaction(1006L, user));
+
+        //Test with invalid owner
+
+        user = this.userService.getById(2L);
+        assertFalse(this.transactionService.canAccessTransaction(1002L, user));
+    }
+
+    @Test
+    public void testIsTransactionValid(){
+
+        //Valid id
+
+        assertTrue(this.transactionService.isTransactionValid(1001L));
+
+        //Invalid id
+
+        assertFalse(this.transactionService.isTransactionValid(10002L));
+    }
+
+
 }

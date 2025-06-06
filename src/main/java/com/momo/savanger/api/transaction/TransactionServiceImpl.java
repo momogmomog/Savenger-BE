@@ -106,7 +106,8 @@ public class TransactionServiceImpl implements TransactionService {
     public boolean canAccessTransaction(Long transactionId, User user) {
         final Specification<Transaction> specification = TransactionSpecifications.idEquals(
                         transactionId)
-                .and(TransactionSpecifications.userIdEquals(user.getId()));
+                .and(TransactionSpecifications.userIdEquals(user.getId()))
+                .and(TransactionSpecifications.maybeRevised(false));
 
         return this.transactionRepository.exists(specification);
     }
