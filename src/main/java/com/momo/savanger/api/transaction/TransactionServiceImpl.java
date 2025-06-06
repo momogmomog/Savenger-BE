@@ -94,4 +94,27 @@ public class TransactionServiceImpl implements TransactionService {
     public Boolean existsByIdAndRevisedFalse(Long id) {
         return this.transactionRepository.existsByIdAndRevisedFalse(id);
     }
+
+    @Override
+    public void deleteById(Long id) {
+
+        this.transactionRepository.deleteById(id);
+
+    }
+
+    @Override
+    public boolean canAccessTransaction(Long transactionId, User user) {
+        final Specification<Transaction> specification = TransactionSpecifications.idEquals(
+                        transactionId)
+                .and(TransactionSpecifications.userIdEquals(user.getId()));
+
+        return this.transactionRepository.exists(specification);
+    }
+
+    @Override
+    public boolean isTransactionValid(Long id) {
+        final Specification<Transaction> specification = TransactionSpecifications.idEquals(id);
+
+        return this.transactionRepository.exists(specification);
+    }
 }

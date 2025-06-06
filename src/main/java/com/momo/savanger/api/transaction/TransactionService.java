@@ -17,4 +17,11 @@ public interface TransactionService {
     Transaction edit(Long id, EditTransactionDto dto);
 
     Boolean existsByIdAndRevisedFalse(Long id);
+
+    void deleteById(Long id);
+
+    boolean canAccessTransaction(Long transactionId, User user);
+
+    boolean isTransactionValid(Long id);
 }
+

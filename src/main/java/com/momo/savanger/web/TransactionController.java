@@ -3,6 +3,8 @@ package com.momo.savanger.web;
 import com.momo.savanger.api.transaction.TransactionMapper;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.constraints.TransactionNotRevised;
+import com.momo.savanger.api.transaction.constraints.CanAccessTransaction;
+import com.momo.savanger.api.transaction.constraints.ValidTransaction;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionDto;
@@ -16,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -56,5 +60,17 @@ public class TransactionController {
 
         return this.transactionMapper.toTransactionDto(
                 this.transactionService.edit(id, dto));
+    }
+
+    @DeleteMapping(Endpoints.TRANSACTION)
+    public void delete(@PathVariable @CanAccessTransaction Long id){
+
+        this.transactionService.deleteById(id);
+
+    }
+
+    @GetMapping(Endpoints.TRANSACTION)
+    public TransactionDto getTransaction(@PathVariable @ValidTransaction Long id){
+        return this.transactionMapper.toTransactionDto(this.transactionService.findById(id));
     }
 }
