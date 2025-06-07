@@ -103,9 +103,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public boolean canAccessTransaction(Long transactionId, User user) {
-        final Specification<Transaction> specification = TransactionSpecifications.idEquals(
-                        transactionId)
+    public boolean canDeleteTransaction(Long transactionId, User user) {
+        final Specification<Transaction> specification = TransactionSpecifications
+                .idEquals(transactionId)
                 .and(TransactionSpecifications.userIdEquals(user.getId()))
                 .and(TransactionSpecifications.maybeRevised(false));
 
@@ -113,9 +113,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public boolean isTransactionValid(Long id) {
-        final Specification<Transaction> specification = TransactionSpecifications.idEquals(id);
+    public boolean canViewTransaction(Long transactionId, Long userId) {
 
-        return this.transactionRepository.exists(specification);
+        return this.transactionRepository.existOwnerOrParticipant(transactionId, userId);
     }
 }

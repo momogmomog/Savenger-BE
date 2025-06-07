@@ -20,8 +20,8 @@ public interface TransactionService {
 
     void deleteById(Long id);
 
-    boolean canAccessTransaction(Long transactionId, User user);
+    boolean canDeleteTransaction(Long transactionId, User user);
 
-    boolean isTransactionValid(Long id);
+    boolean canViewTransaction(Long transactionId, Long userId);
 }
 

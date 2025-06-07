@@ -343,7 +343,7 @@ public class TransactionControllerIt extends BaseControllerIt {
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath("fieldErrors.[?(@.field == \"id\" && "
-                        + "@.constraintName == \"CanAccessTransaction\")]").exists());
+                        + "@.constraintName == \"CanDeleteTransaction\")]").exists());
     }
 
     @Test
@@ -354,13 +354,13 @@ public class TransactionControllerIt extends BaseControllerIt {
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath("fieldErrors.[?(@.field == \"id\" && "
-                        + "@.constraintName == \"CanAccessTransaction\")]").exists());
+                        + "@.constraintName == \"CanDeleteTransaction\")]").exists());
 
         super.delete("/transactions/1003", null
                 , HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath("fieldErrors.[?(@.field == \"id\" && "
-                        + "@.constraintName == \"CanAccessTransaction\")]").exists()
+                        + "@.constraintName == \"CanDeleteTransaction\")]").exists()
         );
     }
 
@@ -371,6 +371,6 @@ public class TransactionControllerIt extends BaseControllerIt {
                 , HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath("fieldErrors.[?(@.field == \"id\" && "
-                        + "@.constraintName == \"ValidTransaction\")]").exists());
+                        + "@.constraintName == \"CanViewTransaction\")]").exists());
     }
 }

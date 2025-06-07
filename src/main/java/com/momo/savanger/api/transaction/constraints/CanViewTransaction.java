@@ -10,12 +10,13 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-@Constraint(validatedBy = CanAccessTransactionValidator.class)
-public @interface CanAccessTransaction {
+@Constraint(validatedBy = CanViewTransactionValidator.class)
+public @interface CanViewTransaction {
 
-    String message() default ValidationMessages.INVALID_TRANSACTION;
+    String message() default ValidationMessages.TRANSACTION_DOES_NOT_EXIST;
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
 }

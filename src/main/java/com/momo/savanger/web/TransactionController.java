@@ -2,9 +2,9 @@ package com.momo.savanger.web;
 
 import com.momo.savanger.api.transaction.TransactionMapper;
 import com.momo.savanger.api.transaction.TransactionService;
-import com.momo.savanger.api.transaction.constraints.CanAccessTransaction;
+import com.momo.savanger.api.transaction.constraints.CanDeleteTransaction;
+import com.momo.savanger.api.transaction.constraints.CanViewTransaction;
 import com.momo.savanger.api.transaction.constraints.TransactionNotRevised;
-import com.momo.savanger.api.transaction.constraints.ValidTransaction;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionDto;
@@ -63,14 +63,15 @@ public class TransactionController {
     }
 
     @DeleteMapping(Endpoints.TRANSACTION)
-    public void delete(@PathVariable @CanAccessTransaction Long id) {
+    public void delete(@PathVariable @CanDeleteTransaction Long id) {
 
         this.transactionService.deleteById(id);
 
     }
 
     @GetMapping(Endpoints.TRANSACTION)
-    public TransactionDto getTransaction(@PathVariable @ValidTransaction Long id) {
+    public TransactionDto getTransaction(@PathVariable @CanViewTransaction Long id) {
+
         return this.transactionMapper.toTransactionDto(this.transactionService.findById(id));
     }
 }

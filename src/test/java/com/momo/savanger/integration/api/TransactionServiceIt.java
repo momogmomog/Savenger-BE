@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.momo.savanger.api.budget.BudgetService;
+import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.transaction.Transaction;
 import com.momo.savanger.api.transaction.TransactionRepository;
@@ -65,7 +67,10 @@ public class TransactionServiceIt {
     private TransactionRepository transactionRepository;
 
     @Autowired
-    UserService userService;
+    private UserService userService;
+
+    @Autowired
+    private BudgetService budgetService;
 
     @Test
     @Transactional
@@ -288,37 +293,44 @@ public class TransactionServiceIt {
     }
 
     @Test
-    public void testCanAccessTransaction() {
+    public void testCanDeleteTransaction() {
 
         //Test with valid parameters
         User user = this.userService.getById(1L);
 
-        assertTrue(this.transactionService.canAccessTransaction(1001L, user));
+        assertTrue(this.transactionService.canDeleteTransaction(1001L, user));
 
         //Test with revised "true"
 
-        assertFalse(this.transactionService.canAccessTransaction(1003L, user));
+        assertFalse(this.transactionService.canDeleteTransaction(1003L, user));
 
         //Test with invalid id
 
-        assertFalse(this.transactionService.canAccessTransaction(1006L, user));
+        assertFalse(this.transactionService.canDeleteTransaction(1006L, user));
 
         //Test with invalid owner
 
         user = this.userService.getById(2L);
-        assertFalse(this.transactionService.canAccessTransaction(1002L, user));
+        assertFalse(this.transactionService.canDeleteTransaction(1002L, user));
     }
 
     @Test
-    public void testIsTransactionValid(){
+    public void testIsTransactionValid() {
 
-        //Valid id
+        //Valid id (owner)
+        assertTrue(this.transactionService.canViewTransaction(1001L, 1L));
 
-        assertTrue(this.transactionService.isTransactionValid(1001L));
+        //Invalid transaction Id
+        assertFalse(this.transactionService.canViewTransaction(10002L, 1L));
 
-        //Invalid id
+        //Valid participant id
+        assertFalse(this.transactionService.canViewTransaction(1001L, 3L));
+        this.budgetService.addParticipant(new AssignParticipantDto(
+                3L,
+                this.budgetService.findById(1001L)
+        ));
+        assertTrue(this.transactionService.canViewTransaction(1001L, 3L));
 
-        assertFalse(this.transactionService.isTransactionValid(10002L));
     }
 
 
