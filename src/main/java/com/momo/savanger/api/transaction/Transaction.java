@@ -1,5 +1,6 @@
 package com.momo.savanger.api.transaction;
 
+import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.tag.Tag;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -56,6 +58,10 @@ public class Transaction {
 
     @Column(nullable = false)
     private Long budgetId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "budgetId", insertable = false, updatable = false)
+    private Budget budget;
 
     @Exclude
     @ManyToMany(fetch = FetchType.LAZY)

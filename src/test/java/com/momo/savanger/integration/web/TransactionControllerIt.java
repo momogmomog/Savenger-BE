@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import com.momo.savanger.api.transaction.Transaction;
 import com.momo.savanger.api.transaction.TransactionRepository;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
@@ -312,10 +313,64 @@ public class TransactionControllerIt extends BaseControllerIt {
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"id\" && @.constraintName == \"TransactionRevised\")]").exists()
+                        "fieldErrors.[?(@.field == \"id\" && @.constraintName == \"TransactionNotRevised\")]").exists()
 
         );
 
 
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testDelete_validId() throws Exception {
+
+        List<Transaction> transactions = this.transactionRepository.findAll();
+
+        assertEquals(3, transactions.size());
+
+        super.deleteOK("/transactions/1001", null);
+
+        transactions = this.transactionRepository.findAll();
+
+        assertEquals(2, transactions.size());
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    public void testDelete_wrongUser() throws Exception {
+
+        super.delete("/transactions/1001", null,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath("fieldErrors.[?(@.field == \"id\" && "
+                        + "@.constraintName == \"CanDeleteTransaction\")]").exists());
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testDelete_invalidTransaction() throws Exception {
+
+        super.delete("/transactions/1043", null,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath("fieldErrors.[?(@.field == \"id\" && "
+                        + "@.constraintName == \"CanDeleteTransaction\")]").exists());
+
+        super.delete("/transactions/1003", null
+                , HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath("fieldErrors.[?(@.field == \"id\" && "
+                        + "@.constraintName == \"CanDeleteTransaction\")]").exists()
+        );
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testGetTransaction_invalidId() throws Exception {
+        super.get("/transactions/2003"
+                , HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath("fieldErrors.[?(@.field == \"id\" && "
+                        + "@.constraintName == \"CanViewTransaction\")]").exists());
     }
 }
