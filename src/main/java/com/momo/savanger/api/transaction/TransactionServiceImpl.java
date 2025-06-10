@@ -8,6 +8,7 @@ import com.momo.savanger.api.user.User;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -116,5 +117,10 @@ public class TransactionServiceImpl implements TransactionService {
     public boolean canViewTransaction(Long transactionId, Long userId) {
 
         return this.transactionRepository.existOwnerOrParticipant(transactionId, userId);
+    }
+
+    @Override
+    public void revisedTransactions(Long budgetId) {
+        this.transactionRepository.setRevisedTrue(budgetId);
     }
 }

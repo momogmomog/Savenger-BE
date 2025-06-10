@@ -23,5 +23,7 @@ public interface TransactionService {
     boolean canDeleteTransaction(Long transactionId, User user);
 
     boolean canViewTransaction(Long transactionId, Long userId);
+
+    void revisedTransactions(Long budgetId);
 }
 
