@@ -138,7 +138,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private BigDecimal getSumAmount(Long budgetId, TransactionType type) {
 
-        BigDecimal sum = this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(
+        final BigDecimal sum = this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(
                 budgetId,
                 type);
 

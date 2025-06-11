@@ -6,7 +6,7 @@ import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.budget.dto.BudgetDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
-import com.momo.savanger.api.budget.dto.StatisticDto;
+import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.transaction.TransactionService;
@@ -143,7 +143,7 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public void editBudgetAfterRevise(Long id, Revision revision) {
+    public void updateBudgetAfterRevision(Long id, Revision revision) {
         final Budget budget = this.findById(id);
 
         budget.setBalance(revision.getBalance());
@@ -154,12 +154,12 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public StatisticDto getStatistic(Long budgetId) {
+    public BudgetStatisticsDto getStatistics(Long budgetId) {
 
         final Budget budget = this.findById(budgetId);
         final BudgetDto budgetDto = this.budgetMapper.toBudgetDto(this.findById(budgetId));
 
-        final StatisticDto statisticDto = new StatisticDto();
+        final BudgetStatisticsDto statisticDto = new BudgetStatisticsDto();
 
         statisticDto.setBudget(budgetDto);
         statisticDto.setBalance(this.getBalance(budget));
@@ -171,8 +171,10 @@ public class BudgetServiceImpl implements BudgetService {
 
     private BigDecimal getBalance(Budget budget) {
 
-        final BigDecimal expensesAmount = this.transactionService.getExpensesAmount(budget.getId());
-        final BigDecimal earningsAmount = this.transactionService.getEarningsAmount(budget.getId());
+        BudgetStatisticsDto statisticsDto = this.getStatistics(budget.getId());
+
+        final BigDecimal expensesAmount = statisticsDto.getExpensesAmount();
+        final BigDecimal earningsAmount = statisticsDto.getEarningsAmount();
 
         return earningsAmount
                 .add(budget.getBalance())

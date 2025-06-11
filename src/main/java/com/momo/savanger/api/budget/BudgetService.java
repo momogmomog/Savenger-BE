@@ -3,7 +3,7 @@ package com.momo.savanger.api.budget;
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
-import com.momo.savanger.api.budget.dto.StatisticDto;
+import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.user.User;
@@ -30,8 +30,8 @@ public interface BudgetService {
 
     Page<Budget> searchBudget(BudgetSearchQuery query, User user);
 
-    void editBudgetAfterRevise(Long id, Revision revision);
+    void updateBudgetAfterRevision(Long id, Revision revision);
 
-    StatisticDto getStatistic(Long budgetId);
+    BudgetStatisticsDto getStatistics(Long budgetId);
 
 }

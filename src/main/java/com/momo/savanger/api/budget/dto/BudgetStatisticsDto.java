@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import lombok.Data;
 
 @Data
-public class StatisticDto {
+public class BudgetStatisticsDto {
 
     private BudgetDto budget;
 

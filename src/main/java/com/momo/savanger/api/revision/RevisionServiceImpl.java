@@ -1,7 +1,7 @@
 package com.momo.savanger.api.revision;
 
 import com.momo.savanger.api.budget.BudgetService;
-import com.momo.savanger.api.budget.dto.StatisticDto;
+import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
 import com.momo.savanger.api.transaction.TransactionService;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class RevisionServiceImpl implements RevisionService {
 
         final Revision revision = this.revisionMapper.toRevision(dto);
 
-        final StatisticDto statisticDto = this.budgetService.getStatistic(dto.getBudgetId());
+        final BudgetStatisticsDto statisticDto = this.budgetService.getStatistics(dto.getBudgetId());
 
         revision.setRevisionDate(LocalDateTime.now());
 
@@ -51,7 +51,7 @@ public class RevisionServiceImpl implements RevisionService {
 
         this.revisionRepository.saveAndFlush(revision);
 
-        this.budgetService.editBudgetAfterRevise(revision.getBudgetId(), revision);
+        this.budgetService.updateBudgetAfterRevision(revision.getBudgetId(), revision);
 
         this.transactionService.reviseTransactions(dto.getBudgetId());
 
