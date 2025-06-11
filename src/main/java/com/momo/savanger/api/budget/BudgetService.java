@@ -29,9 +29,5 @@ public interface BudgetService {
 
     Page<Budget> searchBudget(BudgetSearchQuery query, User user);
 
-    BigDecimal expensesAmount(Long budgetId);
-
-    BigDecimal earningsAmount(Long budgetId);
-
-    BigDecimal balance(Long budgetId);
+    void editBudgetBalance(Long id, BigDecimal balance);
 }

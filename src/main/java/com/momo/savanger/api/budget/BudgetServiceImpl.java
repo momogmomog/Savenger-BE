@@ -6,8 +6,6 @@ import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
-import com.momo.savanger.api.transaction.TransactionRepository;
-import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
 import com.momo.savanger.constants.EntityGraphs;
@@ -31,8 +29,6 @@ public class BudgetServiceImpl implements BudgetService {
     private final BudgetMapper budgetMapper;
 
     private final UserService userService;
-
-    private final TransactionRepository transactionRepository;
 
     @Override
     public Budget findById(Long id) {
@@ -141,22 +137,11 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public BigDecimal expensesAmount(Long budgetId) {
-        return this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(budgetId,
-                TransactionType.EXPENSE);
-    }
+    public void editBudgetBalance(Long id, BigDecimal balance) {
+        final Budget budget = this.findById(id);
 
-    @Override
-    public BigDecimal earningsAmount(Long budgetId) {
-        return this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(budgetId,
-                TransactionType.INCOME);
-    }
+        budget.setBalance(balance);
 
-    @Override
-    public BigDecimal balance(Long budgetId) {
-        BigDecimal expensesAmount = this.expensesAmount(budgetId);
-        BigDecimal earningsAmount = this.earningsAmount(budgetId);
-
-        return earningsAmount.subtract(expensesAmount);
+        this.budgetRepository.save(budget);
     }
 }

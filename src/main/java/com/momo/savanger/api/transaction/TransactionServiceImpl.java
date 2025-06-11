@@ -1,5 +1,7 @@
 package com.momo.savanger.api.transaction;
 
+import com.momo.savanger.api.budget.Budget;
+import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
@@ -7,8 +9,8 @@ import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,6 +26,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper transactionMapper;
 
     private final TagService tagService;
+
+    private final BudgetService budgetService;
 
     @Override
     public Transaction findById(Long id) {
@@ -120,7 +124,43 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void revisedTransactions(Long budgetId) {
+    public void reviseTransactions(Long budgetId) {
         this.transactionRepository.setRevisedTrue(budgetId);
+    }
+
+    @Override
+    public BigDecimal getExpensesAmount(Long budgetId) {
+        BigDecimal expenses = this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(
+                budgetId,
+                TransactionType.EXPENSE);
+
+        if (expenses == null) {
+            return BigDecimal.ZERO;
+        }
+
+        return expenses;
+    }
+
+    @Override
+    public BigDecimal getEarningsAmount(Long budgetId) {
+        BigDecimal earnings = this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(
+                budgetId,
+                TransactionType.INCOME);
+
+        if (earnings == null) {
+            return BigDecimal.ZERO;
+        }
+
+        return earnings;
+    }
+
+    @Override
+    public BigDecimal getBalance(Long budgetId) {
+        final Budget budget = this.budgetService.findById(budgetId);
+
+        BigDecimal expensesAmount = this.getExpensesAmount(budgetId);
+        BigDecimal earningsAmount = this.getEarningsAmount(budgetId);
+
+        return (earningsAmount.add(budget.getBalance())).subtract(expensesAmount);
     }
 }

@@ -4,6 +4,7 @@ import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.user.User;
+import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
 
 public interface TransactionService {
@@ -24,6 +25,13 @@ public interface TransactionService {
 
     boolean canViewTransaction(Long transactionId, Long userId);
 
-    void revisedTransactions(Long budgetId);
+    void reviseTransactions(Long budgetId);
+
+
+    BigDecimal getExpensesAmount(Long budgetId);
+
+    BigDecimal getEarningsAmount(Long budgetId);
+
+    BigDecimal getBalance(Long budgetId);
 }
 
