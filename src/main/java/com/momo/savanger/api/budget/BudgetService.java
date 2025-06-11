@@ -3,6 +3,7 @@ package com.momo.savanger.api.budget;
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
+import com.momo.savanger.api.budget.dto.StatisticDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.user.User;
 import java.math.BigDecimal;
@@ -30,4 +31,8 @@ public interface BudgetService {
     Page<Budget> searchBudget(BudgetSearchQuery query, User user);
 
     void editBudgetBalance(Long id, BigDecimal balance);
+
+    StatisticDto getStatistic(Long budgetId);
+
+    BigDecimal getBalance(Budget budget);
 }

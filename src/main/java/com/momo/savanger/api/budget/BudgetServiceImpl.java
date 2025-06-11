@@ -5,7 +5,9 @@ import static com.momo.savanger.api.budget.BudgetSpecifications.ownerIdEquals;
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
+import com.momo.savanger.api.budget.dto.StatisticDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
+import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
 import com.momo.savanger.constants.EntityGraphs;
@@ -29,6 +31,8 @@ public class BudgetServiceImpl implements BudgetService {
     private final BudgetMapper budgetMapper;
 
     private final UserService userService;
+
+    private TransactionService transactionService;
 
     @Override
     public Budget findById(Long id) {
@@ -143,5 +147,29 @@ public class BudgetServiceImpl implements BudgetService {
         budget.setBalance(balance);
 
         this.budgetRepository.save(budget);
+    }
+
+    @Override
+    public BigDecimal getBalance(Budget budget) {
+
+        BigDecimal expensesAmount = this.transactionService.getExpensesAmount(budget.getId());
+        BigDecimal earningsAmount = this.transactionService.getEarningsAmount(budget.getId());
+
+        return (earningsAmount.add(budget.getBalance())).subtract(expensesAmount);
+    }
+
+    @Override
+    public StatisticDto getStatistic(Long budgetId) {
+
+        final Budget budget = this.findById(budgetId);
+
+        final StatisticDto statisticDto = new StatisticDto();
+
+        statisticDto.setBudget(budget);
+        statisticDto.setBalance(this.getBalance(budget));
+        statisticDto.setEarningsAmount(this.transactionService.getEarningsAmount(budgetId));
+        statisticDto.setExpensesAmount(this.transactionService.getExpensesAmount(budgetId));
+
+        return statisticDto;
     }
 }

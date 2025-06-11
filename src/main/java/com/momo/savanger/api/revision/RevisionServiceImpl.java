@@ -42,7 +42,7 @@ public class RevisionServiceImpl implements RevisionService {
         if (dto.getBalance() != null) {
             revision.setBalance(dto.getBalance());
         } else {
-            revision.setBalance(this.transactionService.getBalance(dto.getBudgetId()));
+            revision.setBalance(this.budgetService.getBalance(budget));
         }
 
         revision.setEarningsAmount(this.transactionService.getEarningsAmount(dto.getBudgetId()));

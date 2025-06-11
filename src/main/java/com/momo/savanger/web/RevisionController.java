@@ -22,7 +22,7 @@ public class RevisionController {
     private final RevisionMapper revisionMapper;
 
     @PostMapping(Endpoints.REVISIONS)
-    public RevisionDto create(@Valid @RequestBody CreateRevisionDto dto){
+    public RevisionDto create(@Valid @RequestBody CreateRevisionDto dto) {
 
         return this.revisionMapper.toRevisionDto(this.revisionService.create(dto));
     }

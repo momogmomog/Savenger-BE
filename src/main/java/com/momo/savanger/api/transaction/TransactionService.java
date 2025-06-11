@@ -31,7 +31,5 @@ public interface TransactionService {
     BigDecimal getExpensesAmount(Long budgetId);
 
     BigDecimal getEarningsAmount(Long budgetId);
-
-    BigDecimal getBalance(Long budgetId);
 }
 
