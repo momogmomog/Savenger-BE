@@ -126,27 +126,26 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public BigDecimal getExpensesAmount(Long budgetId) {
-        BigDecimal expenses = this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(
-                budgetId,
-                TransactionType.EXPENSE);
 
-        if (expenses == null) {
-            return BigDecimal.ZERO;
-        }
-
-        return expenses;
+        return this.getSumAmount(budgetId, TransactionType.EXPENSE);
     }
 
     @Override
     public BigDecimal getEarningsAmount(Long budgetId) {
-        BigDecimal earnings = this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(
-                budgetId,
-                TransactionType.INCOME);
 
-        if (earnings == null) {
+        return this.getSumAmount(budgetId, TransactionType.INCOME);
+    }
+
+    private BigDecimal getSumAmount(Long budgetId, TransactionType type) {
+
+        BigDecimal sum = this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(
+                budgetId,
+                type);
+
+        if (sum == null) {
             return BigDecimal.ZERO;
         }
 
-        return earnings;
+        return sum;
     }
 }

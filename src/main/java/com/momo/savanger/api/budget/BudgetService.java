@@ -5,8 +5,8 @@ import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.StatisticDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
+import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.user.User;
-import java.math.BigDecimal;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 
@@ -30,9 +30,8 @@ public interface BudgetService {
 
     Page<Budget> searchBudget(BudgetSearchQuery query, User user);
 
-    void editBudgetBalance(Long id, BigDecimal balance);
+    void editBudgetAfterRevise(Long id, Revision revision);
 
     StatisticDto getStatistic(Long budgetId);
 
-    BigDecimal getBalance(Budget budget);
 }

@@ -1,7 +1,7 @@
 package com.momo.savanger.api.revision;
 
-import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetService;
+import com.momo.savanger.api.budget.dto.StatisticDto;
 import com.momo.savanger.api.transaction.TransactionService;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -28,29 +28,30 @@ public class RevisionServiceImpl implements RevisionService {
     @Override
     @Transactional
     public Revision create(CreateRevisionDto dto) {
-        final Budget budget = budgetService.findById(dto.getBudgetId());
 
         final Revision revision = this.revisionMapper.toRevision(dto);
+
+        final StatisticDto statisticDto = this.budgetService.getStatistic(dto.getBudgetId());
 
         revision.setRevisionDate(LocalDateTime.now());
 
         revision.setAutoRevise(false);
 
-        revision.setBudgetCap(budget.getBudgetCap());
-        revision.setBudgetStartDate(budget.getDateStarted());
+        revision.setBudgetCap(statisticDto.getBudget().getBudgetCap());
+        revision.setBudgetStartDate(statisticDto.getBudget().getDateStarted());
 
         if (dto.getBalance() != null) {
             revision.setBalance(dto.getBalance());
         } else {
-            revision.setBalance(this.budgetService.getBalance(budget));
+            revision.setBalance(statisticDto.getBalance());
         }
 
-        revision.setEarningsAmount(this.transactionService.getEarningsAmount(dto.getBudgetId()));
-        revision.setExpensesAmount(this.transactionService.getExpensesAmount(dto.getBudgetId()));
+        revision.setEarningsAmount(statisticDto.getEarningsAmount());
+        revision.setExpensesAmount(statisticDto.getExpensesAmount());
 
         this.revisionRepository.saveAndFlush(revision);
 
-        this.budgetService.editBudgetBalance(revision.getBudgetId(), revision.getBalance());
+        this.budgetService.editBudgetAfterRevise(revision.getBudgetId(), revision);
 
         this.transactionService.reviseTransactions(dto.getBudgetId());
 

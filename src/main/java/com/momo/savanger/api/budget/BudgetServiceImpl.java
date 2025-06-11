@@ -3,10 +3,12 @@ package com.momo.savanger.api.budget;
 import static com.momo.savanger.api.budget.BudgetSpecifications.ownerIdEquals;
 
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
+import com.momo.savanger.api.budget.dto.BudgetDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.StatisticDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
+import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
@@ -32,7 +34,7 @@ public class BudgetServiceImpl implements BudgetService {
 
     private final UserService userService;
 
-    private TransactionService transactionService;
+    private final TransactionService transactionService;
 
     @Override
     public Budget findById(Long id) {
@@ -141,35 +143,39 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public void editBudgetBalance(Long id, BigDecimal balance) {
+    public void editBudgetAfterRevise(Long id, Revision revision) {
         final Budget budget = this.findById(id);
 
-        budget.setBalance(balance);
+        budget.setBalance(revision.getBalance());
+        budget.setDateStarted(revision.getRevisionDate());
+        //TODO: set due date with RRule calculation
 
         this.budgetRepository.save(budget);
-    }
-
-    @Override
-    public BigDecimal getBalance(Budget budget) {
-
-        BigDecimal expensesAmount = this.transactionService.getExpensesAmount(budget.getId());
-        BigDecimal earningsAmount = this.transactionService.getEarningsAmount(budget.getId());
-
-        return (earningsAmount.add(budget.getBalance())).subtract(expensesAmount);
     }
 
     @Override
     public StatisticDto getStatistic(Long budgetId) {
 
         final Budget budget = this.findById(budgetId);
+        final BudgetDto budgetDto = this.budgetMapper.toBudgetDto(this.findById(budgetId));
 
         final StatisticDto statisticDto = new StatisticDto();
 
-        statisticDto.setBudget(budget);
+        statisticDto.setBudget(budgetDto);
         statisticDto.setBalance(this.getBalance(budget));
         statisticDto.setEarningsAmount(this.transactionService.getEarningsAmount(budgetId));
         statisticDto.setExpensesAmount(this.transactionService.getExpensesAmount(budgetId));
 
         return statisticDto;
+    }
+
+    private BigDecimal getBalance(Budget budget) {
+
+        final BigDecimal expensesAmount = this.transactionService.getExpensesAmount(budget.getId());
+        final BigDecimal earningsAmount = this.transactionService.getEarningsAmount(budget.getId());
+
+        return earningsAmount
+                .add(budget.getBalance())
+                .subtract(expensesAmount);
     }
 }

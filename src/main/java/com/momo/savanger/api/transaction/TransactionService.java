@@ -27,7 +27,6 @@ public interface TransactionService {
 
     void reviseTransactions(Long budgetId);
 
-
     BigDecimal getExpensesAmount(Long budgetId);
 
     BigDecimal getEarningsAmount(Long budgetId);
