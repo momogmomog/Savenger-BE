@@ -11,7 +11,7 @@ public interface TransactionService {
 
     Transaction findById(Long id);
 
-    Transaction create(CreateTransactionDto dto, User user);
+    Transaction create(CreateTransactionDto dto, Long userId);
 
     Page<Transaction> searchTransactions(TransactionSearchQuery query, User user);
 
@@ -30,5 +30,7 @@ public interface TransactionService {
     BigDecimal getExpensesAmount(Long budgetId);
 
     BigDecimal getEarningsAmount(Long budgetId);
+
+    void createCompensationTransaction(Long budgetId, BigDecimal amount);
 }
 

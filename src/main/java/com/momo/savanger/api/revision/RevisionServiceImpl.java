@@ -3,7 +3,9 @@ package com.momo.savanger.api.revision;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
 import com.momo.savanger.api.transaction.TransactionService;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +33,8 @@ public class RevisionServiceImpl implements RevisionService {
 
         final Revision revision = this.revisionMapper.toRevision(dto);
 
-        final BudgetStatisticsDto statisticDto = this.budgetService.getStatistics(dto.getBudgetId());
+        final BudgetStatisticsDto statisticDto = this.budgetService.getStatistics(
+                dto.getBudgetId());
 
         revision.setRevisionDate(LocalDateTime.now());
 
@@ -41,6 +44,17 @@ public class RevisionServiceImpl implements RevisionService {
         revision.setBudgetStartDate(statisticDto.getBudget().getDateStarted());
 
         if (dto.getBalance() != null) {
+            if (!Objects.equals(revision.getBalance(), statisticDto.getBalance())) {
+                final BigDecimal compensationAmount = dto.getBalance()
+                        .subtract(statisticDto.getBalance());
+                this.transactionService.createCompensationTransaction(
+                        dto.getBudgetId(),
+                        compensationAmount
+                );
+
+                revision.setCompensationAmount(compensationAmount);
+            }
+
             revision.setBalance(dto.getBalance());
         } else {
             revision.setBalance(statisticDto.getBalance());

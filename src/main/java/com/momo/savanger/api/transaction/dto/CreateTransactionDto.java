@@ -44,4 +44,12 @@ public class CreateTransactionDto implements ITransactionDto {
     public List<Long> getTagIds() {
         return Objects.requireNonNullElse(this.tagIds, List.of());
     }
+
+    public static CreateTransactionDto compensateDto(BigDecimal amount, Long budgetId) {
+        final CreateTransactionDto dto = new CreateTransactionDto();
+        dto.type = TransactionType.COMPENSATE;
+        dto.amount = amount;
+        dto.budgetId = budgetId;
+        return dto;
+    }
 }

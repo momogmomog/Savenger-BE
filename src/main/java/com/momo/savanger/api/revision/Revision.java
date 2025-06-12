@@ -41,6 +41,8 @@ public class Revision {
     @Column(nullable = false)
     private BigDecimal earningsAmount;
 
+    private BigDecimal compensationAmount;
+
     @Column(nullable = false)
     private Boolean autoRevise;
 

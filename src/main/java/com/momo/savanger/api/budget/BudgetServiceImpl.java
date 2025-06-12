@@ -5,8 +5,8 @@ import static com.momo.savanger.api.budget.BudgetSpecifications.ownerIdEquals;
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.budget.dto.BudgetDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
-import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
+import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.transaction.TransactionService;
@@ -143,6 +143,7 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
+    @Transactional
     public void updateBudgetAfterRevision(Long id, Revision revision) {
         final Budget budget = this.findById(id);
 
@@ -161,20 +162,22 @@ public class BudgetServiceImpl implements BudgetService {
 
         final BudgetStatisticsDto statisticDto = new BudgetStatisticsDto();
 
+        final BigDecimal earnings = this.transactionService.getEarningsAmount(budgetId);
+        final BigDecimal expenses = this.transactionService.getExpensesAmount(budgetId);
+
         statisticDto.setBudget(budgetDto);
-        statisticDto.setBalance(this.getBalance(budget));
-        statisticDto.setEarningsAmount(this.transactionService.getEarningsAmount(budgetId));
-        statisticDto.setExpensesAmount(this.transactionService.getExpensesAmount(budgetId));
+        statisticDto.setEarningsAmount(earnings);
+        statisticDto.setExpensesAmount(expenses);
+
+        statisticDto.setBalance(this.getBalance(budget, earnings, expenses));
 
         return statisticDto;
     }
 
-    private BigDecimal getBalance(Budget budget) {
-
-        BudgetStatisticsDto statisticsDto = this.getStatistics(budget.getId());
-
-        final BigDecimal expensesAmount = statisticsDto.getExpensesAmount();
-        final BigDecimal earningsAmount = statisticsDto.getEarningsAmount();
+    private BigDecimal getBalance(
+            Budget budget,
+            BigDecimal earningsAmount,
+            BigDecimal expensesAmount) {
 
         return earningsAmount
                 .add(budget.getBalance())

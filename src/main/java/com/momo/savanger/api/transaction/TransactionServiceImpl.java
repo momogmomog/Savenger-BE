@@ -33,14 +33,14 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public Transaction create(CreateTransactionDto dto, User user) {
+    public Transaction create(CreateTransactionDto dto, Long userId) {
         final Transaction transaction = this.transactionMapper.toTransaction(dto);
 
         if (transaction.getDateCreated() == null) {
             transaction.setDateCreated(LocalDateTime.now());
         }
 
-        transaction.setUserId(user.getId());
+        transaction.setUserId(userId);
         transaction.setRevised(false);
 
         if (!dto.getTagIds().isEmpty()) {
@@ -54,6 +54,14 @@ public class TransactionServiceImpl implements TransactionService {
 
         return this.findById(transaction.getId());
     }
+
+    @Override
+    @Transactional
+    public void createCompensationTransaction(Long budgetId, BigDecimal amount) {
+
+        this.create(CreateTransactionDto.compensateDto(amount, budgetId), null);
+    }
+
 
     @Override
     public Page<Transaction> searchTransactions(TransactionSearchQuery query, User user) {
