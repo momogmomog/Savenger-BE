@@ -91,7 +91,7 @@ public class TransactionServiceIt {
 
         User user = this.userService.getById(1L);
 
-        this.transactionService.create(dto, user);
+        this.transactionService.create(dto, user.getId());
 
         assertEquals(4, this.transactionRepository.findAll().size());
 
@@ -117,7 +117,7 @@ public class TransactionServiceIt {
         User user = this.userService.getById(1L);
 
         assertThrows(DataIntegrityViolationException.class, () -> {
-            this.transactionService.create(dto, user);
+            this.transactionService.create(dto, user.getId());
         });
 
     }
