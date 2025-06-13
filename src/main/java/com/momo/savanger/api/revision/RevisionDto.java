@@ -21,6 +21,8 @@ public class RevisionDto {
 
     private BigDecimal earningsAmount;
 
+    private BigDecimal compensationAmount;
+
     private Boolean autoRevise;
 
     private String comment;
