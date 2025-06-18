@@ -12,8 +12,12 @@ import com.momo.savanger.api.budget.BudgetRepository;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
+import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
+import com.momo.savanger.api.revision.CreateRevisionDto;
+import com.momo.savanger.api.revision.Revision;
+import com.momo.savanger.api.revision.RevisionService;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserRepository;
 import com.momo.savanger.api.user.UserService;
@@ -23,6 +27,7 @@ import com.momo.savanger.api.util.SortDirection;
 import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +52,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Sql("classpath:/sql/user-it-data.sql")
 @Sql("classpath:/sql/budget-it-data.sql")
 @Sql("classpath:/sql/budgets_participants-it-data.sql")
+@Sql("classpath:/sql/category-it-data.sql")
+@Sql("classpath:/sql/transaction-it-data.sql")
+@Sql("classpath:/sql/revision-it-data.sql")
+@Sql(value = "classpath:/sql/del-revision-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/del-transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/del-category-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-user-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -63,6 +74,9 @@ public class BudgetServiceIt {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RevisionService revisionService;
 
     @Test
     public void testCreate_validPayload_shouldCreate() {
@@ -354,7 +368,9 @@ public class BudgetServiceIt {
 
         assertEquals(0, budgets.getTotalElements());
 
-        //Test user 2
+        //Test user 2 and test sort if field not exist
+
+        sortQuery.setField("notExist");
 
         query.setDueDate(null);
         query.setAutoRevise(null);
@@ -365,6 +381,40 @@ public class BudgetServiceIt {
 
         assertEquals(1, budgets.getTotalElements());
         assertEquals(1003L, budgets.getContent().getFirst().getId());
+
+    }
+
+    @Test
+    @Transactional
+    public void testUpdateBudgetAfterRevision_shouldUpdateBudget(){
+
+        Revision revision = this.revisionService.findById(1001L);
+
+        this.budgetService.updateBudgetAfterRevision(revision.getBudgetId(), revision);
+
+        Budget budget = this.budgetService.findById(revision.getBudgetId());
+
+        assertEquals(revision.getRevisionDate(), budget.getDateStarted());
+        assertEquals(revision.getBalance(), budget.getBalance());
+    }
+
+    @Test
+    @Transactional
+    public  void testGetStatistics_validId_shouldReturnStatistics() {
+
+        BudgetStatisticsDto statisticsDto = this.budgetService.getStatistics(1001L);
+
+        assertNotNull(statisticsDto);
+        assertEquals(BigDecimal.valueOf(123.32), statisticsDto.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.valueOf(45.00).setScale(2, RoundingMode.HALF_DOWN), statisticsDto.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.valueOf(101.32), statisticsDto.getBalance().setScale(2, RoundingMode.HALF_DOWN));
+    }
+
+    @Test
+    @Transactional
+    public  void testGetStatistics_invalidId_shouldThrowException() {
+
+        assertThrows(ApiException.class, () -> this.budgetService.getStatistics(100231L));
 
     }
 

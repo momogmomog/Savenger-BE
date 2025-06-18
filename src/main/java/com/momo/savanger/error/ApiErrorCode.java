@@ -18,7 +18,8 @@ public enum ApiErrorCode {
     ERR_0008(HttpStatus.BAD_REQUEST, "User is not logged in"),
     ERR_0009(HttpStatus.NOT_FOUND, "User not found"),
     ERR_0010(HttpStatus.NOT_FOUND, "Transaction not found"),
-    ERR_0011(HttpStatus.BAD_REQUEST, "Error during request processing");
+    ERR_0011(HttpStatus.BAD_REQUEST, "Error during request processing"),
+    ERR_0012(HttpStatus.NOT_FOUND, "Revision not found");
 
     public final HttpStatus status;
     public final String message;

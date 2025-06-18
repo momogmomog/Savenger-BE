@@ -31,6 +31,6 @@ public interface TransactionService {
 
     BigDecimal getEarningsAmount(Long budgetId);
 
-    void createCompensationTransaction(Long budgetId, BigDecimal amount);
+    Transaction createCompensationTransaction(Long budgetId, BigDecimal amount);
 }
 

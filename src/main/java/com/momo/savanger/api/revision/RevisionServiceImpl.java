@@ -3,6 +3,8 @@ package com.momo.savanger.api.revision;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
 import com.momo.savanger.api.transaction.TransactionService;
+import com.momo.savanger.error.ApiErrorCode;
+import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -24,7 +26,8 @@ public class RevisionServiceImpl implements RevisionService {
 
     @Override
     public Revision findById(Long id) {
-        return this.revisionRepository.findById(id).orElse(null);
+        return this.revisionRepository.findById(id).orElseThrow(() ->
+                ApiException.with(ApiErrorCode.ERR_0012));
     }
 
     @Override

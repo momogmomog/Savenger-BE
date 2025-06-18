@@ -26,6 +26,7 @@ import com.momo.savanger.api.util.SortDirection;
 import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,7 @@ public class TransactionServiceIt {
     @Transactional
     public void testCreateTransaction_validPayload_shouldSaveTransaction() {
 
-        assertEquals(3, this.transactionRepository.findAll().size());
+        assertEquals(4, this.transactionRepository.findAll().size());
 
         CreateTransactionDto dto = new CreateTransactionDto();
         dto.setType(TransactionType.EXPENSE);
@@ -91,11 +92,10 @@ public class TransactionServiceIt {
 
         User user = this.userService.getById(1L);
 
-        this.transactionService.create(dto, user.getId());
+        Transaction transaction = this.transactionService.create(dto, user.getId());
 
-        assertEquals(4, this.transactionRepository.findAll().size());
+        assertEquals(5, this.transactionRepository.findAll().size());
 
-        Transaction transaction = this.transactionService.findById(1L);
 
         assertNotNull(transaction);
 
@@ -283,13 +283,13 @@ public class TransactionServiceIt {
 
         List<Transaction> transactions = this.transactionRepository.findAll();
 
-        assertEquals(3, transactions.size());
+        assertEquals(4, transactions.size());
 
         this.transactionService.deleteById(1001L);
 
         transactions = this.transactionRepository.findAll();
 
-        assertEquals(2, transactions.size());
+        assertEquals(3, transactions.size());
     }
 
     @Test
@@ -331,6 +331,46 @@ public class TransactionServiceIt {
         ));
         assertTrue(this.transactionService.canViewTransaction(1001L, 3L));
 
+    }
+
+    @Test
+    public void testGetEarningsAmount_validId_shouldReturnEarningsAmount() {
+        BigDecimal earningsAmount = this.transactionService.getEarningsAmount(1001L);
+
+        assertEquals(BigDecimal.valueOf(123.32),
+                earningsAmount.setScale(2, RoundingMode.HALF_DOWN));
+    }
+
+    @Test
+    public void testGetExpensesAmount_validId_shouldReturnExpensesAmount() {
+        BigDecimal expensesAmount = this.transactionService.getExpensesAmount(1001L);
+
+        assertEquals(BigDecimal.valueOf(45.00).setScale(2, RoundingMode.HALF_DOWN),
+                expensesAmount.setScale(2, RoundingMode.HALF_DOWN));
+    }
+
+    @Test
+    public void testGetEarningsAmount_budgetWithoutTransaction_shouldReturnZero(){
+        BigDecimal earningsAmount = this.transactionService.getEarningsAmount(1002L);
+
+        assertEquals(BigDecimal.ZERO, earningsAmount);
+    }
+
+    @Test
+    public void testGetExpensesAmount_budgetWithoutTransaction_shouldReturnZero(){
+        BigDecimal expensesAmount = this.transactionService.getEarningsAmount(1002L);
+
+        assertEquals(BigDecimal.ZERO, expensesAmount);
+    }
+
+    @Test
+    public void testCreateCompensationTransaction_validId_shouldCreateCompensationTransaction() {
+
+       Transaction transaction =  this.transactionService.createCompensationTransaction(1001L, BigDecimal.valueOf(32.22));
+
+
+        assertEquals(TransactionType.COMPENSATE, transaction.getType());
+        assertEquals(BigDecimal.valueOf(32.22), transaction.getAmount().setScale(2, RoundingMode.HALF_DOWN));
     }
 
 

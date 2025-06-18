@@ -56,7 +56,7 @@ public class TransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testCreate_validPayload_shouldSaveTransaction() throws Exception {
 
-        assertEquals(3, this.transactionRepository.findAll().size());
+        assertEquals(4, this.transactionRepository.findAll().size());
 
         CreateTransactionDto dto = new CreateTransactionDto();
         dto.setType(TransactionType.EXPENSE);
@@ -70,7 +70,7 @@ public class TransactionControllerIt extends BaseControllerIt {
         dto.setTagIds(ids);
         super.postOK(Endpoints.TRANSACTIONS, dto);
 
-        assertEquals(4, this.transactionRepository.findAll().size());
+        assertEquals(5, this.transactionRepository.findAll().size());
 
     }
 
@@ -326,13 +326,13 @@ public class TransactionControllerIt extends BaseControllerIt {
 
         List<Transaction> transactions = this.transactionRepository.findAll();
 
-        assertEquals(3, transactions.size());
+        assertEquals(4, transactions.size());
 
         super.deleteOK("/transactions/1001", null);
 
         transactions = this.transactionRepository.findAll();
 
-        assertEquals(2, transactions.size());
+        assertEquals(3, transactions.size());
     }
 
     @Test

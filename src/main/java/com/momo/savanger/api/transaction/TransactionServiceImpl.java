@@ -57,9 +57,10 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public void createCompensationTransaction(Long budgetId, BigDecimal amount) {
+    public Transaction createCompensationTransaction(Long budgetId, BigDecimal amount) {
 
-        this.create(CreateTransactionDto.compensateDto(amount, budgetId), null);
+        return this.create(CreateTransactionDto.compensateDto(amount, budgetId), null);
+
     }
 
 
