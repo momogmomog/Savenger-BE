@@ -15,7 +15,6 @@ import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
-import com.momo.savanger.api.revision.CreateRevisionDto;
 import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.revision.RevisionService;
 import com.momo.savanger.api.user.User;
@@ -386,7 +385,7 @@ public class BudgetServiceIt {
 
     @Test
     @Transactional
-    public void testUpdateBudgetAfterRevision_shouldUpdateBudget(){
+    public void testUpdateBudgetAfterRevision_shouldUpdateBudget() {
 
         Revision revision = this.revisionService.findById(1001L);
 
@@ -400,19 +399,22 @@ public class BudgetServiceIt {
 
     @Test
     @Transactional
-    public  void testGetStatistics_validId_shouldReturnStatistics() {
+    public void testGetStatistics_validId_shouldReturnStatistics() {
 
         BudgetStatisticsDto statisticsDto = this.budgetService.getStatistics(1001L);
 
         assertNotNull(statisticsDto);
-        assertEquals(BigDecimal.valueOf(123.32), statisticsDto.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(45.00).setScale(2, RoundingMode.HALF_DOWN), statisticsDto.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(101.32), statisticsDto.getBalance().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.valueOf(123.32),
+                statisticsDto.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.valueOf(45.00).setScale(2, RoundingMode.HALF_DOWN),
+                statisticsDto.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.valueOf(101.32),
+                statisticsDto.getBalance().setScale(2, RoundingMode.HALF_DOWN));
     }
 
     @Test
     @Transactional
-    public  void testGetStatistics_invalidId_shouldThrowException() {
+    public void testGetStatistics_invalidId_shouldThrowException() {
 
         assertThrows(ApiException.class, () -> this.budgetService.getStatistics(100231L));
 

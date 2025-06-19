@@ -96,7 +96,6 @@ public class TransactionServiceIt {
 
         assertEquals(5, this.transactionRepository.findAll().size());
 
-
         assertNotNull(transaction);
 
         assertEquals("EXPENSE", transaction.getType().toString());
@@ -350,14 +349,14 @@ public class TransactionServiceIt {
     }
 
     @Test
-    public void testGetEarningsAmount_budgetWithoutTransaction_shouldReturnZero(){
+    public void testGetEarningsAmount_budgetWithoutTransaction_shouldReturnZero() {
         BigDecimal earningsAmount = this.transactionService.getEarningsAmount(1002L);
 
         assertEquals(BigDecimal.ZERO, earningsAmount);
     }
 
     @Test
-    public void testGetExpensesAmount_budgetWithoutTransaction_shouldReturnZero(){
+    public void testGetExpensesAmount_budgetWithoutTransaction_shouldReturnZero() {
         BigDecimal expensesAmount = this.transactionService.getEarningsAmount(1002L);
 
         assertEquals(BigDecimal.ZERO, expensesAmount);
@@ -366,11 +365,12 @@ public class TransactionServiceIt {
     @Test
     public void testCreateCompensationTransaction_validId_shouldCreateCompensationTransaction() {
 
-       Transaction transaction =  this.transactionService.createCompensationTransaction(1001L, BigDecimal.valueOf(32.22));
-
+        Transaction transaction = this.transactionService.createCompensationTransaction(1001L,
+                BigDecimal.valueOf(32.22));
 
         assertEquals(TransactionType.COMPENSATE, transaction.getType());
-        assertEquals(BigDecimal.valueOf(32.22), transaction.getAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.valueOf(32.22),
+                transaction.getAmount().setScale(2, RoundingMode.HALF_DOWN));
     }
 
 
