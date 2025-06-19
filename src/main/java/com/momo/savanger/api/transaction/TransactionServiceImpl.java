@@ -7,6 +7,7 @@ import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,14 +33,14 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public Transaction create(CreateTransactionDto dto, User user) {
+    public Transaction create(CreateTransactionDto dto, Long userId) {
         final Transaction transaction = this.transactionMapper.toTransaction(dto);
 
         if (transaction.getDateCreated() == null) {
             transaction.setDateCreated(LocalDateTime.now());
         }
 
-        transaction.setUserId(user.getId());
+        transaction.setUserId(userId);
         transaction.setRevised(false);
 
         if (!dto.getTagIds().isEmpty()) {
@@ -53,6 +54,15 @@ public class TransactionServiceImpl implements TransactionService {
 
         return this.findById(transaction.getId());
     }
+
+    @Override
+    @Transactional
+    public Transaction createCompensationTransaction(Long budgetId, BigDecimal amount) {
+
+        return this.create(CreateTransactionDto.compensateDto(amount, budgetId), null);
+
+    }
+
 
     @Override
     public Page<Transaction> searchTransactions(TransactionSearchQuery query, User user) {
@@ -116,5 +126,35 @@ public class TransactionServiceImpl implements TransactionService {
     public boolean canViewTransaction(Long transactionId, Long userId) {
 
         return this.transactionRepository.existOwnerOrParticipant(transactionId, userId);
+    }
+
+    @Override
+    public void reviseTransactions(Long budgetId) {
+        this.transactionRepository.setRevisedTrue(budgetId);
+    }
+
+    @Override
+    public BigDecimal getExpensesAmount(Long budgetId) {
+
+        return this.getSumAmount(budgetId, TransactionType.EXPENSE);
+    }
+
+    @Override
+    public BigDecimal getEarningsAmount(Long budgetId) {
+
+        return this.getSumAmount(budgetId, TransactionType.INCOME);
+    }
+
+    private BigDecimal getSumAmount(Long budgetId, TransactionType type) {
+
+        final BigDecimal sum = this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(
+                budgetId,
+                type);
+
+        if (sum == null) {
+            return BigDecimal.ZERO;
+        }
+
+        return sum;
     }
 }

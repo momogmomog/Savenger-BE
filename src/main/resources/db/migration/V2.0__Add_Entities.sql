@@ -32,16 +32,17 @@ alter table budgets_participants
 
 create table revisions
 (
-    id                bigint auto_increment primary key,
-    revision_date     datetime        not null,
-    budget_start_date datetime        not null,
-    balance           decimal(30, 15) not null,
-    budget_cap        decimal(30, 15),
-    expenses_amount   decimal(30, 15) not null,
-    earnings_amount   decimal(30, 15) not null,
-    auto_revise       bit             not null,
-    comment           varchar(255),
-    budget_id         bigint          not null
+    id                  bigint auto_increment primary key,
+    revision_date       datetime        not null,
+    budget_start_date   datetime        not null,
+    balance             decimal(30, 15) not null,
+    budget_cap          decimal(30, 15),
+    expenses_amount     decimal(30, 15) not null,
+    earnings_amount     decimal(30, 15) not null,
+    auto_revise         bit             not null,
+    comment             varchar(255),
+    budget_id           bigint          not null,
+    compensation_amount decimal(30, 15)
 );
 
 alter table revisions
@@ -66,9 +67,9 @@ create table transactions
     date        datetime        not null,
     comment     varchar(255),
     revised     bit             not null,
-    user_id     bigint          not null,
-    category_id bigint          not null,
-    budget_id   bigint          not null
+    user_id     bigint,
+    category_id bigint,
+    budget_id   bigint
 );
 
 alter table transactions

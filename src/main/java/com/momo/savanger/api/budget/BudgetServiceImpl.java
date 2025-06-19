@@ -4,8 +4,11 @@ import static com.momo.savanger.api.budget.BudgetSpecifications.ownerIdEquals;
 
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
+import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
+import com.momo.savanger.api.revision.Revision;
+import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
 import com.momo.savanger.constants.EntityGraphs;
@@ -29,6 +32,8 @@ public class BudgetServiceImpl implements BudgetService {
     private final BudgetMapper budgetMapper;
 
     private final UserService userService;
+
+    private final TransactionService transactionService;
 
     @Override
     public Budget findById(Long id) {
@@ -134,5 +139,46 @@ public class BudgetServiceImpl implements BudgetService {
                 .and(BudgetSpecifications.isAutoRevise(query.getAutoRevise()));
 
         return this.budgetRepository.findAll(specification, query.getPage(), null);
+    }
+
+    @Override
+    @Transactional
+    public void updateBudgetAfterRevision(Long id, Revision revision) {
+        final Budget budget = this.findById(id);
+
+        budget.setBalance(revision.getBalance());
+        budget.setDateStarted(revision.getRevisionDate());
+        //TODO: set due date with RRule calculation
+
+        this.budgetRepository.save(budget);
+    }
+
+    @Override
+    public BudgetStatistics getStatistics(Long budgetId) {
+
+        final Budget budget = this.findById(budgetId);
+
+        final BudgetStatistics statisticDto = new BudgetStatistics();
+
+        final BigDecimal earnings = this.transactionService.getEarningsAmount(budgetId);
+        final BigDecimal expenses = this.transactionService.getExpensesAmount(budgetId);
+
+        statisticDto.setBudget(budget);
+        statisticDto.setEarningsAmount(earnings);
+        statisticDto.setExpensesAmount(expenses);
+
+        statisticDto.setBalance(this.getBalance(budget, earnings, expenses));
+
+        return statisticDto;
+    }
+
+    private BigDecimal getBalance(
+            Budget budget,
+            BigDecimal earningsAmount,
+            BigDecimal expensesAmount) {
+
+        return earningsAmount
+                .add(budget.getBalance())
+                .subtract(expensesAmount);
     }
 }

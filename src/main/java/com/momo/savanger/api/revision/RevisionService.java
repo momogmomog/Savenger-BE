@@ -4,4 +4,6 @@ public interface RevisionService {
 
     Revision findById(Long id);
 
+    Revision create(CreateRevisionDto dto);
+
 }
