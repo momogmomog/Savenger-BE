@@ -1,12 +1,13 @@
 package com.momo.savanger.api.budget.dto;
 
+import com.momo.savanger.api.budget.Budget;
 import java.math.BigDecimal;
 import lombok.Data;
 
 @Data
-public class BudgetStatisticsDto {
+public class BudgetStatistics {
 
-    private BudgetDto budget;
+    private Budget budget;
 
     private BigDecimal balance;
 

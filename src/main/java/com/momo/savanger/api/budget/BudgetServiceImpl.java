@@ -3,9 +3,8 @@ package com.momo.savanger.api.budget;
 import static com.momo.savanger.api.budget.BudgetSpecifications.ownerIdEquals;
 
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
-import com.momo.savanger.api.budget.dto.BudgetDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
-import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
+import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.revision.Revision;
@@ -155,17 +154,16 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public BudgetStatisticsDto getStatistics(Long budgetId) {
+    public BudgetStatistics getStatistics(Long budgetId) {
 
         final Budget budget = this.findById(budgetId);
-        final BudgetDto budgetDto = this.budgetMapper.toBudgetDto(this.findById(budgetId));
 
-        final BudgetStatisticsDto statisticDto = new BudgetStatisticsDto();
+        final BudgetStatistics statisticDto = new BudgetStatistics();
 
         final BigDecimal earnings = this.transactionService.getEarningsAmount(budgetId);
         final BigDecimal expenses = this.transactionService.getExpensesAmount(budgetId);
 
-        statisticDto.setBudget(budgetDto);
+        statisticDto.setBudget(budget);
         statisticDto.setEarningsAmount(earnings);
         statisticDto.setExpensesAmount(expenses);
 

@@ -1,7 +1,8 @@
 package com.momo.savanger.api.revision;
 
+import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetService;
-import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
+import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
@@ -36,20 +37,22 @@ public class RevisionServiceImpl implements RevisionService {
 
         final Revision revision = this.revisionMapper.toRevision(dto);
 
-        final BudgetStatisticsDto statisticDto = this.budgetService.getStatistics(
+        final BudgetStatistics statistics = this.budgetService.getStatistics(
                 dto.getBudgetId());
+
+        final Budget budget = statistics.getBudget();
 
         revision.setRevisionDate(LocalDateTime.now());
 
         revision.setAutoRevise(false);
 
-        revision.setBudgetCap(statisticDto.getBudget().getBudgetCap());
-        revision.setBudgetStartDate(statisticDto.getBudget().getDateStarted());
+        revision.setBudgetCap(budget.getBudgetCap());
+        revision.setBudgetStartDate(budget.getDateStarted());
 
         if (dto.getBalance() != null) {
-            if (!Objects.equals(revision.getBalance(), statisticDto.getBalance())) {
+            if (!Objects.equals(revision.getBalance(), statistics.getBalance())) {
                 final BigDecimal compensationAmount = dto.getBalance()
-                        .subtract(statisticDto.getBalance());
+                        .subtract(statistics.getBalance());
                 this.transactionService.createCompensationTransaction(
                         dto.getBudgetId(),
                         compensationAmount
@@ -60,11 +63,11 @@ public class RevisionServiceImpl implements RevisionService {
 
             revision.setBalance(dto.getBalance());
         } else {
-            revision.setBalance(statisticDto.getBalance());
+            revision.setBalance(statistics.getBalance());
         }
 
-        revision.setEarningsAmount(statisticDto.getEarningsAmount());
-        revision.setExpensesAmount(statisticDto.getExpensesAmount());
+        revision.setEarningsAmount(statistics.getEarningsAmount());
+        revision.setExpensesAmount(statistics.getExpensesAmount());
 
         this.revisionRepository.saveAndFlush(revision);
 

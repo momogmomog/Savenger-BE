@@ -12,7 +12,7 @@ import com.momo.savanger.api.budget.BudgetRepository;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
-import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
+import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.revision.Revision;
@@ -401,7 +401,7 @@ public class BudgetServiceIt {
     @Transactional
     public void testGetStatistics_validId_shouldReturnStatistics() {
 
-        BudgetStatisticsDto statisticsDto = this.budgetService.getStatistics(1001L);
+        BudgetStatistics statisticsDto = this.budgetService.getStatistics(1001L);
 
         assertNotNull(statisticsDto);
         assertEquals(BigDecimal.valueOf(123.32),

@@ -2,7 +2,7 @@ package com.momo.savanger.api.budget;
 
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
-import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
+import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.revision.Revision;
@@ -32,6 +32,6 @@ public interface BudgetService {
 
     void updateBudgetAfterRevision(Long id, Revision revision);
 
-    BudgetStatisticsDto getStatistics(Long budgetId);
+    BudgetStatistics getStatistics(Long budgetId);
 
 }

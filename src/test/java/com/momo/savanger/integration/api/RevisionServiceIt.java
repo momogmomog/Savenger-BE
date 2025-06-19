@@ -76,10 +76,12 @@ public class RevisionServiceIt {
         dto.setBudgetId(1001L);
 
         assertEquals(BigDecimal.valueOf(123.32).setScale(2, RoundingMode.HALF_DOWN),
-                this.transactionService.getEarningsAmount(dto.getBudgetId()));
+                this.transactionService.getEarningsAmount(dto.getBudgetId())
+                        .setScale(2, RoundingMode.HALF_DOWN));
 
         assertEquals(BigDecimal.valueOf(45.00).setScale(2, RoundingMode.HALF_DOWN),
-                this.transactionService.getExpensesAmount(dto.getBudgetId()));
+                this.transactionService.getExpensesAmount(dto.getBudgetId())
+                        .setScale(2, RoundingMode.HALF_DOWN));
 
         assertEquals(1, this.revisionRepository.findAll().size());
 
