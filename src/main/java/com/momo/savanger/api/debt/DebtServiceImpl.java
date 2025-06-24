@@ -2,6 +2,7 @@ package com.momo.savanger.api.debt;
 
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,11 +35,16 @@ public class DebtServiceImpl implements DebtService {
     }
 
     @Override
-    public Boolean validDebt(CreateDebtDto dto) {
+    public Boolean isDebtValid(CreateDebtDto dto) {
         final Specification<Debt> specification = DebtSpecifications.lenderBudgetIdEquals(
                         dto.getLenderBudgetId())
                 .and(DebtSpecifications.receiverBudgetIdEquals(dto.getReceiverBudgetId()));
 
         return !this.debtRepository.exists(specification);
+    }
+
+    @Override
+    public BigDecimal getDebtSumByLenderId(Long budgetId) {
+        return this.debtRepository.sumDebtByLenderBudgetId(budgetId);
     }
 }

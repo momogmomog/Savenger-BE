@@ -7,6 +7,7 @@ import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
+import com.momo.savanger.api.debt.DebtService;
 import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.user.User;
@@ -34,6 +35,8 @@ public class BudgetServiceImpl implements BudgetService {
     private final UserService userService;
 
     private final TransactionService transactionService;
+
+    private final DebtService debtService;
 
     @Override
     public Budget findById(Long id) {
@@ -168,6 +171,10 @@ public class BudgetServiceImpl implements BudgetService {
         statisticDto.setExpensesAmount(expenses);
 
         statisticDto.setBalance(this.getBalance(budget, earnings, expenses));
+
+        statisticDto.setDebtAmount(this.debtService.getDebtSumByLenderId(budgetId));
+        statisticDto.setRealBalance(
+                statisticDto.getBalance().subtract(statisticDto.getDebtAmount()));
 
         return statisticDto;
     }

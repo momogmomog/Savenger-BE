@@ -1,5 +1,7 @@
 package com.momo.savanger.api.debt.constraints;
 
+import com.momo.savanger.api.budget.BudgetService;
+import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.debt.CreateDebtDto;
 import com.momo.savanger.api.debt.DebtService;
 import com.momo.savanger.constants.ValidationMessages;
@@ -14,13 +16,23 @@ public class ValidDebtDtoValidator implements ConstraintValidator<ValidDebtDto, 
 
     private final DebtService debtService;
 
+    private final BudgetService budgetService;
+
     @Override
     public boolean isValid(CreateDebtDto debtDto,
             ConstraintValidatorContext constraintValidatorContext) {
 
-        if (!this.debtService.validDebt(debtDto)){
+        final BudgetStatistics budgetStatistics = this.budgetService.getStatistics(
+                debtDto.getLenderBudgetId());
+
+        if (!this.debtService.isDebtValid(debtDto)) {
             return this.fail(constraintValidatorContext, "lenderBudgetId",
                     ValidationMessages.DEBT_ALREADY_EXIST);
+        }
+
+        if (budgetStatistics.getRealBalance().compareTo(debtDto.getAmount()) < 0) {
+            return this.fail(constraintValidatorContext, "amount",
+                    ValidationMessages.AMOUNT_IS_TOO_BIG);
         }
 
         return true;
