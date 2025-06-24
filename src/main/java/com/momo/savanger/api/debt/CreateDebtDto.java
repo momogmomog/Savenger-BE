@@ -21,6 +21,6 @@ public class CreateDebtDto {
 
     @MinValueZero
     @NotNull
-    private BigDecimal amount;
+    private BigDecimal debtAmount;
 
 }

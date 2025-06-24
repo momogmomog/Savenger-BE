@@ -1,5 +1,6 @@
 package com.momo.savanger.api.transaction;
 
+import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
@@ -30,6 +31,8 @@ public interface TransactionService {
     BigDecimal getExpensesAmount(Long budgetId);
 
     BigDecimal getEarningsAmount(Long budgetId);
+
+    void createDebtLenderTransactions(Debt debt, BigDecimal amount);
 
     Transaction createCompensationTransaction(Long budgetId, BigDecimal amount);
 }

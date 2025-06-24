@@ -25,12 +25,7 @@ public class ValidDebtDtoValidator implements ConstraintValidator<ValidDebtDto, 
         final BudgetStatistics budgetStatistics = this.budgetService.getStatistics(
                 debtDto.getLenderBudgetId());
 
-        if (!this.debtService.isDebtValid(debtDto)) {
-            return this.fail(constraintValidatorContext, "lenderBudgetId",
-                    ValidationMessages.DEBT_ALREADY_EXIST);
-        }
-
-        if (budgetStatistics.getRealBalance().compareTo(debtDto.getAmount()) < 0) {
+        if (budgetStatistics.getRealBalance().compareTo(debtDto.getDebtAmount()) < 0) {
             return this.fail(constraintValidatorContext, "amount",
                     ValidationMessages.AMOUNT_IS_TOO_BIG);
         }

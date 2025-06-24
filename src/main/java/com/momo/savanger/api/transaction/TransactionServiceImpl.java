@@ -1,10 +1,12 @@
 package com.momo.savanger.api.transaction;
 
+import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.user.User;
+import com.momo.savanger.api.util.SecurityUtils;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
@@ -53,6 +55,26 @@ public class TransactionServiceImpl implements TransactionService {
         this.transactionRepository.saveAndFlush(transaction);
 
         return this.findById(transaction.getId());
+    }
+
+    @Override
+    @Transactional
+    public void createDebtLenderTransactions(Debt debt, BigDecimal amount) {
+        Long userId = SecurityUtils.getCurrentUser().getId();
+
+        CreateTransactionDto dto = CreateTransactionDto.debtDto(debt.getAmount(),
+                debt.getId(),
+                TransactionType.EXPENSE,
+                debt.getLenderBudgetId());
+
+        this.create(dto, userId);
+
+        dto = CreateTransactionDto.debtDto(debt.getAmount(),
+                debt.getId(),
+                TransactionType.INCOME,
+                debt.getReceiverBudgetId());
+
+        this.create(dto, userId);
     }
 
     @Override
