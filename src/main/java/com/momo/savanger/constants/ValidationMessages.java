@@ -17,5 +17,6 @@ public class ValidationMessages {
     public static final String TRANSACTION_DOES_NOT_EXIST = "Transaction does not exist.";
     public static final String DEBT_ALREADY_EXIST = "Debt with these budgets already exist.";
     public static final String AMOUNT_IS_TOO_BIG = "This budget does not have enough money.";
+    public static final String BUDGETS_SHOULD_BE_DIFFERENT = "Lender and receiver budget ids should be different.";
 
 }
