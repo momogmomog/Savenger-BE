@@ -34,6 +34,8 @@ public interface TransactionService {
 
     void createDebtTransactions(Debt debt, BigDecimal amount);
 
+    void payDebtTransaction(Debt debt, BigDecimal amount);
+
     Transaction createCompensationTransaction(Long budgetId, BigDecimal amount);
 }
 

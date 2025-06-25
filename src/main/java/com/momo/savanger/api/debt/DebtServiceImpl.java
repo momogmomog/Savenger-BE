@@ -50,6 +50,19 @@ public class DebtServiceImpl implements DebtService {
     }
 
     @Override
+    public Debt pay(Long id, PayDebtDto dto) {
+        Debt debt = this.findById(id);
+
+        debt.setAmount(debt.getAmount().subtract(dto.getAmount()));
+
+        this.debtRepository.save(debt);
+
+        this.transactionService.payDebtTransaction(debt, dto.getAmount());
+
+        return debt;
+    }
+
+    @Override
     public Optional<Debt> findDebt(Long receiverBudgetId, Long lenderBudgetId) {
         final Specification<Debt> specification = DebtSpecifications.lenderBudgetIdEquals(
                         lenderBudgetId)

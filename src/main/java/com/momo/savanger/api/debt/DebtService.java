@@ -9,6 +9,8 @@ public interface DebtService {
 
     Debt create(CreateDebtDto dto);
 
+    Debt pay(Long id, PayDebtDto dto);
+
     Optional<Debt> findDebt(Long receiverBudgetId, Long lenderBudgetId);
 
     BigDecimal getSumByLenderBudgetId(Long budgetId);

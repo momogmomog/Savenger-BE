@@ -62,20 +62,43 @@ public class TransactionServiceImpl implements TransactionService {
     public void createDebtTransactions(Debt debt, BigDecimal amount) {
         final Long userId = SecurityUtils.getCurrentUser().getId();
 
-        CreateTransactionDto dto = CreateTransactionDto.debtDto(amount,
-                debt.getId(),
-                TransactionType.EXPENSE,
-                debt.getLenderBudgetId()
+        this.create(
+                this.createTransactionDto(debt.getAmount(), debt.getId(), TransactionType.EXPENSE,
+                        debt.getLenderBudgetId()), userId
         );
 
-        this.create(dto, userId);
+        this.create(
+                this.createTransactionDto(debt.getAmount(), debt.getId(), TransactionType.INCOME,
+                        debt.getReceiverBudgetId()), userId
+        );
+    }
 
-        dto = CreateTransactionDto.debtDto(amount,
-                debt.getId(),
-                TransactionType.INCOME,
-                debt.getReceiverBudgetId());
+    @Override
+    @Transactional
+    public void payDebtTransaction(Debt debt, BigDecimal amount) {
+        final Long userId = SecurityUtils.getCurrentUser().getId();
 
-        this.create(dto, userId);
+        this.create(
+                this.createTransactionDto(debt.getAmount(), debt.getId(), TransactionType.EXPENSE,
+                        debt.getReceiverBudgetId()), userId
+        );
+
+        this.create(
+                this.createTransactionDto(debt.getAmount(), debt.getId(), TransactionType.INCOME,
+                        debt.getLenderBudgetId()), userId
+        );
+    }
+
+    private CreateTransactionDto createTransactionDto(BigDecimal amount, Long debtId,
+            TransactionType transactionType, Long budgetId) {
+
+        CreateTransactionDto dto = CreateTransactionDto.debtDto(amount,
+                debtId,
+                transactionType,
+                budgetId
+        );
+
+        return dto;
     }
 
     @Override

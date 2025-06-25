@@ -4,10 +4,12 @@ import com.momo.savanger.api.debt.CreateDebtDto;
 import com.momo.savanger.api.debt.DebtDto;
 import com.momo.savanger.api.debt.DebtMapper;
 import com.momo.savanger.api.debt.DebtService;
+import com.momo.savanger.api.debt.PayDebtDto;
 import com.momo.savanger.constants.Endpoints;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +27,12 @@ public class DebtController {
     public DebtDto create(@Valid @RequestBody CreateDebtDto createDebtDto) {
 
         return this.debtMapper.toDebtDto(this.debtService.create(createDebtDto));
+    }
+
+    @PostMapping(Endpoints.PAY_DEBT)
+    public DebtDto pay(@PathVariable Long id, @Valid @RequestBody PayDebtDto dto) {
+
+        return this.debtMapper.toDebtDto(this.debtService.pay(id, dto));
     }
 
 }
