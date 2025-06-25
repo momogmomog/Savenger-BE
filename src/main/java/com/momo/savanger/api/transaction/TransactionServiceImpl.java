@@ -59,17 +59,18 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public void createDebtLenderTransactions(Debt debt, BigDecimal amount) {
-        Long userId = SecurityUtils.getCurrentUser().getId();
+    public void createDebtTransactions(Debt debt, BigDecimal amount) {
+        final Long userId = SecurityUtils.getCurrentUser().getId();
 
-        CreateTransactionDto dto = CreateTransactionDto.debtDto(debt.getAmount(),
+        CreateTransactionDto dto = CreateTransactionDto.debtDto(amount,
                 debt.getId(),
                 TransactionType.EXPENSE,
-                debt.getLenderBudgetId());
+                debt.getLenderBudgetId()
+        );
 
         this.create(dto, userId);
 
-        dto = CreateTransactionDto.debtDto(debt.getAmount(),
+        dto = CreateTransactionDto.debtDto(amount,
                 debt.getId(),
                 TransactionType.INCOME,
                 debt.getReceiverBudgetId());

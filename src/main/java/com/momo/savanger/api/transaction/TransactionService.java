@@ -32,7 +32,7 @@ public interface TransactionService {
 
     BigDecimal getEarningsAmount(Long budgetId);
 
-    void createDebtLenderTransactions(Debt debt, BigDecimal amount);
+    void createDebtTransactions(Debt debt, BigDecimal amount);
 
     Transaction createCompensationTransaction(Long budgetId, BigDecimal amount);
 }

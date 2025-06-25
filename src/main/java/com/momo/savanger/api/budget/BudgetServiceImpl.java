@@ -170,11 +170,15 @@ public class BudgetServiceImpl implements BudgetService {
         statisticDto.setEarningsAmount(earnings);
         statisticDto.setExpensesAmount(expenses);
 
-        statisticDto.setBalance(this.getBalance(budget, earnings, expenses));
+        statisticDto.setDebtEarningsAmount(this.debtService.getSumByReceiverBudgetId(budgetId));
 
-        statisticDto.setDebtAmount(this.debtService.getDebtSumByLenderId(budgetId));
-        statisticDto.setRealBalance(
-                statisticDto.getBalance().subtract(statisticDto.getDebtAmount()));
+        statisticDto.setDebtExpensesAmount(this.debtService.getSumByLenderBudgetId(budgetId));
+
+        statisticDto.setRealBalance(this.getBalance(budget, earnings, expenses));
+
+        statisticDto.setBalance(
+                budget.getBalance().subtract(statisticDto.getDebtExpensesAmount())
+                        .add(statisticDto.getDebtEarningsAmount()));
 
         return statisticDto;
     }

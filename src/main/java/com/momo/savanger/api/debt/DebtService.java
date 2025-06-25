@@ -9,7 +9,9 @@ public interface DebtService {
 
     Debt create(CreateDebtDto dto);
 
-    Optional<Debt> findDebt(CreateDebtDto dto);
+    Optional<Debt> findDebt(Long receiverBudgetId, Long lenderBudgetId);
 
-    BigDecimal getDebtSumByLenderId(Long budgetId);
+    BigDecimal getSumByLenderBudgetId(Long budgetId);
+
+    BigDecimal getSumByReceiverBudgetId(Long receiverBudgetId);
 }

@@ -30,7 +30,7 @@ public class DebtServiceImpl implements DebtService {
     @Transactional
     public Debt create(CreateDebtDto dto) {
 
-        final Optional<Debt> maybeDebt = this.findDebt(dto);
+        final Optional<Debt> maybeDebt = this.findDebt(dto.getReceiverBudgetId(), dto.getLenderBudgetId());
         final Debt debt = maybeDebt.orElse(new Debt());
 
         this.debtMapper.mergeIntoDebt(dto, debt);
@@ -43,22 +43,40 @@ public class DebtServiceImpl implements DebtService {
 
         this.debtRepository.save(debt);
 
-        this.transactionService.createDebtLenderTransactions(debt, dto.getDebtAmount());
+        this.transactionService.createDebtTransactions(debt, dto.getDebtAmount());
 
         return this.findById(debt.getId());
     }
 
     @Override
-    public Optional<Debt> findDebt(CreateDebtDto dto) {
+    public Optional<Debt> findDebt(Long receiverBudgetId, Long lenderBudgetId) {
         final Specification<Debt> specification = DebtSpecifications.lenderBudgetIdEquals(
-                        dto.getLenderBudgetId())
-                .and(DebtSpecifications.receiverBudgetIdEquals(dto.getReceiverBudgetId()));
+                       lenderBudgetId)
+                .and(DebtSpecifications.receiverBudgetIdEquals(receiverBudgetId));
 
         return this.debtRepository.findAll(specification, null).stream().findFirst();
     }
 
+
     @Override
-    public BigDecimal getDebtSumByLenderId(Long budgetId) {
-        return this.debtRepository.sumDebtByLenderBudgetId(budgetId);
+    public BigDecimal getSumByLenderBudgetId(Long budgetId) {
+        return this.ifSumIsNullReturnZero(
+                this.debtRepository.sumDebtByLenderBudgetId(budgetId)
+        );
+    }
+
+    @Override
+    public BigDecimal getSumByReceiverBudgetId(Long receiverBudgetId) {
+        return this.ifSumIsNullReturnZero(
+                this.debtRepository.sumDebtByReceiverBudgetId(receiverBudgetId)
+        );
+    }
+
+    private BigDecimal ifSumIsNullReturnZero(BigDecimal sum) {
+        if (sum == null) {
+            return BigDecimal.ZERO;
+        }
+
+        return sum;
     }
 }
