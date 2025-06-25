@@ -55,7 +55,8 @@ public class CreateTransactionDto implements ITransactionDto {
         return dto;
     }
 
-    public static CreateTransactionDto debtDto(BigDecimal amount, Long debtId, TransactionType type, Long budgetId) {
+    public static CreateTransactionDto debtDto(BigDecimal amount, Long debtId, TransactionType type,
+            Long budgetId) {
 
         final CreateTransactionDto createDto = new CreateTransactionDto();
 

@@ -30,7 +30,8 @@ public class DebtServiceImpl implements DebtService {
     @Transactional
     public Debt create(CreateDebtDto dto) {
 
-        final Optional<Debt> maybeDebt = this.findDebt(dto.getReceiverBudgetId(), dto.getLenderBudgetId());
+        final Optional<Debt> maybeDebt = this.findDebt(dto.getReceiverBudgetId(),
+                dto.getLenderBudgetId());
         final Debt debt = maybeDebt.orElse(new Debt());
 
         this.debtMapper.mergeIntoDebt(dto, debt);
@@ -51,7 +52,7 @@ public class DebtServiceImpl implements DebtService {
     @Override
     public Optional<Debt> findDebt(Long receiverBudgetId, Long lenderBudgetId) {
         final Specification<Debt> specification = DebtSpecifications.lenderBudgetIdEquals(
-                       lenderBudgetId)
+                        lenderBudgetId)
                 .and(DebtSpecifications.receiverBudgetIdEquals(receiverBudgetId));
 
         return this.debtRepository.findAll(specification, null).stream().findFirst();

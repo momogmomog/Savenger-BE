@@ -14,6 +14,8 @@ import java.lang.annotation.Target;
 public @interface ValidDebtDto {
 
     String message() default ValidationMessages.DEBT_ALREADY_EXIST;
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }
