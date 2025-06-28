@@ -36,8 +36,6 @@ public class BudgetServiceImpl implements BudgetService {
 
     private final TransactionService transactionService;
 
-    private final DebtService debtService;
-
     @Override
     public Budget findById(Long id) {
         return this.budgetRepository.findById(id)
@@ -166,19 +164,21 @@ public class BudgetServiceImpl implements BudgetService {
         final BigDecimal earnings = this.transactionService.getEarningsAmount(budgetId);
         final BigDecimal expenses = this.transactionService.getExpensesAmount(budgetId);
 
+        final BigDecimal debtLendedSum = this.transactionService.getDebtLendedAmount(budgetId);
+        final BigDecimal debtReceivedSum = this.transactionService.getDebtReceivedAmount(budgetId);
+
         statisticDto.setBudget(budget);
+
         statisticDto.setEarningsAmount(earnings);
         statisticDto.setExpensesAmount(expenses);
-
-        statisticDto.setDebtEarningsAmount(this.debtService.getSumByReceiverBudgetId(budgetId));
-
-        statisticDto.setDebtExpensesAmount(this.debtService.getSumByLenderBudgetId(budgetId));
+        statisticDto.setDebtLendedAmount(debtLendedSum);
+        statisticDto.setDebtReceivedAmount(debtReceivedSum);
 
         statisticDto.setRealBalance(this.getBalance(budget, earnings, expenses));
 
         statisticDto.setBalance(
-                budget.getBalance().subtract(statisticDto.getDebtExpensesAmount())
-                        .add(statisticDto.getDebtEarningsAmount()));
+               statisticDto.getRealBalance().subtract(statisticDto.getDebtReceivedAmount())
+                        .add(statisticDto.getDebtLendedAmount()));
 
         return statisticDto;
     }

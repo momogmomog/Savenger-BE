@@ -32,6 +32,10 @@ public interface TransactionService {
 
     BigDecimal getEarningsAmount(Long budgetId);
 
+    BigDecimal getDebtLendedAmount(Long budgetId);
+
+    BigDecimal getDebtReceivedAmount(Long budgetId);
+
     void createDebtTransactions(Debt debt, BigDecimal amount);
 
     void payDebtTransaction(Debt debt, BigDecimal amount);

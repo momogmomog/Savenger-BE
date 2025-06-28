@@ -1,9 +1,14 @@
 package com.momo.savanger.api.debt;
 
+import com.momo.savanger.api.budget.Budget;
+import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.transaction.TransactionService;
+import com.momo.savanger.api.user.User;
+import com.momo.savanger.api.user.UserService;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,6 +25,8 @@ public class DebtServiceImpl implements DebtService {
 
     private final TransactionService transactionService;
 
+    private final BudgetService budgetService;
+
     @Override
     public Debt findById(Long id) {
         return this.debtRepository.findById(id)
@@ -30,8 +37,15 @@ public class DebtServiceImpl implements DebtService {
     @Transactional
     public Debt create(CreateDebtDto dto) {
 
+        final Budget lender = this.budgetService.findById(dto.getLenderBudgetId());
+
+        if (dto.getDebtAmount().compareTo(lender.getBalance()) > 0){
+            throw ApiException.with(ApiErrorCode.ERR_0014);
+        }
+
         final Optional<Debt> maybeDebt = this.findDebt(dto.getReceiverBudgetId(),
-                dto.getLenderBudgetId());
+                dto.getLenderBudgetId()
+        );
         final Debt debt = maybeDebt.orElse(new Debt());
 
         this.debtMapper.mergeIntoDebt(dto, debt);
@@ -51,7 +65,14 @@ public class DebtServiceImpl implements DebtService {
 
     @Override
     public Debt pay(Long id, PayDebtDto dto) {
+
         Debt debt = this.findById(id);
+
+        Budget budget = budgetService.findById(debt.getReceiverBudgetId());
+
+        if (budget.getBalance().compareTo(dto.getAmount()) < 0){
+            throw ApiException.with(ApiErrorCode.ERR_0014);
+        }
 
         debt.setAmount(debt.getAmount().subtract(dto.getAmount()));
 
@@ -73,24 +94,16 @@ public class DebtServiceImpl implements DebtService {
 
 
     @Override
-    public BigDecimal getSumByLenderBudgetId(Long budgetId) {
-        return this.ifSumIsNullReturnZero(
-                this.debtRepository.sumDebtByLenderBudgetId(budgetId)
-        );
+    public BigDecimal getSumByLenderBudgetId(Long lenderBudgetId) {
+        return Objects.requireNonNullElse(
+                this.debtRepository.sumDebtByLenderBudgetId(lenderBudgetId), BigDecimal.ZERO);
     }
 
     @Override
     public BigDecimal getSumByReceiverBudgetId(Long receiverBudgetId) {
-        return this.ifSumIsNullReturnZero(
-                this.debtRepository.sumDebtByReceiverBudgetId(receiverBudgetId)
-        );
+
+        return Objects.requireNonNullElse(
+                this.debtRepository.sumDebtByReceiverBudgetId(receiverBudgetId), BigDecimal.ZERO);
     }
 
-    private BigDecimal ifSumIsNullReturnZero(BigDecimal sum) {
-        if (sum == null) {
-            return BigDecimal.ZERO;
-        }
-
-        return sum;
-    }
 }

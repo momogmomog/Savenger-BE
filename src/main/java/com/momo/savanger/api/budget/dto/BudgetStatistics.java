@@ -15,9 +15,9 @@ public class BudgetStatistics {
 
     private BigDecimal earningsAmount;
 
-    private BigDecimal debtExpensesAmount;
+    private BigDecimal debtLendedAmount;
 
-    private BigDecimal debtEarningsAmount;
+    private BigDecimal debtReceivedAmount;
 
     private BigDecimal realBalance;
 }

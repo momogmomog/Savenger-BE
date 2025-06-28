@@ -63,7 +63,7 @@ public class RevisionServiceImpl implements RevisionService {
 
             revision.setBalance(dto.getBalance());
         } else {
-            revision.setBalance(statistics.getBalance());
+            revision.setBalance(statistics.getRealBalance());
         }
 
         revision.setEarningsAmount(statistics.getEarningsAmount());

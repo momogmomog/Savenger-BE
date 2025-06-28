@@ -63,12 +63,12 @@ public class TransactionServiceImpl implements TransactionService {
         final Long userId = SecurityUtils.getCurrentUser().getId();
 
         this.create(
-                this.createTransactionDto(debt.getAmount(), debt.getId(), TransactionType.EXPENSE,
+                this.createTransactionDto(amount, debt.getId(), TransactionType.EXPENSE,
                         debt.getLenderBudgetId()), userId
         );
 
         this.create(
-                this.createTransactionDto(debt.getAmount(), debt.getId(), TransactionType.INCOME,
+                this.createTransactionDto(amount, debt.getId(), TransactionType.INCOME,
                         debt.getReceiverBudgetId()), userId
         );
     }
@@ -79,12 +79,12 @@ public class TransactionServiceImpl implements TransactionService {
         final Long userId = SecurityUtils.getCurrentUser().getId();
 
         this.create(
-                this.createTransactionDto(debt.getAmount(), debt.getId(), TransactionType.EXPENSE,
+                this.createTransactionDto(amount, debt.getId(), TransactionType.EXPENSE,
                         debt.getReceiverBudgetId()), userId
         );
 
         this.create(
-                this.createTransactionDto(debt.getAmount(), debt.getId(), TransactionType.INCOME,
+                this.createTransactionDto(amount, debt.getId(), TransactionType.INCOME,
                         debt.getLenderBudgetId()), userId
         );
     }
@@ -92,13 +92,11 @@ public class TransactionServiceImpl implements TransactionService {
     private CreateTransactionDto createTransactionDto(BigDecimal amount, Long debtId,
             TransactionType transactionType, Long budgetId) {
 
-        CreateTransactionDto dto = CreateTransactionDto.debtDto(amount,
+        return CreateTransactionDto.debtDto(amount,
                 debtId,
                 transactionType,
                 budgetId
         );
-
-        return dto;
     }
 
     @Override
@@ -189,6 +187,17 @@ public class TransactionServiceImpl implements TransactionService {
     public BigDecimal getEarningsAmount(Long budgetId) {
 
         return this.getSumAmount(budgetId, TransactionType.INCOME);
+    }
+
+
+    @Override
+    public BigDecimal getDebtLendedAmount(Long budgetId) {
+        return this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId, TransactionType.EXPENSE);
+    }
+
+    @Override
+    public BigDecimal getDebtReceivedAmount(Long budgetId) {
+        return this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId, TransactionType.INCOME);
     }
 
     private BigDecimal getSumAmount(Long budgetId, TransactionType type) {

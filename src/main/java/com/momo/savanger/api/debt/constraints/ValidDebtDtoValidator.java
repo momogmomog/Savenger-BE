@@ -27,14 +27,6 @@ public class ValidDebtDtoValidator implements ConstraintValidator<ValidDebtDto, 
                     ValidationMessages.BUDGETS_SHOULD_BE_DIFFERENT);
         }
 
-        final BudgetStatistics budgetStatistics = this.budgetService.getStatistics(
-                debtDto.getLenderBudgetId());
-
-        if (budgetStatistics.getRealBalance().compareTo(debtDto.getDebtAmount()) < 0) {
-            return this.fail(constraintValidatorContext, "amount",
-                    ValidationMessages.AMOUNT_IS_TOO_BIG);
-        }
-
         return true;
     }
 
