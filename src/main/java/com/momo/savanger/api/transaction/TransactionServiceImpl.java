@@ -192,12 +192,14 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public BigDecimal getDebtLendedAmount(Long budgetId) {
-        return this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId, TransactionType.EXPENSE);
+        return this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId,
+                TransactionType.EXPENSE);
     }
 
     @Override
     public BigDecimal getDebtReceivedAmount(Long budgetId) {
-        return this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId, TransactionType.INCOME);
+        return this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId,
+                TransactionType.INCOME);
     }
 
     private BigDecimal getSumAmount(Long budgetId, TransactionType type) {

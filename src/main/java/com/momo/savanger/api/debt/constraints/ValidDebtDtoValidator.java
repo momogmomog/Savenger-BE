@@ -1,7 +1,6 @@
 package com.momo.savanger.api.debt.constraints;
 
 import com.momo.savanger.api.budget.BudgetService;
-import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.debt.CreateDebtDto;
 import com.momo.savanger.api.debt.DebtService;
 import com.momo.savanger.constants.ValidationMessages;

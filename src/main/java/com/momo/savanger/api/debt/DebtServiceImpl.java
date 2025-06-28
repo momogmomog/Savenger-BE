@@ -3,8 +3,6 @@ package com.momo.savanger.api.debt;
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.transaction.TransactionService;
-import com.momo.savanger.api.user.User;
-import com.momo.savanger.api.user.UserService;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
@@ -39,7 +37,7 @@ public class DebtServiceImpl implements DebtService {
 
         final Budget lender = this.budgetService.findById(dto.getLenderBudgetId());
 
-        if (dto.getDebtAmount().compareTo(lender.getBalance()) > 0){
+        if (dto.getDebtAmount().compareTo(lender.getBalance()) > 0) {
             throw ApiException.with(ApiErrorCode.ERR_0014);
         }
 
@@ -70,7 +68,7 @@ public class DebtServiceImpl implements DebtService {
 
         Budget budget = budgetService.findById(debt.getReceiverBudgetId());
 
-        if (budget.getBalance().compareTo(dto.getAmount()) < 0){
+        if (budget.getBalance().compareTo(dto.getAmount()) < 0) {
             throw ApiException.with(ApiErrorCode.ERR_0014);
         }
 

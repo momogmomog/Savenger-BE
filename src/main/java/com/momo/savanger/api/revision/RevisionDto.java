@@ -21,6 +21,10 @@ public class RevisionDto {
 
     private BigDecimal earningsAmount;
 
+    private BigDecimal debtLendedAmount;
+
+    private BigDecimal debtReceivedAmount;
+
     private BigDecimal compensationAmount;
 
     private Boolean autoRevise;

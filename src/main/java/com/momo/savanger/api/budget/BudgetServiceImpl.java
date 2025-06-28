@@ -7,7 +7,6 @@ import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
-import com.momo.savanger.api.debt.DebtService;
 import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.user.User;
@@ -177,7 +176,7 @@ public class BudgetServiceImpl implements BudgetService {
         statisticDto.setRealBalance(this.getBalance(budget, earnings, expenses));
 
         statisticDto.setBalance(
-               statisticDto.getRealBalance().subtract(statisticDto.getDebtReceivedAmount())
+                statisticDto.getRealBalance().subtract(statisticDto.getDebtReceivedAmount())
                         .add(statisticDto.getDebtLendedAmount()));
 
         return statisticDto;

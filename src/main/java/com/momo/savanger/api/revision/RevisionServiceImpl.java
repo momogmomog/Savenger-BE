@@ -68,6 +68,8 @@ public class RevisionServiceImpl implements RevisionService {
 
         revision.setEarningsAmount(statistics.getEarningsAmount());
         revision.setExpensesAmount(statistics.getExpensesAmount());
+        revision.setDebtLendedAmount(statistics.getDebtLendedAmount());
+        revision.setDebtReceivedAmount(statistics.getDebtReceivedAmount());
 
         this.revisionRepository.saveAndFlush(revision);
 
