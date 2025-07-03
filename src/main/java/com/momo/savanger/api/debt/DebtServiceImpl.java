@@ -41,10 +41,9 @@ public class DebtServiceImpl implements DebtService {
             throw ApiException.with(ApiErrorCode.ERR_0014);
         }
 
-        final Optional<Debt> maybeDebt = this.findDebt(dto.getReceiverBudgetId(),
+        final Debt debt = this.findDebt(dto.getReceiverBudgetId(),
                 dto.getLenderBudgetId()
-        );
-        final Debt debt = maybeDebt.orElse(new Debt());
+        ).orElse(new Debt());
 
         this.debtMapper.mergeIntoDebt(dto, debt);
 
@@ -64,9 +63,9 @@ public class DebtServiceImpl implements DebtService {
     @Override
     public Debt pay(Long id, PayDebtDto dto) {
 
-        Debt debt = this.findById(id);
+        final Debt debt = this.findById(id);
 
-        Budget budget = budgetService.findById(debt.getReceiverBudgetId());
+       final  Budget budget = budgetService.findById(debt.getReceiverBudgetId());
 
         if (budget.getBalance().compareTo(dto.getAmount()) < 0) {
             throw ApiException.with(ApiErrorCode.ERR_0014);
@@ -90,18 +89,5 @@ public class DebtServiceImpl implements DebtService {
         return this.debtRepository.findAll(specification, null).stream().findFirst();
     }
 
-
-    @Override
-    public BigDecimal getSumByLenderBudgetId(Long lenderBudgetId) {
-        return Objects.requireNonNullElse(
-                this.debtRepository.sumDebtByLenderBudgetId(lenderBudgetId), BigDecimal.ZERO);
-    }
-
-    @Override
-    public BigDecimal getSumByReceiverBudgetId(Long receiverBudgetId) {
-
-        return Objects.requireNonNullElse(
-                this.debtRepository.sumDebtByReceiverBudgetId(receiverBudgetId), BigDecimal.ZERO);
-    }
 
 }

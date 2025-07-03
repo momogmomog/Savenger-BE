@@ -1,6 +1,5 @@
 package com.momo.savanger.api.debt;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 public interface DebtService {
@@ -12,8 +11,4 @@ public interface DebtService {
     Debt pay(Long id, PayDebtDto dto);
 
     Optional<Debt> findDebt(Long receiverBudgetId, Long lenderBudgetId);
-
-    BigDecimal getSumByLenderBudgetId(Long budgetId);
-
-    BigDecimal getSumByReceiverBudgetId(Long receiverBudgetId);
 }
