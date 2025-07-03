@@ -14,4 +14,6 @@ public class Endpoints {
     public static final String TRANSACTIONS_SEARCH = "/transactions/search";
     public static final String TRANSACTION = "transactions/{id}";
     public static final String REVISIONS = "/revisions";
+    public static final String DEBTS = "/debts";
+    public static final String PAY_DEBT = "/debts/{id}/payDebt";
 }

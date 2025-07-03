@@ -41,6 +41,10 @@ public class Revision {
     @Column(nullable = false)
     private BigDecimal earningsAmount;
 
+    private BigDecimal debtLendedAmount;
+
+    private BigDecimal debtReceivedAmount;
+
     private BigDecimal compensationAmount;
 
     @Column(nullable = false)
