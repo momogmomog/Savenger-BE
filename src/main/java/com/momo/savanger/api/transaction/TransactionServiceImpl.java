@@ -11,6 +11,7 @@ import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -192,26 +193,22 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public BigDecimal getDebtLendedAmount(Long budgetId) {
-        return this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId,
-                TransactionType.EXPENSE);
+        return Objects.requireNonNullElse(
+                this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId,
+                        TransactionType.EXPENSE), BigDecimal.ZERO);
     }
 
     @Override
     public BigDecimal getDebtReceivedAmount(Long budgetId) {
-        return this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId,
-                TransactionType.INCOME);
+        return Objects.requireNonNullElse(
+                this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId,
+                        TransactionType.INCOME), BigDecimal.ZERO);
     }
 
     private BigDecimal getSumAmount(Long budgetId, TransactionType type) {
 
-        final BigDecimal sum = this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(
-                budgetId,
-                type);
-
-        if (sum == null) {
-            return BigDecimal.ZERO;
-        }
-
-        return sum;
+        return Objects.requireNonNullElse(
+                this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(budgetId,
+                        type), BigDecimal.ZERO);
     }
 }

@@ -1,8 +1,10 @@
 package com.momo.savanger.api.debt;
 
-import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetService;
+import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.transaction.TransactionService;
+import com.momo.savanger.api.user.User;
+import com.momo.savanger.api.util.SecurityUtils;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
@@ -35,9 +37,9 @@ public class DebtServiceImpl implements DebtService {
     @Transactional
     public Debt create(CreateDebtDto dto) {
 
-        final Budget lender = this.budgetService.findById(dto.getLenderBudgetId());
+        final BudgetStatistics lender = this.budgetService.getStatistics(dto.getLenderBudgetId());
 
-        if (dto.getDebtAmount().compareTo(lender.getBalance()) > 0) {
+        if (dto.getDebtAmount().compareTo(lender.getRealBalance()) > 0) {
             throw ApiException.with(ApiErrorCode.ERR_0014);
         }
 
@@ -65,9 +67,19 @@ public class DebtServiceImpl implements DebtService {
 
         final Debt debt = this.findById(id);
 
-       final  Budget budget = budgetService.findById(debt.getReceiverBudgetId());
+        final BudgetStatistics budget = budgetService.getStatistics(debt.getReceiverBudgetId());
 
-        if (budget.getBalance().compareTo(dto.getAmount()) < 0) {
+        User user = SecurityUtils.getCurrentUser();
+
+        if (!Objects.equals(budget.getBudget().getOwnerId(), user.getId())) {
+            throw ApiException.with(ApiErrorCode.ERR_0015);
+        }
+
+        if (debt.getAmount().compareTo(dto.getAmount()) < 0) {
+            dto.setAmount(debt.getAmount());
+        }
+
+        if (budget.getRealBalance().compareTo(dto.getAmount()) < 0) {
             throw ApiException.with(ApiErrorCode.ERR_0014);
         }
 

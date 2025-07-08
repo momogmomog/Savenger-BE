@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
+import com.momo.savanger.api.debt.Debt;
+import com.momo.savanger.api.debt.DebtService;
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.transaction.Transaction;
 import com.momo.savanger.api.transaction.TransactionRepository;
@@ -25,6 +27,8 @@ import com.momo.savanger.api.util.PageQuery;
 import com.momo.savanger.api.util.SortDirection;
 import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.error.ApiException;
+import com.momo.savanger.integration.web.Constants;
+import com.momo.savanger.integration.web.WithLocalMockedUser;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -53,8 +57,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Sql("classpath:/sql/category-it-data.sql")
 @Sql("classpath:/sql/transaction-it-data.sql")
 @Sql("classpath:/sql/transactions_tags-it-data.sql")
+@Sql("classpath:/sql/debt/debt-it-data.sql")
 @Sql(value = "classpath:/sql/del-transactions_tags-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/debt/del-debt-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-category-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-tag-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -72,6 +78,9 @@ public class TransactionServiceIt {
 
     @Autowired
     private BudgetService budgetService;
+
+    @Autowired
+    private DebtService debtService;
 
     @Test
     @Transactional
@@ -373,5 +382,81 @@ public class TransactionServiceIt {
                 transaction.getAmount().setScale(2, RoundingMode.HALF_DOWN));
     }
 
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testCreateDebtTransaction_validId_shouldCreateDebtTransactions() {
+        Debt debt = this.debtService.findById(101L);
+
+        assertEquals(4, this.transactionRepository.findAll().size());
+
+        this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
+
+        assertEquals(6, this.transactionRepository.findAll().size());
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testPayDebtTransaction_validId_shouldCreateDebtTransactions() {
+        Debt debt = this.debtService.findById(101L);
+
+        assertEquals(4, this.transactionRepository.findAll().size());
+
+        this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
+
+        assertEquals(6, this.transactionRepository.findAll().size());
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testGetDebtLendedAmount_validId_shouldCreateDebtTransactions() {
+        Debt debt = this.debtService.findById(101L);
+
+        this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
+        this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(32.32));
+
+        BigDecimal lendedAmount = this.transactionService.getDebtLendedAmount(1002L);
+
+        assertEquals(BigDecimal.valueOf(232.32), lendedAmount.setScale(2, RoundingMode.HALF_DOWN));
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testGetDebtReceivedAmount_validId_shouldCreateDebtTransactions() {
+        Debt debt = this.debtService.findById(101L);
+
+        this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
+        this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(32.32));
+
+        BigDecimal receivedAmount = this.transactionService.getDebtReceivedAmount(1001L);
+
+        assertEquals(BigDecimal.valueOf(232.32),
+                receivedAmount.setScale(2, RoundingMode.HALF_DOWN));
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testGetDebtLendedAmount_invalidId_shouldCreateDebtTransactions() {
+        Debt debt = this.debtService.findById(101L);
+
+        this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
+        this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(32.32));
+
+        BigDecimal lendedAmount = this.transactionService.getDebtLendedAmount(1004L);
+
+        assertEquals(BigDecimal.ZERO, lendedAmount);
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testGetDebtReceivedAmount_invalidId_shouldCreateDebtTransactions() {
+        Debt debt = this.debtService.findById(101L);
+
+        this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
+        this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(32.32));
+
+        BigDecimal receivedAmount = this.transactionService.getDebtReceivedAmount(1004L);
+
+        assertEquals(BigDecimal.ZERO, receivedAmount);
+    }
 
 }

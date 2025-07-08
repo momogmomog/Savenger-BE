@@ -21,6 +21,10 @@ public class ValidDebtDtoValidator implements ConstraintValidator<ValidDebtDto, 
     public boolean isValid(CreateDebtDto debtDto,
             ConstraintValidatorContext constraintValidatorContext) {
 
+        if (debtDto.getLenderBudgetId() == null || debtDto.getReceiverBudgetId() == null) {
+            return true;
+        }
+
         if (debtDto.getLenderBudgetId().equals(debtDto.getReceiverBudgetId())) {
             return this.fail(constraintValidatorContext, "lenderBudgetId",
                     ValidationMessages.BUDGETS_SHOULD_BE_DIFFERENT);
