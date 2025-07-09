@@ -57,6 +57,8 @@ public class Transaction {
     @Column(nullable = false)
     private Long budgetId;
 
+    private Long debtId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "budgetId", insertable = false, updatable = false)
     private Budget budget;

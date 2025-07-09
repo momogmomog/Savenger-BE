@@ -1,14 +1,17 @@
 package com.momo.savanger.api.transaction;
 
+import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.user.User;
+import com.momo.savanger.api.util.SecurityUtils;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -53,6 +56,48 @@ public class TransactionServiceImpl implements TransactionService {
         this.transactionRepository.saveAndFlush(transaction);
 
         return this.findById(transaction.getId());
+    }
+
+    @Override
+    @Transactional
+    public void createDebtTransactions(Debt debt, BigDecimal amount) {
+        final Long userId = SecurityUtils.getCurrentUser().getId();
+
+        this.create(
+                this.createTransactionDto(amount, debt.getId(), TransactionType.EXPENSE,
+                        debt.getLenderBudgetId()), userId
+        );
+
+        this.create(
+                this.createTransactionDto(amount, debt.getId(), TransactionType.INCOME,
+                        debt.getReceiverBudgetId()), userId
+        );
+    }
+
+    @Override
+    @Transactional
+    public void payDebtTransaction(Debt debt, BigDecimal amount) {
+        final Long userId = SecurityUtils.getCurrentUser().getId();
+
+        this.create(
+                this.createTransactionDto(amount, debt.getId(), TransactionType.EXPENSE,
+                        debt.getReceiverBudgetId()), userId
+        );
+
+        this.create(
+                this.createTransactionDto(amount, debt.getId(), TransactionType.INCOME,
+                        debt.getLenderBudgetId()), userId
+        );
+    }
+
+    private CreateTransactionDto createTransactionDto(BigDecimal amount, Long debtId,
+            TransactionType transactionType, Long budgetId) {
+
+        return CreateTransactionDto.debtDto(amount,
+                debtId,
+                transactionType,
+                budgetId
+        );
     }
 
     @Override
@@ -145,16 +190,25 @@ public class TransactionServiceImpl implements TransactionService {
         return this.getSumAmount(budgetId, TransactionType.INCOME);
     }
 
+
+    @Override
+    public BigDecimal getDebtLendedAmount(Long budgetId) {
+        return Objects.requireNonNullElse(
+                this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId,
+                        TransactionType.EXPENSE), BigDecimal.ZERO);
+    }
+
+    @Override
+    public BigDecimal getDebtReceivedAmount(Long budgetId) {
+        return Objects.requireNonNullElse(
+                this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId,
+                        TransactionType.INCOME), BigDecimal.ZERO);
+    }
+
     private BigDecimal getSumAmount(Long budgetId, TransactionType type) {
 
-        final BigDecimal sum = this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(
-                budgetId,
-                type);
-
-        if (sum == null) {
-            return BigDecimal.ZERO;
-        }
-
-        return sum;
+        return Objects.requireNonNullElse(
+                this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(budgetId,
+                        type), BigDecimal.ZERO);
     }
 }

@@ -39,6 +39,8 @@ public class CreateTransactionDto implements ITransactionDto {
     @CanAccessBudget
     private Long budgetId;
 
+    private Long debtId;
+
     private List<Long> tagIds;
 
     public List<Long> getTagIds() {
@@ -51,5 +53,18 @@ public class CreateTransactionDto implements ITransactionDto {
         dto.amount = amount;
         dto.budgetId = budgetId;
         return dto;
+    }
+
+    public static CreateTransactionDto debtDto(BigDecimal amount, Long debtId, TransactionType type,
+            Long budgetId) {
+
+        final CreateTransactionDto createDto = new CreateTransactionDto();
+
+        createDto.setAmount(amount);
+        createDto.setBudgetId(budgetId);
+        createDto.setType(type);
+        createDto.setDebtId(debtId);
+
+        return createDto;
     }
 }

@@ -163,11 +163,22 @@ public class BudgetServiceImpl implements BudgetService {
         final BigDecimal earnings = this.transactionService.getEarningsAmount(budgetId);
         final BigDecimal expenses = this.transactionService.getExpensesAmount(budgetId);
 
+        final BigDecimal debtLendedSum = this.transactionService.getDebtLendedAmount(budgetId);
+        final BigDecimal debtReceivedSum = this.transactionService.getDebtReceivedAmount(budgetId);
+
         statisticDto.setBudget(budget);
+
         statisticDto.setEarningsAmount(earnings);
         statisticDto.setExpensesAmount(expenses);
+        statisticDto.setDebtLendedAmount(debtLendedSum);
+        statisticDto.setDebtReceivedAmount(debtReceivedSum);
 
-        statisticDto.setBalance(this.getBalance(budget, earnings, expenses));
+        statisticDto.setRealBalance(this.getBalance(budget, earnings, expenses));
+
+        statisticDto.setBalance(
+                statisticDto.getRealBalance().subtract(statisticDto.getDebtReceivedAmount())
+                        .add(statisticDto.getDebtLendedAmount())
+        );
 
         return statisticDto;
     }

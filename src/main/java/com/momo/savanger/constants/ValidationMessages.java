@@ -15,5 +15,7 @@ public class ValidationMessages {
     public static final String TRANSACTION_IS_REVISED = "Transaction is already revised and cannot be edit.";
     public static final String INVALID_TRANSACTION = "Invalid transaction or you don't have access to it.";
     public static final String TRANSACTION_DOES_NOT_EXIST = "Transaction does not exist.";
+    public static final String DEBT_ALREADY_EXIST = "Debt with these budgets already exist.";
+    public static final String BUDGETS_SHOULD_BE_DIFFERENT = "Lender and receiver budget ids should be different.";
 
 }

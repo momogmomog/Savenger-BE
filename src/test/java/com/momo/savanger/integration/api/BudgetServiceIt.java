@@ -401,15 +401,17 @@ public class BudgetServiceIt {
     @Transactional
     public void testGetStatistics_validId_shouldReturnStatistics() {
 
-        BudgetStatistics statisticsDto = this.budgetService.getStatistics(1001L);
+        BudgetStatistics statistics = this.budgetService.getStatistics(1001L);
 
-        assertNotNull(statisticsDto);
+        assertNotNull(statistics);
         assertEquals(BigDecimal.valueOf(123.32),
-                statisticsDto.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
+                statistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.valueOf(45.00).setScale(2, RoundingMode.HALF_DOWN),
-                statisticsDto.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+                statistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.valueOf(101.32),
-                statisticsDto.getBalance().setScale(2, RoundingMode.HALF_DOWN));
+                statistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.ZERO, statistics.getDebtLendedAmount());
+        assertEquals(BigDecimal.ZERO, statistics.getDebtReceivedAmount());
     }
 
     @Test
