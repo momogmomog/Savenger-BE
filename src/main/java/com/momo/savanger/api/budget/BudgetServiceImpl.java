@@ -177,7 +177,8 @@ public class BudgetServiceImpl implements BudgetService {
 
         statisticDto.setBalance(
                 statisticDto.getRealBalance().subtract(statisticDto.getDebtReceivedAmount())
-                        .add(statisticDto.getDebtLendedAmount()));
+                        .add(statisticDto.getDebtLendedAmount())
+        );
 
         return statisticDto;
     }

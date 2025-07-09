@@ -69,7 +69,7 @@ public class DebtServiceImpl implements DebtService {
 
         final BudgetStatistics budget = budgetService.getStatistics(debt.getReceiverBudgetId());
 
-        User user = SecurityUtils.getCurrentUser();
+        final User user = SecurityUtils.getCurrentUser();
 
         if (!Objects.equals(budget.getBudget().getOwnerId(), user.getId())) {
             throw ApiException.with(ApiErrorCode.ERR_0015);
