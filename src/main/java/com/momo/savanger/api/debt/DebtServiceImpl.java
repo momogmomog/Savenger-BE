@@ -75,6 +75,8 @@ public class DebtServiceImpl implements DebtService {
             throw ApiException.with(ApiErrorCode.ERR_0015);
         }
 
+        //TODO: test if all budgets are accessible.
+
         if (debt.getAmount().compareTo(dto.getAmount()) < 0) {
             dto.setAmount(debt.getAmount());
         }
