@@ -12,10 +12,13 @@ public class ValidationMessages {
     public static final String PARTICIPANT_NOT_EXIST = "Participant does not exist.";
     public static final String INVALID_BUDGET = "Missing or invalid budget";
     public static final String CATEGORY_DOES_NOT_EXIST_OR_BUDGET_IS_NOT_VALID = "Category does not exist or budget is not valid.";
+    public static final String TRANSACTION_DTO_IS_IS_NOT_VALID = "Transaction DTO is not valid.";
     public static final String TRANSACTION_IS_REVISED = "Transaction is already revised and cannot be edit.";
+    public static final String RECURRING_TRANSACTION_DTO_IS_NOT_VALID = "Recurring transaction DTO is not valid.";
     public static final String INVALID_TRANSACTION = "Invalid transaction or you don't have access to it.";
     public static final String TRANSACTION_DOES_NOT_EXIST = "Transaction does not exist.";
     public static final String DEBT_ALREADY_EXIST = "Debt with these budgets already exist.";
     public static final String BUDGETS_SHOULD_BE_DIFFERENT = "Lender and receiver budget ids should be different.";
+    public static final String PREPAYMENT_DOES_NOT_EXIST_OR_BUDGET_IS_NOT_VALID = "Payment does not exist or budget is not valid.";
 
 }

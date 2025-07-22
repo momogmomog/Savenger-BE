@@ -1,36 +1,39 @@
-package com.momo.savanger.api.transaction.constraints;
+package com.momo.savanger.api.transaction.recurring.constraints;
 
 import com.momo.savanger.api.category.CategoryService;
+import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.tag.TagService;
-import com.momo.savanger.api.transaction.dto.ITransactionDto;
+import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
 import com.momo.savanger.constants.ValidationMessages;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Component
-@RequiredArgsConstructor
-public class ValidTransactionDtoValidator implements
-        ConstraintValidator<ValidTransactionDto, ITransactionDto> {
+public class ValidRecurringTransactionDtoValidator implements
+        ConstraintValidator<ValidRecurringTransactionDto,
+                CreateRecurringTransactionDto> {
 
-    private final TagService tagService;
-    private final CategoryService categoryService;
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private TagService tagService;
+
+    @Autowired
+    private PrepaymentService prepaymentService;
+
 
     @Override
-    public void initialize(ValidTransactionDto constraintAnnotation) {
+    public void initialize(ValidRecurringTransactionDto constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
     @Override
-    public boolean isValid(ITransactionDto dto,
+    public boolean isValid(CreateRecurringTransactionDto dto,
             ConstraintValidatorContext constraintValidatorContext) {
 
-        if (dto.getBudgetId() == null) {
-            return true;
-        }
         if (!this.categoryService.isCategoryValid(dto.getCategoryId(), dto.getBudgetId())) {
             return this.fail(constraintValidatorContext, "categoryId",
                     ValidationMessages.CATEGORY_DOES_NOT_EXIST_OR_BUDGET_IS_NOT_VALID);
