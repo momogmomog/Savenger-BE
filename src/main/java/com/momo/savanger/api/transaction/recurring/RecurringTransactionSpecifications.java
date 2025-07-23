@@ -23,8 +23,17 @@ public final class RecurringTransactionSpecifications {
         return QuerySpecifications.equal(RecurringTransaction_.id, id);
     }
 
-    public static Specification<RecurringTransaction> budgetIdEquals(final Long budgetId) {
-        return QuerySpecifications.equal(RecurringTransaction_.budgetId, budgetId);
+    public static Specification<RecurringTransaction> typeEquals(final TransactionType type) {
+        return QuerySpecifications.equalIfPresent(RecurringTransaction_.type, type);
+    }
+
+    public static Specification<RecurringTransaction> betweenNextDate(
+            final BetweenQuery<LocalDateTime> query) {
+        return QuerySpecifications.between(RecurringTransaction_.nextDate, query);
+    }
+
+    public static Specification<RecurringTransaction> isAutoExecuted(final boolean isAutoExecuted) {
+        return QuerySpecifications.equal(RecurringTransaction_.autoExecute, isAutoExecuted);
     }
 
     public static Specification<RecurringTransaction> betweenAmount(
@@ -32,22 +41,24 @@ public final class RecurringTransactionSpecifications {
         return QuerySpecifications.between(RecurringTransaction_.amount, query);
     }
 
-    public static Specification<RecurringTransaction> categoryIdEquals(final Long categoryId) {
-        return QuerySpecifications.equalIfPresent(RecurringTransaction_.categoryId, categoryId);
-    }
-
     public static Specification<RecurringTransaction> prepaymentIdEquals(final Long prepaymentId) {
         return QuerySpecifications.equalIfPresent(RecurringTransaction_.prepaymentId, prepaymentId);
     }
 
-    public static Specification<RecurringTransaction> typeEquals(final TransactionType type) {
-        return QuerySpecifications.equalIfPresent(RecurringTransaction_.type, type);
+    public static Specification<RecurringTransaction> isCompleted(final boolean isCompleted) {
+        return QuerySpecifications.equal(RecurringTransaction_.completed, isCompleted);
     }
 
+    public static Specification<RecurringTransaction> categoryIdEquals(final Long categoryId) {
+        return QuerySpecifications.equalIfPresent(RecurringTransaction_.categoryId, categoryId);
+    }
 
-    public static Specification<RecurringTransaction> betweenNextDate(
-            final BetweenQuery<LocalDateTime> query) {
-        return QuerySpecifications.between(RecurringTransaction_.nextDate, query);
+    public static Specification<RecurringTransaction> budgetIdEquals(final Long budgetId) {
+        return QuerySpecifications.equalIfPresent(RecurringTransaction_.budgetId, budgetId);
+    }
+
+    public static Specification<RecurringTransaction> debtIdEquals(final Long debtId) {
+        return QuerySpecifications.equalIfPresent(RecurringTransaction_.debtId, debtId);
     }
 
     public static Specification<RecurringTransaction> isLinkedToTag(final Long tagId) {

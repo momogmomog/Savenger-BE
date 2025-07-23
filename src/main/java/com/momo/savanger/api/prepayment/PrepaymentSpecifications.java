@@ -17,10 +17,6 @@ public final class PrepaymentSpecifications {
         return QuerySpecifications.equal(Prepayment_.id, id);
     }
 
-    public static Specification<Prepayment> budgetIdEquals(final Long budgetId) {
-        return QuerySpecifications.equal(Prepayment_.budgetId, budgetId);
-    }
-
     public static Specification<Prepayment> betweenAmount(
             final BetweenQuery<BigDecimal> query) {
         return QuerySpecifications.between(Prepayment_.amount, query);
@@ -35,9 +31,17 @@ public final class PrepaymentSpecifications {
         return QuerySpecifications.between(Prepayment_.paidUntil, query);
     }
 
+    public static Specification<Prepayment> isCompleted(final boolean isCompleted) {
+        return QuerySpecifications.equal(Prepayment_.completed, isCompleted);
+    }
+
     public static Specification<Prepayment> betweenRemainingAmount(
             final BetweenQuery<BigDecimal> query) {
         return QuerySpecifications.between(Prepayment_.remainingAmount, query);
+    }
+
+    public static Specification<Prepayment> budgetIdEquals(final Long budgetId) {
+        return QuerySpecifications.equal(Prepayment_.budgetId, budgetId);
     }
 
 

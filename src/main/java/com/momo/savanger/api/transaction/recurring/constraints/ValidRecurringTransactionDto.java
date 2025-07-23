@@ -1,6 +1,5 @@
 package com.momo.savanger.api.transaction.recurring.constraints;
 
-import com.momo.savanger.constants.ValidationMessages;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.ElementType;
