@@ -6,6 +6,4 @@ public interface PrepaymentService {
 
     Prepayment create(CreatePrepaymentDto dto);
 
-    Boolean isPrepaymentValid(Long prepaymentId, Long budgetId);
-
 }

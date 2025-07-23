@@ -26,7 +26,7 @@ public final class PrepaymentSpecifications {
         return QuerySpecifications.between(Prepayment_.amount, query);
     }
 
-    public static Specification<Prepayment> nameEquals(final String name) {
+    public static Specification<Prepayment> nameContains(final String name) {
         return QuerySpecifications.equal(Prepayment_.name, name);
     }
 

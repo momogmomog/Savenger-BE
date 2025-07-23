@@ -4,6 +4,7 @@ import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -13,8 +14,9 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     private final RecurringTransactionMapper recurringTransactionMapper;
 
     @Override
+    @Transactional
     public RecurringTransaction create(CreateRecurringTransactionDto dto) {
-        RecurringTransaction recurringTransaction = this.recurringTransactionMapper.ToRecurringTransaction(
+        final RecurringTransaction recurringTransaction = this.recurringTransactionMapper.ToRecurringTransaction(
                 dto);
 
         recurringTransaction.setCompleted(false);
@@ -33,6 +35,7 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     }
 
     @Override
+    @Transactional
     public void addPrepaymentId(Long prepaymentId, RecurringTransaction recurringTransaction) {
         recurringTransaction.setPrepaymentId(prepaymentId);
         this.recurringTransactionRepository.save(recurringTransaction);

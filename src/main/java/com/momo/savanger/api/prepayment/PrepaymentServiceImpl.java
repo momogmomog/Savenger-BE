@@ -9,6 +9,7 @@ import com.momo.savanger.error.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +32,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
     }
 
     @Override
+    @Transactional
     public Prepayment create(CreatePrepaymentDto dto) {
         final Prepayment prepayment = this.prepaymentMapper.toPrepayment(dto);
 
@@ -64,15 +66,5 @@ public class PrepaymentServiceImpl implements PrepaymentService {
         return this.findById(
                 prepayment.getId()
         );
-    }
-
-    @Override
-    public Boolean isPrepaymentValid(Long prepaymentId, Long budgetId) {
-
-        final Specification<Prepayment> specification = PrepaymentSpecifications.idEquals(
-                        prepaymentId)
-                .and(PrepaymentSpecifications.budgetIdEquals(budgetId));
-
-        return this.prepaymentRepository.exists(specification);
     }
 }

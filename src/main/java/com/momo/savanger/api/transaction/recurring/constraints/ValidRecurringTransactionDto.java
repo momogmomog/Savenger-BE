@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = ValidRecurringTransactionDtoValidator.class)
 public @interface ValidRecurringTransactionDto {
 
-    String message() default ValidationMessages.RECURRING_TRANSACTION_DTO_IS_NOT_VALID;
+    String message() default "Recurring transaction DTO is not valid.";
 
     Class<?>[] groups() default {};
 
