@@ -8,7 +8,6 @@ import com.momo.savanger.api.util.SecurityUtils;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -67,21 +66,21 @@ public class DebtServiceImpl implements DebtService {
 
         final Debt debt = this.findById(id);
 
-        final BudgetStatistics budget = budgetService.getStatistics(debt.getReceiverBudgetId());
+        final BudgetStatistics receiverBudget = budgetService.getStatistics(
+                debt.getReceiverBudgetId());
 
         final User user = SecurityUtils.getCurrentUser();
 
-        if (!Objects.equals(budget.getBudget().getOwnerId(), user.getId())) {
+        if (!budgetService.isUserPermitted(user, receiverBudget.getBudget().getId()) ||
+                !budgetService.isUserPermitted(user, debt.getLenderBudgetId())) {
             throw ApiException.with(ApiErrorCode.ERR_0015);
         }
-
-        //TODO: test if all budgets are accessible.
 
         if (debt.getAmount().compareTo(dto.getAmount()) < 0) {
             dto.setAmount(debt.getAmount());
         }
 
-        if (budget.getRealBalance().compareTo(dto.getAmount()) < 0) {
+        if (receiverBudget.getRealBalance().compareTo(dto.getAmount()) < 0) {
             throw ApiException.with(ApiErrorCode.ERR_0014);
         }
 
