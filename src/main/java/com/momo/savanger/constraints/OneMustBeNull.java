@@ -1,6 +1,5 @@
-package com.momo.savanger.api.transaction.constraints;
+package com.momo.savanger.constraints;
 
-import com.momo.savanger.constants.ValidationMessages;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.ElementType;
@@ -8,12 +7,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = OneMustBeNullValidator.class)
 @Target(ElementType.TYPE)
-@Constraint(validatedBy = ValidTransactionDtoValidator.class)
-public @interface ValidTransactionDto {
+@Retention(RetentionPolicy.RUNTIME)
+public @interface OneMustBeNull {
 
-    String message() default ValidationMessages.TRANSACTION_DTO_IS_IS_NOT_VALID;
+    String fieldOne();
+
+    String fieldTwo();
+
+    String message() default "Either {fieldOne} or {fieldTwo} fields can be populated, but not both.";
 
     Class<?>[] groups() default {};
 
