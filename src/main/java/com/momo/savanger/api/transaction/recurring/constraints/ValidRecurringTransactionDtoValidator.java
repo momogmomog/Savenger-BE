@@ -1,6 +1,7 @@
 package com.momo.savanger.api.transaction.recurring.constraints;
 
 import com.momo.savanger.api.category.CategoryService;
+import com.momo.savanger.api.debt.DebtService;
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
@@ -22,6 +23,9 @@ public class ValidRecurringTransactionDtoValidator implements
     @Autowired
     private TagService tagService;
 
+    @Autowired
+    private DebtService debtService;
+
     @Override
     public void initialize(ValidRecurringTransactionDto constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
@@ -39,6 +43,13 @@ public class ValidRecurringTransactionDtoValidator implements
             if (!this.categoryService.isCategoryValid(dto.getCategoryId(), dto.getBudgetId())) {
                 return this.fail(constraintValidatorContext, "categoryId",
                         ValidationMessages.CATEGORY_DOES_NOT_EXIST_OR_BUDGET_IS_NOT_VALID);
+            }
+        }
+
+        if (dto.getDebtId() != null) {
+            if (!this.debtService.isValid(dto.getDebtId())) {
+                return this.fail(constraintValidatorContext, "debtId",
+                        ValidationMessages.DEBT_IS_NOT_VALID);
             }
         }
 

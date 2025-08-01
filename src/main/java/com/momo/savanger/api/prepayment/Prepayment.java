@@ -31,11 +31,13 @@ public class Prepayment extends Audit {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private LocalDateTime paidUntil;
 
     @Column(nullable = false)
     private Boolean completed;
 
+    @Column(nullable = false)
     private BigDecimal remainingAmount;
 
     @Column(nullable = false)

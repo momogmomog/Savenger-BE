@@ -22,8 +22,8 @@ public final class PrepaymentSpecifications {
         return QuerySpecifications.between(Prepayment_.amount, query);
     }
 
-    public static Specification<Prepayment> nameContains(final String name) {
-        return QuerySpecifications.equal(Prepayment_.name, name);
+    public static Specification<Prepayment> nameEquals(final String name) {
+        return QuerySpecifications.equalIfPresent(Prepayment_.name, name);
     }
 
     public static Specification<Prepayment> betweenPaidUntil(
@@ -32,7 +32,7 @@ public final class PrepaymentSpecifications {
     }
 
     public static Specification<Prepayment> isCompleted(final boolean isCompleted) {
-        return QuerySpecifications.equal(Prepayment_.completed, isCompleted);
+        return QuerySpecifications.equalIfPresent(Prepayment_.completed, isCompleted);
     }
 
     public static Specification<Prepayment> betweenRemainingAmount(
@@ -41,7 +41,7 @@ public final class PrepaymentSpecifications {
     }
 
     public static Specification<Prepayment> budgetIdEquals(final Long budgetId) {
-        return QuerySpecifications.equal(Prepayment_.budgetId, budgetId);
+        return QuerySpecifications.equalIfPresent(Prepayment_.budgetId, budgetId);
     }
 
 

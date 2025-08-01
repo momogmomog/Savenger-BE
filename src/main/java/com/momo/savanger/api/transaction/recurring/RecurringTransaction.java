@@ -39,8 +39,10 @@ public class RecurringTransaction extends Audit {
     @Enumerated(EnumType.STRING)
     private TransactionType type;
 
+    @Column(nullable = false)
     private String recurringRule;
 
+    @Column(nullable = false)
     private LocalDateTime nextDate;
 
     @Column(nullable = false)
@@ -56,6 +58,7 @@ public class RecurringTransaction extends Audit {
 
     private Long categoryId;
 
+    @Column(nullable = false)
     private Long budgetId;
 
     private Long debtId;

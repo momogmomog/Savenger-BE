@@ -35,6 +35,7 @@ public class CreateRecurringTransactionDto {
 
     private Long categoryId;
 
+    @NotNull
     @CanAccessBudget
     private Long budgetId;
 

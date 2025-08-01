@@ -66,29 +66,24 @@ public class DebtServiceImpl implements DebtService {
 
         final Debt debt = this.findById(id);
 
-        final BudgetStatistics receiverBudget = budgetService.getStatistics(
-                debt.getReceiverBudgetId());
+        if (this.isPermitted(debt)) {
+            final BudgetStatistics receiverBudget = budgetService.getStatistics(
+                    debt.getReceiverBudgetId());
 
-        final User user = SecurityUtils.getCurrentUser();
+            if (debt.getAmount().compareTo(dto.getAmount()) < 0) {
+                dto.setAmount(debt.getAmount());
+            }
 
-        if (!budgetService.isUserPermitted(user, receiverBudget.getBudget().getId()) ||
-                !budgetService.isUserPermitted(user, debt.getLenderBudgetId())) {
-            throw ApiException.with(ApiErrorCode.ERR_0015);
+            if (receiverBudget.getRealBalance().compareTo(dto.getAmount()) < 0) {
+                throw ApiException.with(ApiErrorCode.ERR_0014);
+            }
+
+            debt.setAmount(debt.getAmount().subtract(dto.getAmount()));
+
+            this.debtRepository.save(debt);
+
+            this.transactionService.payDebtTransaction(debt, dto.getAmount());
         }
-
-        if (debt.getAmount().compareTo(dto.getAmount()) < 0) {
-            dto.setAmount(debt.getAmount());
-        }
-
-        if (receiverBudget.getRealBalance().compareTo(dto.getAmount()) < 0) {
-            throw ApiException.with(ApiErrorCode.ERR_0014);
-        }
-
-        debt.setAmount(debt.getAmount().subtract(dto.getAmount()));
-
-        this.debtRepository.save(debt);
-
-        this.transactionService.payDebtTransaction(debt, dto.getAmount());
 
         return debt;
     }
@@ -102,5 +97,27 @@ public class DebtServiceImpl implements DebtService {
         return this.debtRepository.findAll(specification, null).stream().findFirst();
     }
 
+    private Boolean isPermitted(Debt debt) {
+        final User user = SecurityUtils.getCurrentUser();
+
+        if (!budgetService.isUserPermitted(user, debt.getReceiverBudgetId()) ||
+                !budgetService.isUserPermitted(user, debt.getLenderBudgetId())) {
+            throw ApiException.with(ApiErrorCode.ERR_0015);
+        }
+
+        return true;
+    }
+
+    @Override
+    public Boolean isValid(Long id) {
+
+        try {
+            Debt debt = this.findById(id);
+
+            return debt != null && this.isPermitted(debt);
+        } catch (ApiException e) {
+            return false;
+        }
+    }
 
 }

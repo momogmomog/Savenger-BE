@@ -33,7 +33,8 @@ public final class RecurringTransactionSpecifications {
     }
 
     public static Specification<RecurringTransaction> isAutoExecuted(final boolean isAutoExecuted) {
-        return QuerySpecifications.equal(RecurringTransaction_.autoExecute, isAutoExecuted);
+        return QuerySpecifications.equalIfPresent(RecurringTransaction_.autoExecute,
+                isAutoExecuted);
     }
 
     public static Specification<RecurringTransaction> betweenAmount(
@@ -46,7 +47,7 @@ public final class RecurringTransactionSpecifications {
     }
 
     public static Specification<RecurringTransaction> isCompleted(final boolean isCompleted) {
-        return QuerySpecifications.equal(RecurringTransaction_.completed, isCompleted);
+        return QuerySpecifications.equalIfPresent(RecurringTransaction_.completed, isCompleted);
     }
 
     public static Specification<RecurringTransaction> categoryIdEquals(final Long categoryId) {

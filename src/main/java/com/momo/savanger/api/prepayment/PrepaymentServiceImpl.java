@@ -52,15 +52,17 @@ public class PrepaymentServiceImpl implements PrepaymentService {
 
         RecurringTransaction rTransaction = null;
 
-        if (dto.getRecurringTransactionDto() != null) {
+        if (dto.getRecurringTransaction() != null) {
             rTransaction = this.recurringTransactionService.create(
-                    dto.getRecurringTransactionDto());
+                    dto.getRecurringTransaction());
         } else if (dto.getRecurringTransactionId() != null) {
             rTransaction = this.recurringTransactionService.findById(
                     dto.getRecurringTransactionId());
         }
 
-        this.recurringTransactionService.addPrepaymentId(prepayment.getId(), rTransaction);
+        if (rTransaction != null) {
+            this.recurringTransactionService.addPrepaymentId(prepayment.getId(), rTransaction);
+        }
 
         return this.findById(
                 prepayment.getId()

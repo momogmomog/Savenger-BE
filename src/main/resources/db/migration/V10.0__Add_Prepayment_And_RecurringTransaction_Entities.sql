@@ -1,14 +1,14 @@
 create table prepayments
 (
     id               bigint auto_increment primary key,
-    amount           decimal(30, 15),
-    name             varchar(50) not null,
-    create_date      datetime    not null,
-    update_date      datetime    not null,
-    paid_until       datetime,
-    completed        bit         not null,
-    remaining_amount decimal(30, 15),
-    budget_id        bigint      not null
+    amount           decimal(30, 15) not null,
+    name             varchar(50)     not null,
+    create_date      datetime        not null,
+    update_date      datetime        not null,
+    paid_until       datetime        not null,
+    completed        bit             not null,
+    remaining_amount decimal(30, 15) not null,
+    budget_id        bigint          not null
 );
 
 alter table prepayments
@@ -18,16 +18,16 @@ create table recurring_transactions
 (
     id             bigint auto_increment primary key,
     type           varchar(255)    not null,
-    recurring_rule varchar(255),
+    recurring_rule varchar(255)    not null,
     create_date    datetime        not null,
     update_date    datetime        not null,
     amount         decimal(30, 15) not null,
-    next_date      datetime,
+    next_date      datetime        not null,
     auto_execute   bit             not null,
     completed      bit             not null,
     prepayment_id  bigint,
     category_id    bigint,
-    budget_id      bigint,
+    budget_id      bigint          not null,
     debt_id        bigint
 
 );
