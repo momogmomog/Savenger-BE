@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = ValidTransactionDtoValidator.class)
 public @interface ValidTransactionDto {
 
-    String message() default ValidationMessages.TRANSACTION_DTO_IS_IS_NOT_VALID;
+    String message() default "Transaction DTO is not valid";
 
     Class<?>[] groups() default {};
 
