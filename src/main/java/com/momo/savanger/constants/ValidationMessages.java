@@ -18,6 +18,7 @@ public class ValidationMessages {
     public static final String DEBT_ALREADY_EXIST = "Debt with these budgets already exist.";
     public static final String DEBT_IS_NOT_VALID = "Debt is not valid.";
     public static final String BUDGETS_SHOULD_BE_DIFFERENT = "Lender and receiver budget ids should be different.";
+    public static final String BUDGETS_SHOULD_BE_EQUALS = "BudgetId in RTransaction should be equals to BudgetId in Prepayment";
     public static final String FIELDS_CANNOT_BE_NULL = "One of these fields %s cannot be null.";
 
 }

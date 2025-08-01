@@ -6,4 +6,8 @@ import org.mapstruct.Mapper;
 public interface RecurringTransactionMapper {
 
     RecurringTransaction ToRecurringTransaction(CreateRecurringTransactionDto dto);
+
+    RecurringTransactionDto toRecurringTransactionDto(RecurringTransaction transaction);
+
+    RecurringTransactionDto toRecurringTransactionDto(CreateRecurringTransactionDto transactionDto);
 }
