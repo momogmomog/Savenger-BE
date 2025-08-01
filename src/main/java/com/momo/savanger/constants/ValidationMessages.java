@@ -12,7 +12,6 @@ public class ValidationMessages {
     public static final String PARTICIPANT_NOT_EXIST = "Participant does not exist.";
     public static final String INVALID_BUDGET = "Missing or invalid budget";
     public static final String CATEGORY_DOES_NOT_EXIST_OR_BUDGET_IS_NOT_VALID = "Category does not exist or budget is not valid.";
-    public static final String TRANSACTION_DTO_IS_IS_NOT_VALID = "Transaction DTO is not valid.";
     public static final String TRANSACTION_IS_REVISED = "Transaction is already revised and cannot be edit.";
     public static final String INVALID_TRANSACTION = "Invalid transaction or you don't have access to it.";
     public static final String TRANSACTION_DOES_NOT_EXIST = "Transaction does not exist.";
