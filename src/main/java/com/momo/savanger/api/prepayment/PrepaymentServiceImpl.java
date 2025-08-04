@@ -1,11 +1,10 @@
 package com.momo.savanger.api.prepayment;
 
-import com.momo.savanger.api.budget.BudgetService;
-import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +16,6 @@ public class PrepaymentServiceImpl implements PrepaymentService {
     private final PrepaymentRepository prepaymentRepository;
 
     private final PrepaymentMapper prepaymentMapper;
-
-    private final BudgetService budgetService;
 
     private final RecurringTransactionService recurringTransactionService;
 
@@ -39,14 +36,6 @@ public class PrepaymentServiceImpl implements PrepaymentService {
         prepayment.setRemainingAmount(
                 dto.getAmount()
         );
-
-        final BudgetStatistics statistics = this.budgetService.getStatistics(
-                dto.getBudgetId()
-        );
-
-        if (statistics.getRealBalance().compareTo(dto.getAmount()) < 0) {
-            throw ApiException.with(ApiErrorCode.ERR_0014);
-        }
 
         this.prepaymentRepository.saveAndFlush(prepayment);
 
@@ -69,5 +58,15 @@ public class PrepaymentServiceImpl implements PrepaymentService {
         return this.findById(
                 prepayment.getId()
         );
+    }
+
+    @Override
+    public BigDecimal getPrepaymentAmountSumByBudgetId(Long budgetId) {
+        BigDecimal sum = this.prepaymentRepository.sumPrepaymentAmountByBudgetId(budgetId);
+
+        if (sum == null) {
+            return BigDecimal.ZERO;
+        }
+        return sum;
     }
 }

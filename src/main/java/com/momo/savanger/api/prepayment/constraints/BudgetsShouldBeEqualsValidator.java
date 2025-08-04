@@ -5,10 +5,10 @@ import com.momo.savanger.api.transaction.recurring.RecurringTransactionDto;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionMapper;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
 import com.momo.savanger.constants.ValidationMessages;
+import com.momo.savanger.constraints.ValidationFail;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,11 +16,11 @@ import org.springframework.stereotype.Component;
 public class BudgetsShouldBeEqualsValidator implements
         ConstraintValidator<BudgetsShouldBeEquals, CreatePrepaymentDto> {
 
-    @Autowired
-    private RecurringTransactionService recurringTransactionService;
+    private final RecurringTransactionService recurringTransactionService;
 
-    @Autowired
-    private RecurringTransactionMapper recurringTransactionMapper;
+    private final RecurringTransactionMapper recurringTransactionMapper;
+
+    private final ValidationFail validationFail;
 
     @Override
     public void initialize(BudgetsShouldBeEquals constraintAnnotation) {
@@ -47,7 +47,7 @@ public class BudgetsShouldBeEqualsValidator implements
 
         if (recurringTransaction != null) {
             if (!recurringTransaction.getBudgetId().equals(dto.getBudgetId())) {
-                return this.fail(
+                return this.validationFail.fail(
                         constraintValidatorContext,
                         "recurringTransaction.budgetId",
                         ValidationMessages.BUDGETS_SHOULD_BE_EQUALS
@@ -56,15 +56,5 @@ public class BudgetsShouldBeEqualsValidator implements
         }
 
         return true;
-    }
-
-    private boolean fail(ConstraintValidatorContext context, String field, String msg) {
-        context.buildConstraintViolationWithTemplate(msg)
-                .addPropertyNode(field)
-                .addConstraintViolation()
-                .disableDefaultConstraintViolation();
-
-        return false;
-
     }
 }

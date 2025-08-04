@@ -7,15 +7,19 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class OneOfTheseNotBeNullValidator implements
         ConstraintValidator<OneOfTheseNotBeNull, Object> {
 
     private String[] fields;
+
+    private final ValidationFail validationFail;
 
     @Override
     public void initialize(OneOfTheseNotBeNull constraintAnnotation) {
@@ -51,18 +55,9 @@ public class OneOfTheseNotBeNullValidator implements
             throw ApiException.with(ApiErrorCode.ERR_0001);
         }
 
-        return this.fail(constraintValidatorContext, this.fields[0],
+        return this.validationFail.fail(constraintValidatorContext, this.fields[0],
                 String.format(ValidationMessages.FIELDS_CANNOT_BE_NULL,
                         Arrays.stream(this.fields).toList()));
     }
 
-    private boolean fail(ConstraintValidatorContext context, String field, String msg) {
-        context.buildConstraintViolationWithTemplate(msg)
-                .addPropertyNode(field)
-                .addConstraintViolation()
-                .disableDefaultConstraintViolation();
-
-        return false;
-
-    }
 }

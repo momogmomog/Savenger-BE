@@ -20,5 +20,6 @@ public class ValidationMessages {
     public static final String BUDGETS_SHOULD_BE_DIFFERENT = "Lender and receiver budget ids should be different.";
     public static final String BUDGETS_SHOULD_BE_EQUALS = "BudgetId in RTransaction should be equals to BudgetId in Prepayment";
     public static final String FIELDS_CANNOT_BE_NULL = "One of these fields %s cannot be null.";
+    public static final String AMOUNT_CANNOT_BE_BIGGER_THAN_BALANCE = "Amount cannot be bigger than budget balance";
 
 }

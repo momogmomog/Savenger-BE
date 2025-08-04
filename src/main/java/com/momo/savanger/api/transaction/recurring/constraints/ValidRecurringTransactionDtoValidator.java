@@ -6,25 +6,26 @@ import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
 import com.momo.savanger.constants.ValidationMessages;
+import com.momo.savanger.constraints.ValidationFail;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ValidRecurringTransactionDtoValidator implements
         ConstraintValidator<ValidRecurringTransactionDto,
                 CreateRecurringTransactionDto> {
 
-    @Autowired
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
-    @Autowired
-    private TagService tagService;
+    private final TagService tagService;
 
-    @Autowired
-    private DebtService debtService;
+    private final DebtService debtService;
+
+    private final ValidationFail validationFail;
 
     @Override
     public void initialize(ValidRecurringTransactionDto constraintAnnotation) {
@@ -41,14 +42,14 @@ public class ValidRecurringTransactionDtoValidator implements
 
         if (dto.getCategoryId() != null) {
             if (!this.categoryService.isCategoryValid(dto.getCategoryId(), dto.getBudgetId())) {
-                return this.fail(constraintValidatorContext, "categoryId",
+                return this.validationFail.fail(constraintValidatorContext, "categoryId",
                         ValidationMessages.CATEGORY_DOES_NOT_EXIST_OR_BUDGET_IS_NOT_VALID);
             }
         }
 
         if (dto.getDebtId() != null) {
             if (!this.debtService.isValid(dto.getDebtId())) {
-                return this.fail(constraintValidatorContext, "debtId",
+                return this.validationFail.fail(constraintValidatorContext, "debtId",
                         ValidationMessages.DEBT_IS_NOT_VALID);
             }
         }
@@ -67,20 +68,10 @@ public class ValidRecurringTransactionDtoValidator implements
                     .filter(tid -> tags.stream().noneMatch(tag -> tag.getId().equals(tid)))
                     .toList();
 
-            return this.fail(constraintValidatorContext, "tagIds",
+            return this.validationFail.fail(constraintValidatorContext, "tagIds",
                     String.format("Invalid tags: %s", invalidIds));
         }
 
         return true;
-    }
-
-    private boolean fail(ConstraintValidatorContext context, String field, String msg) {
-        context.buildConstraintViolationWithTemplate(msg)
-                .addPropertyNode(field)
-                .addConstraintViolation()
-                .disableDefaultConstraintViolation();
-
-        return false;
-
     }
 }

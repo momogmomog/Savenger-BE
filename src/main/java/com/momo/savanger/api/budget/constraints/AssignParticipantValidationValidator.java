@@ -1,11 +1,11 @@
 package com.momo.savanger.api.budget.constraints;
 
 import com.momo.savanger.api.budget.Budget;
-import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.IAssignParticipantDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
 import com.momo.savanger.constants.ValidationMessages;
+import com.momo.savanger.constraints.ValidationFail;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.Objects;
@@ -21,9 +21,9 @@ public class AssignParticipantValidationValidator implements
 
     private boolean requiredUserAssigned;
 
-    private final BudgetService budgetService;
-
     private final UserService userService;
+
+    private final ValidationFail validationFail;
 
     @Override
     public void initialize(AssignParticipantValidation constraintAnnotation) {
@@ -36,7 +36,8 @@ public class AssignParticipantValidationValidator implements
 
         try {
             if (dto.getBudgetRef() == null) {
-                return fail(context, "budgetId", ValidationMessages.INVALID_BUDGET);
+                return this.validationFail.fail(context, "budgetId",
+                        ValidationMessages.INVALID_BUDGET);
             }
 
             final Budget budget = dto.getBudgetRef();
@@ -69,16 +70,8 @@ public class AssignParticipantValidationValidator implements
     }
 
     private boolean fail(ConstraintValidatorContext context, String msg) {
-        return this.fail(context, "participantId", msg);
+        return this.validationFail.fail(context, "participantId", msg);
     }
 
-    private boolean fail(ConstraintValidatorContext context, String field, String msg) {
-        context.buildConstraintViolationWithTemplate(msg)
-                .addPropertyNode(field)
-                .addConstraintViolation()
-                .disableDefaultConstraintViolation();
 
-        return false;
-
-    }
 }

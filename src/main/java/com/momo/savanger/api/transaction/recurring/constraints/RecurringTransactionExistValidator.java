@@ -3,15 +3,15 @@ package com.momo.savanger.api.transaction.recurring.constraints;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class RecurringTransactionExistValidator implements
         ConstraintValidator<RecurringTransactionExist, Long> {
 
-    @Autowired
-    private RecurringTransactionService recurringTransactionService;
+    private final RecurringTransactionService recurringTransactionService;
 
     @Override
     public void initialize(RecurringTransactionExist constraintAnnotation) {
