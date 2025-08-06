@@ -4,8 +4,8 @@ import com.momo.savanger.api.category.CategoryService;
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.transaction.dto.ITransactionDto;
+import com.momo.savanger.api.util.ValidationUtil;
 import com.momo.savanger.constants.ValidationMessages;
-import com.momo.savanger.constraints.ValidationFail;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
@@ -21,8 +21,6 @@ public class ValidTransactionDtoValidator implements
 
     private final CategoryService categoryService;
 
-    private final ValidationFail validationFail;
-
     @Override
     public void initialize(ValidTransactionDto constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
@@ -36,7 +34,7 @@ public class ValidTransactionDtoValidator implements
             return true;
         }
         if (!this.categoryService.isCategoryValid(dto.getCategoryId(), dto.getBudgetId())) {
-            return this.validationFail.fail(constraintValidatorContext, "categoryId",
+            return ValidationUtil.fail(constraintValidatorContext, "categoryId",
                     ValidationMessages.CATEGORY_DOES_NOT_EXIST_OR_BUDGET_IS_NOT_VALID);
         }
 
@@ -50,7 +48,7 @@ public class ValidTransactionDtoValidator implements
                     .filter(tid -> tags.stream().noneMatch(tag -> tag.getId().equals(tid)))
                     .toList();
 
-            return this.validationFail.fail(constraintValidatorContext, "tagIds",
+            return ValidationUtil.fail(constraintValidatorContext, "tagIds",
                     String.format("Invalid tags: %s", invalidIds));
         }
 

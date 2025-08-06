@@ -5,8 +5,8 @@ import com.momo.savanger.api.debt.DebtService;
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
+import com.momo.savanger.api.util.ValidationUtil;
 import com.momo.savanger.constants.ValidationMessages;
-import com.momo.savanger.constraints.ValidationFail;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
@@ -25,8 +25,6 @@ public class ValidRecurringTransactionDtoValidator implements
 
     private final DebtService debtService;
 
-    private final ValidationFail validationFail;
-
     @Override
     public void initialize(ValidRecurringTransactionDto constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
@@ -42,14 +40,14 @@ public class ValidRecurringTransactionDtoValidator implements
 
         if (dto.getCategoryId() != null) {
             if (!this.categoryService.isCategoryValid(dto.getCategoryId(), dto.getBudgetId())) {
-                return this.validationFail.fail(constraintValidatorContext, "categoryId",
+                return ValidationUtil.fail(constraintValidatorContext, "categoryId",
                         ValidationMessages.CATEGORY_DOES_NOT_EXIST_OR_BUDGET_IS_NOT_VALID);
             }
         }
 
         if (dto.getDebtId() != null) {
             if (!this.debtService.isValid(dto.getDebtId())) {
-                return this.validationFail.fail(constraintValidatorContext, "debtId",
+                return ValidationUtil.fail(constraintValidatorContext, "debtId",
                         ValidationMessages.DEBT_IS_NOT_VALID);
             }
         }
@@ -68,7 +66,7 @@ public class ValidRecurringTransactionDtoValidator implements
                     .filter(tid -> tags.stream().noneMatch(tag -> tag.getId().equals(tid)))
                     .toList();
 
-            return this.validationFail.fail(constraintValidatorContext, "tagIds",
+            return ValidationUtil.fail(constraintValidatorContext, "tagIds",
                     String.format("Invalid tags: %s", invalidIds));
         }
 

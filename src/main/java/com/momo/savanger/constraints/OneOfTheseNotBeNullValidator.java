@@ -1,5 +1,6 @@
 package com.momo.savanger.constraints;
 
+import com.momo.savanger.api.util.ValidationUtil;
 import com.momo.savanger.constants.ValidationMessages;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
@@ -18,8 +19,6 @@ public class OneOfTheseNotBeNullValidator implements
         ConstraintValidator<OneOfTheseNotBeNull, Object> {
 
     private String[] fields;
-
-    private final ValidationFail validationFail;
 
     @Override
     public void initialize(OneOfTheseNotBeNull constraintAnnotation) {
@@ -55,7 +54,7 @@ public class OneOfTheseNotBeNullValidator implements
             throw ApiException.with(ApiErrorCode.ERR_0001);
         }
 
-        return this.validationFail.fail(constraintValidatorContext, this.fields[0],
+        return ValidationUtil.fail(constraintValidatorContext, this.fields[0],
                 String.format(ValidationMessages.FIELDS_CANNOT_BE_NULL,
                         Arrays.stream(this.fields).toList()));
     }

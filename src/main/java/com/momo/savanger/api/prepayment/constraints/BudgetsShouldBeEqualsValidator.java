@@ -4,8 +4,8 @@ import com.momo.savanger.api.prepayment.CreatePrepaymentDto;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionDto;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionMapper;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
+import com.momo.savanger.api.util.ValidationUtil;
 import com.momo.savanger.constants.ValidationMessages;
-import com.momo.savanger.constraints.ValidationFail;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,6 @@ public class BudgetsShouldBeEqualsValidator implements
     private final RecurringTransactionService recurringTransactionService;
 
     private final RecurringTransactionMapper recurringTransactionMapper;
-
-    private final ValidationFail validationFail;
 
     @Override
     public void initialize(BudgetsShouldBeEquals constraintAnnotation) {
@@ -47,7 +45,7 @@ public class BudgetsShouldBeEqualsValidator implements
 
         if (recurringTransaction != null) {
             if (!recurringTransaction.getBudgetId().equals(dto.getBudgetId())) {
-                return this.validationFail.fail(
+                return ValidationUtil.fail(
                         constraintValidatorContext,
                         "recurringTransaction.budgetId",
                         ValidationMessages.BUDGETS_SHOULD_BE_EQUALS

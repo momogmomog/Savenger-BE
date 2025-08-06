@@ -4,8 +4,8 @@ import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.dto.IAssignParticipantDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
+import com.momo.savanger.api.util.ValidationUtil;
 import com.momo.savanger.constants.ValidationMessages;
-import com.momo.savanger.constraints.ValidationFail;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.Objects;
@@ -23,8 +23,6 @@ public class AssignParticipantValidationValidator implements
 
     private final UserService userService;
 
-    private final ValidationFail validationFail;
-
     @Override
     public void initialize(AssignParticipantValidation constraintAnnotation) {
         requiredUserAssigned = constraintAnnotation.requireUserAssigned();
@@ -36,7 +34,7 @@ public class AssignParticipantValidationValidator implements
 
         try {
             if (dto.getBudgetRef() == null) {
-                return this.validationFail.fail(context, "budgetId",
+                return ValidationUtil.fail(context, "budgetId",
                         ValidationMessages.INVALID_BUDGET);
             }
 
@@ -70,7 +68,7 @@ public class AssignParticipantValidationValidator implements
     }
 
     private boolean fail(ConstraintValidatorContext context, String msg) {
-        return this.validationFail.fail(context, "participantId", msg);
+        return ValidationUtil.fail(context, "participantId", msg);
     }
 
 
