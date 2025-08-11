@@ -37,7 +37,9 @@ public class BudgetsShouldBeEqualsValidator implements
         if (dto.getRecurringTransaction() != null) {
             recurringTransaction = recurringTransactionMapper.toRecurringTransactionDto(
                     dto.getRecurringTransaction());
-        } else if (dto.getRecurringTransactionId() != null) {
+        } else if (dto.getRecurringTransactionId() != null
+                && this.recurringTransactionService.isRecurringTransactionValid(
+                dto.getRecurringTransactionId())) {
             recurringTransaction = recurringTransactionMapper.toRecurringTransactionDto(
                     this.recurringTransactionService.findById(dto.getRecurringTransactionId())
             );

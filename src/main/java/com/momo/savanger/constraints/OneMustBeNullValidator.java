@@ -1,5 +1,7 @@
 package com.momo.savanger.constraints;
 
+import com.momo.savanger.api.util.ValidationUtil;
+import com.momo.savanger.constants.ValidationMessages;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import jakarta.validation.ConstraintValidator;
@@ -48,7 +50,9 @@ public class OneMustBeNullValidator
             try {
                 fieldTwo.setAccessible(true);
                 if (fieldTwo.get(dto) != null) {
-                    return false;
+                    return ValidationUtil.fail(context, fieldOneName, String.format(
+                            ValidationMessages.ONE_FIELD_SHOULD_BE_NULL, fieldOneName,
+                            fieldTwoName));
                 }
             } finally {
                 fieldTwo.setAccessible(false);
