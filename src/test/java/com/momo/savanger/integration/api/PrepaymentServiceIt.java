@@ -11,6 +11,7 @@ import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionRepository;
+import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -32,26 +33,26 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
 @Sql("classpath:/sql/user-it-data.sql")
-@Sql("classpath:/sql/debt/budget-it-data.sql")
-@Sql("classpath:/sql/debt/budgets_participants-it-data.sql")
-@Sql("classpath:/sql/debt/tag-it-data.sql")
-@Sql("classpath:/sql/debt/category-it-data.sql")
-@Sql("classpath:/sql/debt/transaction-it-data.sql")
-@Sql("classpath:/sql/debt/transactions_tags-it-data.sql")
-@Sql("classpath:/sql/debt/revision-it-data.sql")
-@Sql("classpath:/sql/debt/debt-it-data.sql")
-@Sql("classpath:/sql/debt/prepayment-it-data.sql")
-@Sql("classpath:/sql/debt/recurring_transaction-it-data.sql")
-@Sql(value = "classpath:/sql/debt/del-recurring_transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-prepayment-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-revision-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-transactions_tags-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-debt-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-category-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-tag-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql("classpath:/sql/prepayment/budget-it-data.sql")
+@Sql("classpath:/sql/prepayment/budgets_participants-it-data.sql")
+@Sql("classpath:/sql/prepayment/tag-it-data.sql")
+@Sql("classpath:/sql/prepayment/category-it-data.sql")
+@Sql("classpath:/sql/prepayment/transaction-it-data.sql")
+@Sql("classpath:/sql/prepayment/transactions_tags-it-data.sql")
+@Sql("classpath:/sql/prepayment/revision-it-data.sql")
+@Sql("classpath:/sql/prepayment/debt-it-data.sql")
+@Sql("classpath:/sql/prepayment/prepayment-it-data.sql")
+@Sql("classpath:/sql/prepayment/recurring_transaction-it-data.sql")
+@Sql(value = "classpath:/sql/prepayment/del-recurring_transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-prepayment-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-revision-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-transactions_tags-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-debt-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-category-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-tag-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-user-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 public class PrepaymentServiceIt {
 
@@ -64,11 +65,14 @@ public class PrepaymentServiceIt {
     @Autowired
     private RecurringTransactionRepository recurringTransactionRepository;
 
+    @Autowired
+    private RecurringTransactionService recurringTransactionService;
+
     @Test
     @Transactional
     public void testCreate_validPayload_shouldCreatePayment() {
 
-        assertEquals(1, this.prepaymentRepository.findAll().size());
+        assertEquals(2, this.prepaymentRepository.findAll().size());
 
         CreateRecurringTransactionDto createRecurringTransactionDto = new CreateRecurringTransactionDto();
         createRecurringTransactionDto.setAmount(BigDecimal.valueOf(20));
@@ -87,10 +91,28 @@ public class PrepaymentServiceIt {
 
         this.prepaymentService.create(createPrepaymentDto);
 
-        assertEquals(2, this.prepaymentRepository.findAll().size());
+        assertEquals(3, this.prepaymentRepository.findAll().size());
     }
 
     @Test
+    @Transactional
+    public void testAddPrepaymentIdToRTransaction_validPayload_shouldCreatePayment() {
+        assertEquals(1001L, this.recurringTransactionService.findById(1001L).getPrepaymentId());
+
+        CreatePrepaymentDto createPrepaymentDto = new CreatePrepaymentDto();
+        createPrepaymentDto.setAmount(BigDecimal.valueOf(200));
+        createPrepaymentDto.setBudgetId(1001L);
+        createPrepaymentDto.setName("NETI");
+        createPrepaymentDto.setPaidUntil(LocalDateTime.now().plusMonths(6));
+        createPrepaymentDto.setRecurringTransactionId(1001L);
+
+        this.prepaymentService.create(createPrepaymentDto);
+
+        assertEquals(1, this.recurringTransactionService.findById(1001L).getPrepaymentId());
+    }
+
+    @Test
+    @Transactional
     public void testCreate_emptyPayload_shouldThrowException() {
         CreatePrepaymentDto dto = new CreatePrepaymentDto();
 
@@ -101,7 +123,8 @@ public class PrepaymentServiceIt {
     }
 
     @Test
-    public void testCreate_validPayload_shouldCreateRTransaction(){
+    @Transactional
+    public void testCreate_validPayload_shouldCreateRTransaction() {
         assertEquals(1, this.recurringTransactionRepository.findAll().size());
 
         CreateRecurringTransactionDto createRecurringTransactionDto = new CreateRecurringTransactionDto();
@@ -125,7 +148,8 @@ public class PrepaymentServiceIt {
     }
 
     @Test
-    public void testCreate_validPayload_shouldUseExistedRTransaction(){
+    @Transactional
+    public void testCreate_validPayload_shouldUseExistedRTransaction() {
         assertEquals(1, this.recurringTransactionRepository.findAll().size());
 
         CreatePrepaymentDto createPrepaymentDto = new CreatePrepaymentDto();
@@ -149,7 +173,7 @@ public class PrepaymentServiceIt {
 
     @Test
     public void testFindById_invalidId_shouldThrowException() {
-        assertThrows(ApiException.class, () -> this.prepaymentService.findById(1002L));
+        assertThrows(ApiException.class, () -> this.prepaymentService.findById(10020L));
     }
 
     @Test
@@ -161,9 +185,10 @@ public class PrepaymentServiceIt {
 
     @Test
     public void testPrepaymentAmountSumByBudgetId_withoutPrepaymentsBudget_shouldThrowException() {
-        BigDecimal sum = this.prepaymentService.getPrepaymentAmountSumByBudgetId(1002L);
+        BigDecimal sum = this.prepaymentService.getPrepaymentAmountSumByBudgetId(1003L);
 
-        assertEquals(BigDecimal.ZERO.setScale(1, RoundingMode.HALF_DOWN), sum.setScale(1, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.ZERO.setScale(1, RoundingMode.HALF_DOWN),
+                sum.setScale(1, RoundingMode.HALF_DOWN));
     }
 
 }

@@ -28,26 +28,26 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
 @Sql("classpath:/sql/user-it-data.sql")
-@Sql("classpath:/sql/debt/budget-it-data.sql")
-@Sql("classpath:/sql/debt/budgets_participants-it-data.sql")
-@Sql("classpath:/sql/debt/tag-it-data.sql")
-@Sql("classpath:/sql/debt/category-it-data.sql")
-@Sql("classpath:/sql/debt/transaction-it-data.sql")
-@Sql("classpath:/sql/debt/transactions_tags-it-data.sql")
-@Sql("classpath:/sql/debt/revision-it-data.sql")
-@Sql("classpath:/sql/debt/debt-it-data.sql")
-@Sql("classpath:/sql/debt/prepayment-it-data.sql")
-@Sql("classpath:/sql/debt/recurring_transaction-it-data.sql")
-@Sql(value = "classpath:/sql/debt/del-recurring_transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-prepayment-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-revision-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-transactions_tags-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-debt-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-category-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-tag-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql("classpath:/sql/prepayment/budget-it-data.sql")
+@Sql("classpath:/sql/prepayment/budgets_participants-it-data.sql")
+@Sql("classpath:/sql/prepayment/tag-it-data.sql")
+@Sql("classpath:/sql/prepayment/category-it-data.sql")
+@Sql("classpath:/sql/prepayment/transaction-it-data.sql")
+@Sql("classpath:/sql/prepayment/transactions_tags-it-data.sql")
+@Sql("classpath:/sql/prepayment/revision-it-data.sql")
+@Sql("classpath:/sql/prepayment/debt-it-data.sql")
+@Sql("classpath:/sql/prepayment/prepayment-it-data.sql")
+@Sql("classpath:/sql/prepayment/recurring_transaction-it-data.sql")
+@Sql(value = "classpath:/sql/prepayment/del-recurring_transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-prepayment-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-revision-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-transactions_tags-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-debt-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-category-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-tag-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-user-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 public class PrepaymentControllerIt extends BaseControllerIt {
 
@@ -57,7 +57,7 @@ public class PrepaymentControllerIt extends BaseControllerIt {
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testCreate_validPayload_shouldCreatePrepayment() throws Exception {
-        assertEquals(1, this.prepaymentRepository.findAll().size());
+        assertEquals(2, this.prepaymentRepository.findAll().size());
 
         CreatePrepaymentDto dto = new CreatePrepaymentDto();
         dto.setRecurringTransactionId(1001L);
@@ -68,6 +68,8 @@ public class PrepaymentControllerIt extends BaseControllerIt {
 
         super.postOK(Endpoints.PREPAYMENTS,
                 dto);
+
+        assertEquals(3, this.prepaymentRepository.findAll().size());
     }
 
     @Test

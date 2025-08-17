@@ -45,7 +45,7 @@ public class BudgetsShouldBeEqualsValidator implements
             );
         }
 
-        if (recurringTransaction != null) {
+        if (recurringTransaction != null && recurringTransaction.getBudgetId() != null) {
             if (!recurringTransaction.getBudgetId().equals(dto.getBudgetId())) {
                 return ValidationUtil.fail(
                         constraintValidatorContext,
