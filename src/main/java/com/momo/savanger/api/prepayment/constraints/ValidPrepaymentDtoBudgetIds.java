@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Constraint(validatedBy = BudgetsShouldBeEqualsValidator.class)
-public @interface BudgetsShouldBeEquals {
+@Constraint(validatedBy = ValidPrepaymentDtoBudgetIdsValidator.class)
+public @interface ValidPrepaymentDtoBudgetIds {
 
     String message() default "BudgetId in RecurringTransaction should be equals to BudgetId in Prepayment";
 
