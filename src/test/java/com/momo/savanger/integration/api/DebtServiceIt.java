@@ -187,6 +187,8 @@ public class DebtServiceIt {
         dto.setLenderBudgetId(1001L);
         dto.setReceiverBudgetId(1002L);
 
+        this.debtService.create(dto);
+
         assertEquals(2, debtRepository.findAll().size());
 
         BudgetStatistics lenderBudget = this.budgetService.getStatistics(dto.getLenderBudgetId());
@@ -369,21 +371,21 @@ public class DebtServiceIt {
         PayDebtDto dto = new PayDebtDto();
         dto.setAmount(BigDecimal.valueOf(310));
 
+        debt = this.debtService.pay(101L, dto);
+
         lenderBudgetStatistics = this.budgetService.getStatistics(debt.getLenderBudgetId());
         receiverBudgetStatistics = this.budgetService.getStatistics(debt.getReceiverBudgetId());
-
-        debt = this.debtService.pay(101L, dto);
 
         //Test after pay
         assertEquals(BigDecimal.valueOf(0.00).setScale(2, RoundingMode.HALF_DOWN),
                 debt.getAmount().setScale(2, RoundingMode.HALF_DOWN)
         );
         assertEquals(BigDecimal.valueOf(545.09),
-                lenderBudgetStatistics.getRealBalance()
+                lenderBudgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN)
         );
 
         assertEquals(BigDecimal.valueOf(17.91),
-                receiverBudgetStatistics.getRealBalance()
+                receiverBudgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN)
         );
     }
 
