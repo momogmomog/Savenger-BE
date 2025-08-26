@@ -1,4 +1,4 @@
-package com.momo.savanger.api.transaction.constraints;
+package com.momo.savanger.api.transaction.recurring.constraints;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -8,11 +8,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Constraint(validatedBy = ValidTransactionDtoValidator.class)
-public @interface ValidTransactionDto {
+@Target(ElementType.FIELD)
+@Constraint(validatedBy = RecurringTransactionExistValidator.class)
+public @interface RecurringTransactionExist {
 
-    String message() default "Transaction DTO is not valid";
+    String message() default "Recurring transaction does not exist";
 
     Class<?>[] groups() default {};
 

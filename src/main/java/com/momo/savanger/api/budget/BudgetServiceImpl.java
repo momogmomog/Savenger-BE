@@ -7,6 +7,7 @@ import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
+import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.user.User;
@@ -34,6 +35,8 @@ public class BudgetServiceImpl implements BudgetService {
     private final UserService userService;
 
     private final TransactionService transactionService;
+
+    private final PrepaymentService prepaymentService;
 
     @Override
     public Budget findById(Long id) {
@@ -166,6 +169,9 @@ public class BudgetServiceImpl implements BudgetService {
         final BigDecimal debtLendedSum = this.transactionService.getDebtLendedAmount(budgetId);
         final BigDecimal debtReceivedSum = this.transactionService.getDebtReceivedAmount(budgetId);
 
+        final BigDecimal prepaymentsAmount = this.prepaymentService.getPrepaymentAmountSumByBudgetId(
+                budgetId);
+
         statisticDto.setBudget(budget);
 
         statisticDto.setEarningsAmount(earnings);
@@ -173,7 +179,7 @@ public class BudgetServiceImpl implements BudgetService {
         statisticDto.setDebtLendedAmount(debtLendedSum);
         statisticDto.setDebtReceivedAmount(debtReceivedSum);
 
-        statisticDto.setRealBalance(this.getBalance(budget, earnings, expenses));
+        statisticDto.setRealBalance(this.getBalance(budget, earnings, expenses, prepaymentsAmount));
 
         statisticDto.setBalance(
                 statisticDto.getRealBalance().subtract(statisticDto.getDebtReceivedAmount())
@@ -186,10 +192,12 @@ public class BudgetServiceImpl implements BudgetService {
     private BigDecimal getBalance(
             Budget budget,
             BigDecimal earningsAmount,
-            BigDecimal expensesAmount) {
+            BigDecimal expensesAmount,
+            BigDecimal prepaymentAmount) {
 
         return earningsAmount
                 .add(budget.getBalance())
-                .subtract(expensesAmount);
+                .subtract(expensesAmount)
+                .subtract(prepaymentAmount);
     }
 }
