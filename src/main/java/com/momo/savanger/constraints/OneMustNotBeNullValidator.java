@@ -15,13 +15,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class OneOfTheseNotBeNullValidator implements
-        ConstraintValidator<OneOfTheseNotBeNull, Object> {
+public class OneMustNotBeNullValidator implements
+        ConstraintValidator<OneMustNotBeNull, Object> {
 
     private String[] fields;
 
     @Override
-    public void initialize(OneOfTheseNotBeNull constraintAnnotation) {
+    public void initialize(OneMustNotBeNull constraintAnnotation) {
         this.fields = constraintAnnotation.fields();
         ConstraintValidator.super.initialize(constraintAnnotation);
     }

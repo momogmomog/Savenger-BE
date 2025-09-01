@@ -3,6 +3,7 @@ package com.momo.savanger.api.transaction.recurring;
 import com.momo.savanger.api.common.model.Audit;
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.transaction.TransactionType;
+import com.momo.savanger.constants.EntityGraphs;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,6 +30,7 @@ import lombok.ToString.Exclude;
 @Getter
 @Setter
 @ToString
+@NamedEntityGraph(name = EntityGraphs.RECURRING_TRANSACTION_ALL, includeAllAttributes = true)
 public class RecurringTransaction extends Audit {
 
     @Id

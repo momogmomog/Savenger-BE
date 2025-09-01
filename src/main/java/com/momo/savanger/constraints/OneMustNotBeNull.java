@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Constraint(validatedBy = OneOfTheseNotBeNullValidator.class)
-public @interface OneOfTheseNotBeNull {
+@Constraint(validatedBy = OneMustNotBeNullValidator.class)
+public @interface OneMustNotBeNull {
 
     String[] fields();
 

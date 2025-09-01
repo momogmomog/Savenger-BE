@@ -12,7 +12,8 @@ import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionRepository;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
-import com.momo.savanger.error.ApiException;
+import com.momo.savanger.error.ApiErrorCode;
+import com.momo.savanger.util.AssertUtil;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -149,7 +150,7 @@ public class PrepaymentServiceIt {
 
     @Test
     @Transactional
-    public void testCreate_validPayload_shouldUseExistedRTransaction() {
+    public void testCreate_validPayload_shouldUseExistingRTransaction() {
         assertEquals(1, this.recurringTransactionRepository.findAll().size());
 
         CreatePrepaymentDto createPrepaymentDto = new CreatePrepaymentDto();
@@ -173,7 +174,8 @@ public class PrepaymentServiceIt {
 
     @Test
     public void testFindById_invalidId_shouldThrowException() {
-        assertThrows(ApiException.class, () -> this.prepaymentService.findById(10020L));
+        AssertUtil.assertApiException(ApiErrorCode.ERR_0015,
+                () -> this.prepaymentService.findById(10040L));
     }
 
     @Test

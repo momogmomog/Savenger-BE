@@ -5,9 +5,11 @@ import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
+import com.momo.savanger.constants.EntityGraphs;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -100,19 +102,15 @@ public class DebtServiceImpl implements DebtService {
     private Boolean isPermitted(Debt debt) {
         final User user = SecurityUtils.getCurrentUser();
 
-        if (!budgetService.isUserPermitted(user, debt.getReceiverBudgetId()) ||
-                !budgetService.isUserPermitted(user, debt.getLenderBudgetId())) {
-            throw ApiException.with(ApiErrorCode.ERR_0015);
-        }
-
-        return true;
+        return budgetService.isUserPermitted(user, debt.getReceiverBudgetId()) &&
+                budgetService.isUserPermitted(user, debt.getLenderBudgetId());
     }
 
     @Override
-    public Boolean isValid(Long id) {
+    public Boolean isValid(Long id, Long budgetId) {
 
         try {
-            Debt debt = this.findById(id);
+            final Debt debt = this.findDebtIfExists(id, budgetId).orElse(null);
 
             return debt != null && this.isPermitted(debt);
         } catch (ApiException e) {
@@ -120,4 +118,16 @@ public class DebtServiceImpl implements DebtService {
         }
     }
 
+    @Override
+    public Optional<Debt> findDebtIfExists(Long id, Long budgetId) {
+        final Specification<Debt> specification = DebtSpecifications.idEquals(id)
+                .and(DebtSpecifications.receiverBudgetIdEquals(budgetId)
+                        .or(DebtSpecifications.lenderBudgetIdEquals(budgetId)));
+
+        final List<Debt> debts = this.debtRepository.findAll(
+                specification,
+                EntityGraphs.DEBT_ALL
+        );
+        return debts.stream().findFirst();
+    }
 }

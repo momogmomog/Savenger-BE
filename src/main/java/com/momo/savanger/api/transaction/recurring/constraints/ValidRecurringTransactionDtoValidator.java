@@ -46,7 +46,7 @@ public class ValidRecurringTransactionDtoValidator implements
         }
 
         if (dto.getDebtId() != null) {
-            if (!this.debtService.isValid(dto.getDebtId())) {
+            if (!this.debtService.isValid(dto.getDebtId(), dto.getBudgetId())) {
                 return ValidationUtil.fail(constraintValidatorContext, "debtId",
                         ValidationMessages.DEBT_IS_NOT_VALID);
             }

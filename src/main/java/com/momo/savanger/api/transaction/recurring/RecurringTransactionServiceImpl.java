@@ -1,8 +1,11 @@
 package com.momo.savanger.api.transaction.recurring;
 
+import com.momo.savanger.constants.EntityGraphs;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -22,7 +25,9 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
                 dto);
 
         recurringTransaction.setCompleted(false);
-        recurringTransaction.setNextDate(LocalDateTime.now().plusMonths(1));
+
+        //While implementing RRule
+        recurringTransaction.setNextDate(LocalDateTime.now());
 
         this.recurringTransactionRepository.saveAndFlush(recurringTransaction);
 
@@ -33,7 +38,7 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     public RecurringTransaction findById(Long id) {
         return this.recurringTransactionRepository.findById(id)
                 .orElseThrow(
-                        () -> ApiException.with(ApiErrorCode.ERR_0017)
+                        () -> ApiException.with(ApiErrorCode.ERR_0016)
                 );
     }
 
@@ -46,11 +51,18 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
 
     @Override
     public Boolean isRecurringTransactionValid(Long recurringTransactionId) {
-        final Specification<RecurringTransaction> specification = RecurringTransactionSpecifications
-                .idEquals(recurringTransactionId);
-
-        return this.recurringTransactionRepository.exists(specification);
+        return this.findByIdIfExists(recurringTransactionId).isPresent();
     }
 
+    @Override
+    public Optional<RecurringTransaction> findByIdIfExists(Long id) {
+        final Specification<RecurringTransaction> specification = RecurringTransactionSpecifications.idEquals(
+                        id)
+                .and(RecurringTransactionSpecifications.isCompleted(false));
 
+        final List<RecurringTransaction> recurringTransactions = this.recurringTransactionRepository.findAll(
+                specification, EntityGraphs.RECURRING_TRANSACTION_ALL
+        );
+        return recurringTransactions.stream().findFirst();
+    }
 }

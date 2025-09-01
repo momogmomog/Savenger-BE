@@ -13,7 +13,8 @@ import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionRepository;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
-import com.momo.savanger.error.ApiException;
+import com.momo.savanger.error.ApiErrorCode;
+import com.momo.savanger.util.AssertUtil;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
@@ -128,7 +129,8 @@ public class RecurringTransactionServiceIt {
 
     @Test
     public void testFindById_invalidId_shouldThrowException() {
-        assertThrows(ApiException.class, () -> this.rTransactionService.findById(2399L));
+        AssertUtil.assertApiException(ApiErrorCode.ERR_0016,
+                () -> this.rTransactionService.findById(2399L));
     }
 
     @Test

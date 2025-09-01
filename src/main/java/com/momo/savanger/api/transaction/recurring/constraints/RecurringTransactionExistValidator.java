@@ -1,7 +1,6 @@
 package com.momo.savanger.api.transaction.recurring.constraints;
 
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
-import com.momo.savanger.error.ApiException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +26,6 @@ public class RecurringTransactionExistValidator implements
             return true;
         }
 
-        try {
-            return this.recurringTransactionService.isRecurringTransactionValid(rTransactionId);
-        } catch (ApiException e) {
-            return false;
-        }
+        return this.recurringTransactionService.isRecurringTransactionValid(rTransactionId);
     }
 }

@@ -23,7 +23,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
     public Prepayment findById(Long id) {
         return this.prepaymentRepository.findById(id)
                 .orElseThrow(
-                        () -> ApiException.with(ApiErrorCode.ERR_0016)
+                        () -> ApiException.with(ApiErrorCode.ERR_0015)
                 );
     }
 
@@ -39,7 +39,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
 
         this.prepaymentRepository.saveAndFlush(prepayment);
 
-        RecurringTransaction rTransaction = null;
+        final RecurringTransaction rTransaction;
 
         if (dto.getRecurringTransaction() != null) {
             rTransaction = this.recurringTransactionService.create(
@@ -49,6 +49,8 @@ public class PrepaymentServiceImpl implements PrepaymentService {
             rTransaction = this.recurringTransactionService.findById(
                     dto.getRecurringTransactionId()
             );
+        } else {
+            rTransaction = null;
         }
 
         if (rTransaction != null) {
@@ -62,7 +64,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
 
     @Override
     public BigDecimal getPrepaymentAmountSumByBudgetId(Long budgetId) {
-        BigDecimal sum = this.prepaymentRepository.sumPrepaymentAmountByBudgetId(budgetId);
+        final BigDecimal sum = this.prepaymentRepository.sumPrepaymentAmountByBudgetId(budgetId);
 
         if (sum == null) {
             return BigDecimal.ZERO;
