@@ -1,6 +1,7 @@
 package com.momo.savanger.integration.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -75,6 +76,8 @@ public class PrepaymentServiceIt {
 
         assertEquals(2, this.prepaymentRepository.findAll().size());
 
+        assertEquals(1, this.recurringTransactionRepository.findAll().size());
+
         CreateRecurringTransactionDto createRecurringTransactionDto = new CreateRecurringTransactionDto();
         createRecurringTransactionDto.setAmount(BigDecimal.valueOf(20));
         createRecurringTransactionDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
@@ -83,6 +86,7 @@ public class PrepaymentServiceIt {
         createRecurringTransactionDto.setCategoryId(1001L);
         createRecurringTransactionDto.setAutoExecute(false);
 
+        //Test with new recurring transaction
         CreatePrepaymentDto createPrepaymentDto = new CreatePrepaymentDto();
         createPrepaymentDto.setAmount(BigDecimal.valueOf(200));
         createPrepaymentDto.setBudgetId(1001L);
@@ -93,13 +97,37 @@ public class PrepaymentServiceIt {
         this.prepaymentService.create(createPrepaymentDto);
 
         assertEquals(3, this.prepaymentRepository.findAll().size());
+
+        assertEquals(2, this.recurringTransactionRepository.findAll().size());
+
+        //Test data
+        assertEquals(createPrepaymentDto.getName(),
+                this.prepaymentRepository.findAll().getFirst().getName());
+
+        assertEquals(createPrepaymentDto.getAmount(),
+                this.prepaymentRepository.findAll().getFirst().getAmount());
+
+        assertEquals(createPrepaymentDto.getBudgetId(),
+                this.prepaymentRepository.findAll().getFirst().getBudgetId());
+
+        assertEquals(createPrepaymentDto.getPaidUntil(),
+                this.prepaymentRepository.findAll().getFirst().getPaidUntil());
+
+        //Test prepayment id
+        assertEquals(1, this.recurringTransactionService.findById(1L).getPrepaymentId());
     }
 
     @Test
     @Transactional
-    public void testAddPrepaymentIdToRTransaction_validPayload_shouldCreatePayment() {
+    public void testCreate_withExistingRTransactionId_shouldCreatePrepaymentWithExistingRTransaction() {
+
+        assertEquals(2, this.prepaymentRepository.findAll().size());
+
+        assertEquals(1, this.recurringTransactionRepository.findAll().size());
+
         assertEquals(1001L, this.recurringTransactionService.findById(1001L).getPrepaymentId());
 
+        //Test with existing recurring transaction id
         CreatePrepaymentDto createPrepaymentDto = new CreatePrepaymentDto();
         createPrepaymentDto.setAmount(BigDecimal.valueOf(200));
         createPrepaymentDto.setBudgetId(1001L);
@@ -109,7 +137,12 @@ public class PrepaymentServiceIt {
 
         this.prepaymentService.create(createPrepaymentDto);
 
-        assertEquals(1, this.recurringTransactionService.findById(1001L).getPrepaymentId());
+        assertEquals(3, this.prepaymentRepository.findAll().size());
+
+        assertEquals(1, this.recurringTransactionRepository.findAll().size());
+
+        //Test addPrepaymentId method
+        assertNotEquals(1001L, this.recurringTransactionService.findById(1001L).getPrepaymentId());
     }
 
     @Test
@@ -121,48 +154,6 @@ public class PrepaymentServiceIt {
             this.prepaymentService.create(dto);
         });
 
-    }
-
-    @Test
-    @Transactional
-    public void testCreate_validPayload_shouldCreateRTransaction() {
-        assertEquals(1, this.recurringTransactionRepository.findAll().size());
-
-        CreateRecurringTransactionDto createRecurringTransactionDto = new CreateRecurringTransactionDto();
-        createRecurringTransactionDto.setAmount(BigDecimal.valueOf(20));
-        createRecurringTransactionDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
-        createRecurringTransactionDto.setType(TransactionType.EXPENSE);
-        createRecurringTransactionDto.setBudgetId(1001L);
-        createRecurringTransactionDto.setCategoryId(1001L);
-        createRecurringTransactionDto.setAutoExecute(false);
-
-        CreatePrepaymentDto createPrepaymentDto = new CreatePrepaymentDto();
-        createPrepaymentDto.setAmount(BigDecimal.valueOf(200));
-        createPrepaymentDto.setBudgetId(1001L);
-        createPrepaymentDto.setName("NETI");
-        createPrepaymentDto.setPaidUntil(LocalDateTime.now().plusMonths(6));
-        createPrepaymentDto.setRecurringTransaction(createRecurringTransactionDto);
-
-        this.prepaymentService.create(createPrepaymentDto);
-
-        assertEquals(2, this.recurringTransactionRepository.findAll().size());
-    }
-
-    @Test
-    @Transactional
-    public void testCreate_validPayload_shouldUseExistingRTransaction() {
-        assertEquals(1, this.recurringTransactionRepository.findAll().size());
-
-        CreatePrepaymentDto createPrepaymentDto = new CreatePrepaymentDto();
-        createPrepaymentDto.setAmount(BigDecimal.valueOf(200));
-        createPrepaymentDto.setBudgetId(1001L);
-        createPrepaymentDto.setName("NETI");
-        createPrepaymentDto.setPaidUntil(LocalDateTime.now().plusMonths(6));
-        createPrepaymentDto.setRecurringTransactionId(1001L);
-
-        this.prepaymentService.create(createPrepaymentDto);
-
-        assertEquals(1, this.recurringTransactionRepository.findAll().size());
     }
 
     @Test
@@ -188,6 +179,14 @@ public class PrepaymentServiceIt {
     @Test
     public void testPrepaymentAmountSumByBudgetId_withoutPrepaymentsBudget_shouldThrowException() {
         BigDecimal sum = this.prepaymentService.getPrepaymentAmountSumByBudgetId(1003L);
+
+        assertEquals(BigDecimal.ZERO.setScale(1, RoundingMode.HALF_DOWN),
+                sum.setScale(1, RoundingMode.HALF_DOWN));
+    }
+
+    @Test
+    public void testPrepaymentAmountSumByBudgetId_invalidId() {
+        BigDecimal sum = this.prepaymentService.getPrepaymentAmountSumByBudgetId(10099L);
 
         assertEquals(BigDecimal.ZERO.setScale(1, RoundingMode.HALF_DOWN),
                 sum.setScale(1, RoundingMode.HALF_DOWN));

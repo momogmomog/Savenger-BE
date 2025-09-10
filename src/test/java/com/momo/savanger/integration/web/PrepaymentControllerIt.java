@@ -93,7 +93,7 @@ public class PrepaymentControllerIt extends BaseControllerIt {
                 jsonPath(
                         "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransactionId\" && @.constraintName == \"OneOfTheseNotBeNull\")]").exists()
+                        "fieldErrors.[?(@.field == \"recurringTransactionId\" && @.constraintName == \"OneMustNotBeNull\")]").exists()
         );
 
         CreateRecurringTransactionDto transactionDto = new CreateRecurringTransactionDto();
@@ -144,7 +144,7 @@ public class PrepaymentControllerIt extends BaseControllerIt {
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath("fieldErrors.[?(@.field == \"recurringTransaction.budgetId\""
-                        + "&& @.constraintName == \"BudgetsShouldBeEquals\")]").exists()
+                        + "&& @.constraintName == \"ValidPrepaymentDtoBudgetIds\")]").exists()
         );
 
         //Test amount is bigger than budget balance
@@ -184,7 +184,7 @@ public class PrepaymentControllerIt extends BaseControllerIt {
                 jsonPath("fieldErrors.[?(@.field == \"budgetId\""
                         + "&& @.constraintName == \"CanAccessBudget\")]").exists(),
                 jsonPath("fieldErrors.[?(@.field == \"recurringTransaction.budgetId\""
-                        + "&& @.constraintName == \"BudgetsShouldBeEquals\")]").exists()
+                        + "&& @.constraintName == \"ValidPrepaymentDtoBudgetIds\")]").exists()
         );
     }
 

@@ -11,6 +11,7 @@ import com.momo.savanger.api.transaction.recurring.RecurringTransactionRepositor
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,28 +28,28 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase
 @Sql("classpath:/sql/user-it-data.sql")
-@Sql("classpath:/sql/debt/budget-it-data.sql")
-@Sql("classpath:/sql/debt/budgets_participants-it-data.sql")
-@Sql("classpath:/sql/debt/tag-it-data.sql")
-@Sql("classpath:/sql/debt/category-it-data.sql")
-@Sql("classpath:/sql/debt/transaction-it-data.sql")
-@Sql("classpath:/sql/debt/transactions_tags-it-data.sql")
-@Sql("classpath:/sql/debt/revision-it-data.sql")
-@Sql("classpath:/sql/debt/debt-it-data.sql")
-@Sql("classpath:/sql/debt/prepayment-it-data.sql")
-@Sql("classpath:/sql/debt/recurring_transaction-it-data.sql")
-@Sql(value = "classpath:/sql/debt/del-recurring_transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-prepayment-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-revision-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-transactions_tags-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-debt-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-category-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-tag-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-@Sql(value = "classpath:/sql/debt/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql("classpath:/sql/prepayment/budget-it-data.sql")
+@Sql("classpath:/sql/prepayment/budgets_participants-it-data.sql")
+@Sql("classpath:/sql/prepayment/tag-it-data.sql")
+@Sql("classpath:/sql/prepayment/category-it-data.sql")
+@Sql("classpath:/sql/prepayment/transaction-it-data.sql")
+@Sql("classpath:/sql/prepayment/transactions_tags-it-data.sql")
+@Sql("classpath:/sql/prepayment/revision-it-data.sql")
+@Sql("classpath:/sql/prepayment/debt-it-data.sql")
+@Sql("classpath:/sql/prepayment/prepayment-it-data.sql")
+@Sql("classpath:/sql/prepayment/recurring_transaction-it-data.sql")
+@Sql(value = "classpath:/sql/prepayment/del-recurring_transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-prepayment-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-revision-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-transactions_tags-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-debt-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-category-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-tag-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-user-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-public class RecurringTransactionControlletIt extends BaseControllerIt {
+public class RecurringTransactionControllerIt extends BaseControllerIt {
 
     @Autowired
     private RecurringTransactionRepository recurringTransactionRepository;
@@ -97,7 +98,7 @@ public class RecurringTransactionControlletIt extends BaseControllerIt {
         super.post(Endpoints.PREPAYMENTS,
                 prepaymentDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(6)),
+                jsonPath("fieldErrors.length()", is(7)),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.type\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
@@ -109,7 +110,10 @@ public class RecurringTransactionControlletIt extends BaseControllerIt {
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransaction.recurringRule\" && @.constraintName == \"RRule\")]").exists()
+                        "fieldErrors.[?(@.field == \"recurringTransaction.recurringRule\" && @.constraintName == \"RRule\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"ValidPrepaymentDtoBudgetIds\")]").exists()
+
         );
 
         //Test recurringRule
@@ -122,13 +126,16 @@ public class RecurringTransactionControlletIt extends BaseControllerIt {
         super.post(Endpoints.PREPAYMENTS,
                 prepaymentDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath("fieldErrors.length()", is(4)),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.amount\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransaction.recurringRule\" && @.constraintName == \"RRule\")]").exists()
+                        "fieldErrors.[?(@.field == \"recurringTransaction.recurringRule\" && @.constraintName == \"RRule\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"ValidPrepaymentDtoBudgetIds\")]").exists()
+
         );
 
         //Test amount
@@ -138,11 +145,14 @@ public class RecurringTransactionControlletIt extends BaseControllerIt {
         super.post(Endpoints.PREPAYMENTS,
                 prepaymentDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(2)),
+                jsonPath("fieldErrors.length()", is(3)),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.amount\" && @.constraintName == \"MinValueZero\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"NotNull\")]").exists()
+                        "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"ValidPrepaymentDtoBudgetIds\")]").exists()
+
         );
 
         //Test budgetID
@@ -162,5 +172,41 @@ public class RecurringTransactionControlletIt extends BaseControllerIt {
 
         );
 
+        prepaymentDto.setBudgetId(1001L);
+        rTransactionDto.setBudgetId(1001L);
+        rTransactionDto.setCategoryId(1002L);
+
+        super.post(Endpoints.PREPAYMENTS,
+                prepaymentDto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringTransaction.categoryId\" && @.constraintName == \"ValidRecurringTransactionDto\" "
+                                + "&& @.message == \"Category does not exist or budget is not valid.\")]").exists()
+        );
+
+        rTransactionDto.setCategoryId(1001L);
+        rTransactionDto.setDebtId(1001L);
+
+        super.post(Endpoints.PREPAYMENTS,
+                prepaymentDto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringTransaction.debtId\" && @.constraintName == \"ValidRecurringTransactionDto\" "
+                                + "&& @.message == \"Debt is not valid.\")]").exists()
+        );
+
+        rTransactionDto.setDebtId(101L);
+        rTransactionDto.setTagIds(List.of(1001L, 1002L, 1003L));
+
+        super.post(Endpoints.PREPAYMENTS,
+                prepaymentDto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringTransaction.tagIds\" && @.constraintName == \"ValidRecurringTransactionDto\" "
+                                + "&& @.message == \"Invalid tags: [1002, 1003]\")]").exists()
+        );
     }
 }

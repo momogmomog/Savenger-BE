@@ -17,6 +17,7 @@ import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.util.AssertUtil;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,6 +109,20 @@ public class RecurringTransactionServiceIt {
 
         assertEquals(2, this.rTransactionRepository.findAll().size());
 
+        //Test data
+        assertEquals(transactionDto.getBudgetId(),
+                this.rTransactionRepository.findAll().getFirst().getBudgetId());
+        assertEquals(transactionDto.getType(),
+                this.rTransactionRepository.findAll().getFirst().getType());
+        assertEquals(transactionDto.getRecurringRule(),
+                this.rTransactionRepository.findAll().getFirst().getRecurringRule());
+        assertEquals(transactionDto.getCategoryId(),
+                this.rTransactionRepository.findAll().getFirst().getCategoryId());
+        assertEquals(transactionDto.getAutoExecute(),
+                this.rTransactionRepository.findAll().getFirst().getAutoExecute());
+        assertEquals(transactionDto.getAmount(),
+                this.rTransactionRepository.findAll().getFirst().getAmount());
+
     }
 
     @Test
@@ -152,6 +167,16 @@ public class RecurringTransactionServiceIt {
         this.rTransactionService.addPrepaymentId(1002L, recurringTransaction);
 
         assertEquals(1002L, recurringTransaction.getPrepaymentId());
+    }
+
+    @Test
+    public void testFindByIdIfExist_validId_shouldReturnRTransaction() {
+        assertNotNull(this.rTransactionService.findByIdIfExists(1001L));
+    }
+
+    @Test
+    public void testFindByIdIfExist_invalidId_shouldReturnOptionalEmpty() {
+        assertEquals(Optional.empty(), this.rTransactionService.findByIdIfExists(10001L));
     }
 
 }

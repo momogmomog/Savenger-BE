@@ -1,7 +1,9 @@
 package com.momo.savanger.integration.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.BudgetStatistics;
@@ -426,15 +428,6 @@ public class DebtServiceIt {
     }
 
     @Test
-    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
-    public void testPay_notBudgetsOwner_shouldThrowException() {
-        PayDebtDto dto = new PayDebtDto();
-        dto.setAmount(BigDecimal.valueOf(32.00));
-
-        AssertUtil.assertApiException(ApiErrorCode.ERR_0015, () -> this.debtService.pay(101L, dto));
-    }
-
-    @Test
     public void testFindDebt_existedId_shouldReturnDebt() {
         assertNotNull(this.debtService.findDebt(1001L, 1002L));
     }
@@ -453,5 +446,36 @@ public class DebtServiceIt {
     public void testFindById_notExistedId_shouldThrowException() {
         AssertUtil.assertApiException(ApiErrorCode.ERR_0013,
                 () -> this.debtService.findById(1001L));
+    }
+
+    @Test
+    public void testFindDebtIfExist_validId_shouldReturnRTransaction() {
+        assertNotNull(this.debtService.findDebtIfExists(1001L, 1L));
+    }
+
+    @Test
+    public void testFindDebtIfExist_invalidId_shouldReturnOptionalEmpty() {
+        assertEquals(Optional.empty(), this.debtService.findDebtIfExists(10001L, 1L));
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testIsValid_validId_shouldReturnTrue() {
+
+        assertTrue(this.debtService.isValid(101L, 1001L));
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testIsValid_invalidId_shouldReturnFalse() {
+
+        assertFalse(this.debtService.isValid(101L, 10001L));
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    public void testIsValid_withNotPermittedUser_shouldReturnFalse() {
+
+        assertFalse(this.debtService.isValid(101L, 1001L));
     }
 }
