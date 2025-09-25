@@ -22,5 +22,6 @@ public class ValidationMessages {
     public static final String FIELDS_CANNOT_BE_NULL = "One of these fields %s cannot be null.";
     public static final String AMOUNT_CANNOT_BE_BIGGER_THAN_BALANCE = "Amount cannot be bigger than budget balance";
     public static final String ONE_FIELD_SHOULD_BE_NULL = "One of these fields %s, %s should be null.";
+    public static final String R_TRANSACTION_ID_NOT_EXIST = "RecurringTransactionId with this budget id does not exist.";
 
 }

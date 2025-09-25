@@ -5,7 +5,6 @@ import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
-import com.momo.savanger.constants.EntityGraphs;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
@@ -68,24 +67,26 @@ public class DebtServiceImpl implements DebtService {
 
         final Debt debt = this.findById(id);
 
-        if (this.isPermitted(debt)) {
-            final BudgetStatistics receiverBudget = budgetService.getStatistics(
-                    debt.getReceiverBudgetId());
-
-            if (debt.getAmount().compareTo(dto.getAmount()) < 0) {
-                dto.setAmount(debt.getAmount());
-            }
-
-            if (receiverBudget.getRealBalance().compareTo(dto.getAmount()) < 0) {
-                throw ApiException.with(ApiErrorCode.ERR_0014);
-            }
-
-            debt.setAmount(debt.getAmount().subtract(dto.getAmount()));
-
-            this.debtRepository.save(debt);
-
-            this.transactionService.payDebtTransaction(debt, dto.getAmount());
+        if (!this.isPermitted(debt)) {
+            throw ApiException.with(ApiErrorCode.ERR_0003);
         }
+
+        final BudgetStatistics receiverBudget = budgetService.getStatistics(
+                debt.getReceiverBudgetId());
+
+        if (debt.getAmount().compareTo(dto.getAmount()) < 0) {
+            dto.setAmount(debt.getAmount());
+        }
+
+        if (receiverBudget.getRealBalance().compareTo(dto.getAmount()) < 0) {
+            throw ApiException.with(ApiErrorCode.ERR_0014);
+        }
+
+        debt.setAmount(debt.getAmount().subtract(dto.getAmount()));
+
+        this.debtRepository.save(debt);
+
+        this.transactionService.payDebtTransaction(debt, dto.getAmount());
 
         return debt;
     }
@@ -126,7 +127,7 @@ public class DebtServiceImpl implements DebtService {
 
         final List<Debt> debts = this.debtRepository.findAll(
                 specification,
-                EntityGraphs.DEBT_ALL
+                null
         );
         return debts.stream().findFirst();
     }

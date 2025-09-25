@@ -149,13 +149,18 @@ public class RecurringTransactionServiceIt {
     }
 
     @Test
-    public void testIsRecurringTransactionValid_valid_shouldReturnTransaction() {
-        assertTrue(this.rTransactionService.isRecurringTransactionValid(1001L));
+    public void testRecurringTransactionExist_valid_shouldReturnTrue() {
+        assertTrue(this.rTransactionService.recurringTransactionExists(1001L, 1001L));
     }
 
     @Test
-    public void testIsRecurringTransactionValid_invalid_shouldReturnTransaction() {
-        assertFalse(this.rTransactionService.isRecurringTransactionValid(10001L));
+    public void testRecurringTransactionExist_invalidRTransactionId_shouldReturnFalse() {
+        assertFalse(this.rTransactionService.recurringTransactionExists(10001L, 1001L));
+    }
+
+    @Test
+    public void testRecurringTransactionExist_invalidBudgetId_shouldReturnFalse() {
+        assertFalse(this.rTransactionService.recurringTransactionExists(1001L, 1002L));
     }
 
     @Test

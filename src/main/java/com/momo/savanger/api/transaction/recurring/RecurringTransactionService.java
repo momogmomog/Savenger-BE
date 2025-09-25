@@ -12,6 +12,6 @@ public interface RecurringTransactionService {
 
     void addPrepaymentId(Long prepaymentId, RecurringTransaction recurringTransaction);
 
-    Boolean isRecurringTransactionValid(Long rTransactionId);
+    boolean recurringTransactionExists(Long rTransactionId, Long budgetId);
 
 }

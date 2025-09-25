@@ -1,4 +1,4 @@
-package com.momo.savanger.api.transaction.recurring.constraints;
+package com.momo.savanger.api.prepayment.constraints;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -8,11 +8,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-@Constraint(validatedBy = RecurringTransactionExistValidator.class)
-public @interface RecurringTransactionExist {
+@Target(ElementType.TYPE)
+@Constraint(validatedBy = ValidPrepaymentDtoValidator.class)
+public @interface ValidPrepaymentDto {
 
-    String message() default "Recurring transaction does not exist";
+    String message() default "BudgetId in RecurringTransaction should be equals to BudgetId in Prepayment";
 
     Class<?>[] groups() default {};
 

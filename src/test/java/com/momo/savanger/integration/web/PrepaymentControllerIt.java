@@ -134,7 +134,7 @@ public class PrepaymentControllerIt extends BaseControllerIt {
                                 + " && @.constraintName == \"OneMustBeNull\")]").exists()
         );
 
-        //Test budget ids equals
+        //Test recurring transaction budgetId equals to prepayment budgetId
 
         prepaymentDto.setBudgetId(1002L);
         prepaymentDto.setRecurringTransactionId(null);
@@ -144,7 +144,7 @@ public class PrepaymentControllerIt extends BaseControllerIt {
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath("fieldErrors.[?(@.field == \"recurringTransaction.budgetId\""
-                        + "&& @.constraintName == \"ValidPrepaymentDtoBudgetIds\")]").exists()
+                        + "&& @.constraintName == \"ValidPrepaymentDto\")]").exists()
         );
 
         //Test amount is bigger than budget balance
@@ -169,7 +169,7 @@ public class PrepaymentControllerIt extends BaseControllerIt {
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath("fieldErrors.[?(@.field == \"recurringTransactionId\""
-                        + "&& @.constraintName == \"RecurringTransactionExist\")]").exists()
+                        + "&& @.constraintName == \"ValidPrepaymentDto\")]").exists()
         );
 
         //Test user has access to budget
@@ -183,8 +183,8 @@ public class PrepaymentControllerIt extends BaseControllerIt {
                 jsonPath("fieldErrors.length()", is(2)),
                 jsonPath("fieldErrors.[?(@.field == \"budgetId\""
                         + "&& @.constraintName == \"CanAccessBudget\")]").exists(),
-                jsonPath("fieldErrors.[?(@.field == \"recurringTransaction.budgetId\""
-                        + "&& @.constraintName == \"ValidPrepaymentDtoBudgetIds\")]").exists()
+                jsonPath("fieldErrors.[?(@.field == \"recurringTransactionId\""
+                        + "&& @.constraintName == \"ValidPrepaymentDto\")]").exists()
         );
     }
 

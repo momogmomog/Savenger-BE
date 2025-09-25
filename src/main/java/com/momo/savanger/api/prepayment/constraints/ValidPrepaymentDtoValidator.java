@@ -13,13 +13,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ValidPrepaymentDtoBudgetIdsValidator implements
-        ConstraintValidator<ValidPrepaymentDtoBudgetIds, CreatePrepaymentDto> {
+public class ValidPrepaymentDtoValidator implements
+        ConstraintValidator<ValidPrepaymentDto, CreatePrepaymentDto> {
 
     private final RecurringTransactionService recurringTransactionService;
 
     @Override
-    public void initialize(ValidPrepaymentDtoBudgetIds constraintAnnotation) {
+    public void initialize(ValidPrepaymentDto constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
@@ -36,8 +36,13 @@ public class ValidPrepaymentDtoBudgetIdsValidator implements
         if (dto.getRecurringTransaction() != null) {
             budgetIds.add(dto.getRecurringTransaction().getBudgetId());
         } else if (dto.getRecurringTransactionId() != null) {
-            this.recurringTransactionService.findByIdIfExists(dto.getRecurringTransactionId())
-                    .ifPresent(rt -> budgetIds.add(rt.getBudgetId()));
+            if (!this.recurringTransactionService.recurringTransactionExists(
+                    dto.getRecurringTransactionId(), dto.getBudgetId())) {
+                return ValidationUtil.fail(
+                        constraintValidatorContext,
+                        "recurringTransactionId",
+                        ValidationMessages.R_TRANSACTION_ID_NOT_EXIST);
+            }
         }
 
         if (budgetIds.size() > 1) {

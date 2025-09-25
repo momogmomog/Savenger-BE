@@ -2,9 +2,8 @@ package com.momo.savanger.api.prepayment;
 
 import com.momo.savanger.api.budget.constraints.CanAccessBudget;
 import com.momo.savanger.api.prepayment.constraints.IsBudgetBalanceBigger;
-import com.momo.savanger.api.prepayment.constraints.ValidPrepaymentDtoBudgetIds;
+import com.momo.savanger.api.prepayment.constraints.ValidPrepaymentDto;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
-import com.momo.savanger.api.transaction.recurring.constraints.RecurringTransactionExist;
 import com.momo.savanger.constants.Lengths;
 import com.momo.savanger.constraints.MinValueZero;
 import com.momo.savanger.constraints.NotNull;
@@ -20,7 +19,7 @@ import lombok.Data;
 @Data
 @OneMustBeNull(fieldOne = "recurringTransactionId", fieldTwo = "recurringTransaction")
 @OneMustNotBeNull(fields = {"recurringTransactionId", "recurringTransaction"})
-@ValidPrepaymentDtoBudgetIds
+@ValidPrepaymentDto
 @IsBudgetBalanceBigger
 public class CreatePrepaymentDto {
 
@@ -40,7 +39,6 @@ public class CreatePrepaymentDto {
     @NotNull
     private Long budgetId;
 
-    @RecurringTransactionExist
     private Long recurringTransactionId;
 
     @Valid

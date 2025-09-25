@@ -50,8 +50,9 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     }
 
     @Override
-    public Boolean isRecurringTransactionValid(Long recurringTransactionId) {
-        return this.findByIdIfExists(recurringTransactionId).isPresent();
+    public boolean recurringTransactionExists(Long recurringTransactionId, Long budgetId) {
+        return this.recurringTransactionRepository.existsByIdAndBudgetId(recurringTransactionId,
+                budgetId);
     }
 
     @Override

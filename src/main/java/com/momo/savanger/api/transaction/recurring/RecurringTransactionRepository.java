@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 public interface RecurringTransactionRepository extends JpaRepository<RecurringTransaction, Long>,
         RecurringTransactionRepositoryFragment {
 
+    boolean existsByIdAndBudgetId(Long recurringTransactionId, Long budgetId);
 }
