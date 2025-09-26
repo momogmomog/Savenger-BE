@@ -8,7 +8,7 @@ import com.momo.savanger.api.util.SecurityUtils;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
-import java.util.Objects;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -67,19 +67,18 @@ public class DebtServiceImpl implements DebtService {
 
         final Debt debt = this.findById(id);
 
-        final BudgetStatistics budget = budgetService.getStatistics(debt.getReceiverBudgetId());
-
-        final User user = SecurityUtils.getCurrentUser();
-
-        if (!Objects.equals(budget.getBudget().getOwnerId(), user.getId())) {
-            throw ApiException.with(ApiErrorCode.ERR_0015);
+        if (!this.isPermitted(debt)) {
+            throw ApiException.with(ApiErrorCode.ERR_0004);
         }
+
+        final BudgetStatistics receiverBudget = budgetService.getStatistics(
+                debt.getReceiverBudgetId());
 
         if (debt.getAmount().compareTo(dto.getAmount()) < 0) {
             dto.setAmount(debt.getAmount());
         }
 
-        if (budget.getRealBalance().compareTo(dto.getAmount()) < 0) {
+        if (receiverBudget.getRealBalance().compareTo(dto.getAmount()) < 0) {
             throw ApiException.with(ApiErrorCode.ERR_0014);
         }
 
@@ -101,5 +100,35 @@ public class DebtServiceImpl implements DebtService {
         return this.debtRepository.findAll(specification, null).stream().findFirst();
     }
 
+    private Boolean isPermitted(Debt debt) {
+        final User user = SecurityUtils.getCurrentUser();
 
+        return budgetService.isUserPermitted(user, debt.getReceiverBudgetId()) &&
+                budgetService.isUserPermitted(user, debt.getLenderBudgetId());
+    }
+
+    @Override
+    public Boolean isValid(Long id, Long budgetId) {
+
+        try {
+            final Debt debt = this.findDebtIfExists(id, budgetId).orElse(null);
+
+            return debt != null && this.isPermitted(debt);
+        } catch (ApiException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public Optional<Debt> findDebtIfExists(Long id, Long budgetId) {
+        final Specification<Debt> specification = DebtSpecifications.idEquals(id)
+                .and(DebtSpecifications.receiverBudgetIdEquals(budgetId)
+                        .or(DebtSpecifications.lenderBudgetIdEquals(budgetId)));
+
+        final List<Debt> debts = this.debtRepository.findAll(
+                specification,
+                null
+        );
+        return debts.stream().findFirst();
+    }
 }

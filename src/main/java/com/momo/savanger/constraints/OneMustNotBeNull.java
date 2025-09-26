@@ -1,4 +1,4 @@
-package com.momo.savanger.api.transaction.constraints;
+package com.momo.savanger.constraints;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -9,10 +9,12 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@Constraint(validatedBy = ValidTransactionDtoValidator.class)
-public @interface ValidTransactionDto {
+@Constraint(validatedBy = OneMustNotBeNullValidator.class)
+public @interface OneMustNotBeNull {
 
-    String message() default "Transaction DTO is not valid";
+    String[] fields();
+
+    String message() default "One of these fields should be not null";
 
     Class<?>[] groups() default {};
 

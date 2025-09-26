@@ -1,9 +1,10 @@
-package com.momo.savanger.api.transaction.constraints;
+package com.momo.savanger.api.transaction.recurring.constraints;
 
 import com.momo.savanger.api.category.CategoryService;
+import com.momo.savanger.api.debt.DebtService;
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.tag.TagService;
-import com.momo.savanger.api.transaction.dto.ITransactionDto;
+import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
 import com.momo.savanger.api.util.ValidationUtil;
 import com.momo.savanger.constants.ValidationMessages;
 import jakarta.validation.ConstraintValidator;
@@ -14,28 +15,45 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ValidTransactionDtoValidator implements
-        ConstraintValidator<ValidTransactionDto, ITransactionDto> {
-
-    private final TagService tagService;
+public class ValidRecurringTransactionDtoValidator implements
+        ConstraintValidator<ValidRecurringTransactionDto,
+                CreateRecurringTransactionDto> {
 
     private final CategoryService categoryService;
 
+    private final TagService tagService;
+
+    private final DebtService debtService;
+
     @Override
-    public void initialize(ValidTransactionDto constraintAnnotation) {
+    public void initialize(ValidRecurringTransactionDto constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
     @Override
-    public boolean isValid(ITransactionDto dto,
+    public boolean isValid(CreateRecurringTransactionDto dto,
             ConstraintValidatorContext constraintValidatorContext) {
 
         if (dto.getBudgetId() == null) {
             return true;
         }
-        if (!this.categoryService.isCategoryValid(dto.getCategoryId(), dto.getBudgetId())) {
-            return ValidationUtil.fail(constraintValidatorContext, "categoryId",
-                    ValidationMessages.CATEGORY_DOES_NOT_EXIST_OR_BUDGET_IS_NOT_VALID);
+
+        if (dto.getCategoryId() != null) {
+            if (!this.categoryService.isCategoryValid(dto.getCategoryId(), dto.getBudgetId())) {
+                return ValidationUtil.fail(constraintValidatorContext, "categoryId",
+                        ValidationMessages.CATEGORY_DOES_NOT_EXIST_OR_BUDGET_IS_NOT_VALID);
+            }
+        }
+
+        if (dto.getDebtId() != null) {
+            if (!this.debtService.isValid(dto.getDebtId(), dto.getBudgetId())) {
+                return ValidationUtil.fail(constraintValidatorContext, "debtId",
+                        ValidationMessages.DEBT_IS_NOT_VALID);
+            }
+        }
+
+        if (dto.getTagIds() == null) {
+            return true;
         }
 
         final List<Tag> tags = this.tagService.findByBudgetAndIdContaining(dto.getTagIds(),

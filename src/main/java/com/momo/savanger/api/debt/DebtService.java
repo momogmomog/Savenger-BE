@@ -11,4 +11,8 @@ public interface DebtService {
     Debt pay(Long id, PayDebtDto dto);
 
     Optional<Debt> findDebt(Long receiverBudgetId, Long lenderBudgetId);
+
+    Boolean isValid(Long id, Long budgetId);
+
+    Optional<Debt> findDebtIfExists(Long id, Long budgetId);
 }
