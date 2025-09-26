@@ -68,7 +68,7 @@ public class DebtServiceImpl implements DebtService {
         final Debt debt = this.findById(id);
 
         if (!this.isPermitted(debt)) {
-            throw ApiException.with(ApiErrorCode.ERR_0003);
+            throw ApiException.with(ApiErrorCode.ERR_0004);
         }
 
         final BudgetStatistics receiverBudget = budgetService.getStatistics(
