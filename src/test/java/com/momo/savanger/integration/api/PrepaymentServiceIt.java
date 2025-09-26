@@ -177,6 +177,22 @@ public class PrepaymentServiceIt {
     }
 
     @Test
+    public void testPrepaymentAmountSumByBudgetId_withTwoPrepayments_shouldSumAmount() {
+        CreatePrepaymentDto createPrepaymentDto = new CreatePrepaymentDto();
+        createPrepaymentDto.setAmount(BigDecimal.valueOf(200));
+        createPrepaymentDto.setBudgetId(1001L);
+        createPrepaymentDto.setName("NETI");
+        createPrepaymentDto.setPaidUntil(LocalDateTime.now().plusMonths(6));
+        createPrepaymentDto.setRecurringTransactionId(1001L);
+
+        this.prepaymentService.create(createPrepaymentDto);
+
+        BigDecimal sum = this.prepaymentService.getPrepaymentAmountSumByBudgetId(1001L);
+
+        assertEquals(BigDecimal.valueOf(400.00), sum.setScale(1, RoundingMode.HALF_DOWN));
+    }
+
+    @Test
     public void testPrepaymentAmountSumByBudgetId_withoutPrepaymentsBudget_shouldThrowException() {
         BigDecimal sum = this.prepaymentService.getPrepaymentAmountSumByBudgetId(1003L);
 
