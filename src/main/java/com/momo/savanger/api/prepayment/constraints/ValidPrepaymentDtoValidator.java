@@ -36,12 +36,18 @@ public class ValidPrepaymentDtoValidator implements
         if (dto.getRecurringTransaction() != null) {
             budgetIds.add(dto.getRecurringTransaction().getBudgetId());
         } else if (dto.getRecurringTransactionId() != null) {
-            if (!this.recurringTransactionService.recurringTransactionExists(
-                    dto.getRecurringTransactionId(), dto.getBudgetId())) {
+
+            final boolean rTransactionExists = this.recurringTransactionService
+                    .recurringTransactionExists(
+                            dto.getRecurringTransactionId(),
+                            dto.getBudgetId()
+                    );
+            if (!rTransactionExists) {
                 return ValidationUtil.fail(
                         constraintValidatorContext,
                         "recurringTransactionId",
-                        ValidationMessages.R_TRANSACTION_ID_NOT_EXIST);
+                        ValidationMessages.R_TRANSACTION_ID_NOT_EXIST
+                );
             }
         }
 
