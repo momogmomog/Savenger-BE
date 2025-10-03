@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface PrepaymentRepository extends JpaRepository<Prepayment, Long>,
         PrepaymentRepositoryFragment {
 
-    @Query("select sum(p.amount) from Prepayment p "
+    @Query("select sum(p.remainingAmount) from Prepayment p "
             + " where p.budgetId = :budgetId "
             + "and p.completed = false ")
     BigDecimal sumPrepaymentAmountByBudgetId(Long budgetId);

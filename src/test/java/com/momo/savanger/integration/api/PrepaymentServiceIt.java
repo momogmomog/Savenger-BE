@@ -171,7 +171,7 @@ public class PrepaymentServiceIt {
 
     @Test
     public void testPrepaymentAmountSumByBudgetId_validPayload_shouldSumAmount() {
-        BigDecimal sum = this.prepaymentService.getPrepaymentAmountSumByBudgetId(1001L);
+        BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(1001L);
 
         assertEquals(BigDecimal.valueOf(200.00), sum.setScale(1, RoundingMode.HALF_DOWN));
     }
@@ -187,14 +187,14 @@ public class PrepaymentServiceIt {
 
         this.prepaymentService.create(createPrepaymentDto);
 
-        BigDecimal sum = this.prepaymentService.getPrepaymentAmountSumByBudgetId(1001L);
+        BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(1001L);
 
         assertEquals(BigDecimal.valueOf(400.00), sum.setScale(1, RoundingMode.HALF_DOWN));
     }
 
     @Test
     public void testPrepaymentAmountSumByBudgetId_withoutPrepaymentsBudget_shouldThrowException() {
-        BigDecimal sum = this.prepaymentService.getPrepaymentAmountSumByBudgetId(1003L);
+        BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(1003L);
 
         assertEquals(BigDecimal.ZERO.setScale(1, RoundingMode.HALF_DOWN),
                 sum.setScale(1, RoundingMode.HALF_DOWN));
@@ -202,7 +202,7 @@ public class PrepaymentServiceIt {
 
     @Test
     public void testPrepaymentAmountSumByBudgetId_invalidId() {
-        BigDecimal sum = this.prepaymentService.getPrepaymentAmountSumByBudgetId(10099L);
+        BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(10099L);
 
         assertEquals(BigDecimal.ZERO.setScale(1, RoundingMode.HALF_DOWN),
                 sum.setScale(1, RoundingMode.HALF_DOWN));

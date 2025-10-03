@@ -59,7 +59,7 @@ public class BudgetStatisticsTest {
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.ZERO);
         when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
         when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(prepaymentService.getPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
+        when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.ZERO);
 
         BudgetStatistics stats = budgetService.getStatistics(budgetId);
@@ -81,7 +81,7 @@ public class BudgetStatisticsTest {
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
         when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
         when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(prepaymentService.getPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
+        when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.ZERO);
 
         BudgetStatistics stats = budgetService.getStatistics(budgetId);
@@ -104,7 +104,7 @@ public class BudgetStatisticsTest {
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.ZERO);
         when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
         when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(prepaymentService.getPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
+        when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.ZERO);
 
         BudgetStatistics stats = budgetService.getStatistics(budgetId);
@@ -126,7 +126,7 @@ public class BudgetStatisticsTest {
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
         when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
         when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(prepaymentService.getPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
+        when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.ZERO);
 
         BudgetStatistics stats = budgetService.getStatistics(budgetId);
@@ -148,7 +148,7 @@ public class BudgetStatisticsTest {
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
         when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
         when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(prepaymentService.getPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
+        when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.valueOf(230));
 
         BudgetStatistics stats = budgetService.getStatistics(budgetId);
@@ -170,7 +170,7 @@ public class BudgetStatisticsTest {
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
         when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
         when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.valueOf(50));
-        when(prepaymentService.getPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
+        when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.valueOf(230));
 
         BudgetStatistics stats = budgetService.getStatistics(budgetId);
@@ -180,8 +180,8 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.valueOf(200), stats.getExpensesAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtLendedAmount());
         assertEquals(BigDecimal.valueOf(50), stats.getDebtReceivedAmount());
-        assertEquals(BigDecimal.valueOf(620), stats.getRealBalance());
-        assertEquals(BigDecimal.valueOf(570), stats.getBalance());
+        assertEquals(BigDecimal.valueOf(570), stats.getRealBalance());
+        assertEquals(BigDecimal.valueOf(520), stats.getBalance());
     }
 
     @Test
@@ -192,7 +192,7 @@ public class BudgetStatisticsTest {
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
         when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.valueOf(100));
         when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(prepaymentService.getPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
+        when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.valueOf(230));
 
         BudgetStatistics stats = budgetService.getStatistics(budgetId);
@@ -210,11 +210,20 @@ public class BudgetStatisticsTest {
     public void testBudgetStatistic_withReceivedAndLendedDebt() {
         Long budgetId = 1L;
 
+        // Balance: 1000, Real Balance: 1000
         when(transactionService.getEarningsAmount(budgetId)).thenReturn(BigDecimal.valueOf(1000));
+
+        // Balance 800, Real Balance 800
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
+
+        // Balance 900, Real Balance 800
         when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.valueOf(100));
+
+        // Balance 850, Real Balance 800
         when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.valueOf(50));
-        when(prepaymentService.getPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
+
+        // Balance 850, Real Balance 570
+        when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.valueOf(230));
 
         BudgetStatistics stats = budgetService.getStatistics(budgetId);
@@ -224,7 +233,7 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.valueOf(200), stats.getExpensesAmount());
         assertEquals(BigDecimal.valueOf(100), stats.getDebtLendedAmount());
         assertEquals(BigDecimal.valueOf(50), stats.getDebtReceivedAmount());
-        assertEquals(BigDecimal.valueOf(520), stats.getRealBalance());
-        assertEquals(BigDecimal.valueOf(570), stats.getBalance());
+        assertEquals(BigDecimal.valueOf(570), stats.getRealBalance());
+        assertEquals(BigDecimal.valueOf(850), stats.getBalance());
     }
 }

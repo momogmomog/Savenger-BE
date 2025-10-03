@@ -63,7 +63,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
     }
 
     @Override
-    public BigDecimal getPrepaymentAmountSumByBudgetId(Long budgetId) {
+    public BigDecimal getRemainingPrepaymentAmountSumByBudgetId(Long budgetId) {
         final BigDecimal sum = this.prepaymentRepository.sumPrepaymentAmountByBudgetId(budgetId);
 
         if (sum == null) {

@@ -169,7 +169,7 @@ public class BudgetServiceImpl implements BudgetService {
         final BigDecimal debtLendedSum = this.transactionService.getDebtLendedAmount(budgetId);
         final BigDecimal debtReceivedSum = this.transactionService.getDebtReceivedAmount(budgetId);
 
-        final BigDecimal prepaymentsAmount = this.prepaymentService.getPrepaymentAmountSumByBudgetId(
+        final BigDecimal prepaymentsAmount = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(
                 budgetId);
 
         statisticDto.setBudget(budget);
@@ -179,15 +179,18 @@ public class BudgetServiceImpl implements BudgetService {
         statisticDto.setDebtLendedAmount(debtLendedSum);
         statisticDto.setDebtReceivedAmount(debtReceivedSum);
 
-        statisticDto.setRealBalance(
-                this.sumRealBalance(budget, earnings, expenses,
-                        prepaymentsAmount, debtLendedSum, debtReceivedSum)
+        statisticDto.setRealBalance(this.sumRealBalance(
+                budget,
+                earnings,
+                expenses,
+                prepaymentsAmount)
         );
 
         statisticDto.setBalance(
                 statisticDto.getRealBalance()
                         .subtract(statisticDto.getDebtReceivedAmount())
                         .add(statisticDto.getDebtLendedAmount())
+                        .add(prepaymentsAmount)
         );
 
         return statisticDto;
@@ -197,14 +200,10 @@ public class BudgetServiceImpl implements BudgetService {
             Budget budget,
             BigDecimal earningsAmount,
             BigDecimal expensesAmount,
-            BigDecimal prepaymentAmount,
-            BigDecimal lendedAmount,
-            BigDecimal receivedAmount) {
+            BigDecimal prepaymentAmount) {
 
         return earningsAmount
                 .add(budget.getBalance())
-                .add(receivedAmount)
-                .subtract(lendedAmount)
                 .subtract(expensesAmount)
                 .subtract(prepaymentAmount);
     }
