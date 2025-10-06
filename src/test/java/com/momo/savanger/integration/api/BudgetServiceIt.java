@@ -47,7 +47,6 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @Sql("classpath:/sql/user-it-data.sql")
 @Sql("classpath:/sql/budget-it-data.sql")
 @Sql("classpath:/sql/budgets_participants-it-data.sql")

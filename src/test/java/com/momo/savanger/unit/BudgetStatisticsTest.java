@@ -159,7 +159,30 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.ZERO, stats.getDebtLendedAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtReceivedAmount());
         assertEquals(BigDecimal.valueOf(570), stats.getRealBalance());
-        assertEquals(BigDecimal.valueOf(570), stats.getBalance());
+        assertEquals(BigDecimal.valueOf(800), stats.getBalance());
+    }
+
+    @Test
+    public void testBudgetStatistic_withPrepaymentAndInitialBalance() {
+        Long budgetId = 1L;
+
+        testBudget.setBalance(BigDecimal.valueOf(1000));
+        when(transactionService.getEarningsAmount(budgetId)).thenReturn(BigDecimal.valueOf(1000));
+        when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
+        when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
+                BigDecimal.valueOf(230));
+
+        BudgetStatistics stats = budgetService.getStatistics(budgetId);
+
+        assertNotNull(stats);
+        assertEquals(BigDecimal.valueOf(1000), stats.getEarningsAmount());
+        assertEquals(BigDecimal.valueOf(200), stats.getExpensesAmount());
+        assertEquals(BigDecimal.ZERO, stats.getDebtLendedAmount());
+        assertEquals(BigDecimal.ZERO, stats.getDebtReceivedAmount());
+        assertEquals(BigDecimal.valueOf(1570), stats.getRealBalance());
+        assertEquals(BigDecimal.valueOf(1800), stats.getBalance());
     }
 
     @Test
@@ -181,7 +204,7 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.ZERO, stats.getDebtLendedAmount());
         assertEquals(BigDecimal.valueOf(50), stats.getDebtReceivedAmount());
         assertEquals(BigDecimal.valueOf(570), stats.getRealBalance());
-        assertEquals(BigDecimal.valueOf(520), stats.getBalance());
+        assertEquals(BigDecimal.valueOf(750), stats.getBalance());
     }
 
     @Test
@@ -202,8 +225,8 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.valueOf(200), stats.getExpensesAmount());
         assertEquals(BigDecimal.valueOf(100), stats.getDebtLendedAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtReceivedAmount());
-        assertEquals(BigDecimal.valueOf(470), stats.getRealBalance());
-        assertEquals(BigDecimal.valueOf(570), stats.getBalance());
+        assertEquals(BigDecimal.valueOf(570), stats.getRealBalance());
+        assertEquals(BigDecimal.valueOf(900), stats.getBalance());
     }
 
     @Test

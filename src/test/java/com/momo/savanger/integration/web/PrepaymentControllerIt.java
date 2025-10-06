@@ -26,7 +26,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@AutoConfigureTestDatabase
 @Sql("classpath:/sql/user-it-data.sql")
 @Sql("classpath:/sql/prepayment/budget-it-data.sql")
 @Sql("classpath:/sql/prepayment/budgets_participants-it-data.sql")
