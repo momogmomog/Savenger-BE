@@ -46,6 +46,7 @@ public class BudgetStatisticTestIt {
     public static BigDecimal BUDGET_ONE_BALANCE = BigDecimal.ZERO;
     public static BigDecimal BUDGET_TWO_BALANCE = BigDecimal.valueOf(100);
     public static BigDecimal BUDGET_THREE_BALANCE = BigDecimal.valueOf(200);
+    private static final BigDecimal ZERO = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN);
 
     @Autowired
     private BudgetService budgetService;
@@ -73,18 +74,30 @@ public class BudgetStatisticTestIt {
         BudgetStatistics budgetStatistics = this.budgetService.getStatistics(1L);
 
         //Test without debts, transactions and prepayments
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                ZERO,
+                toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                ZERO,
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                ZERO,
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+        assertEquals(
+                ZERO,
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+        assertEquals(
+                ZERO,
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+        assertEquals(
+                ZERO,
+                toScale(budgetStatistics.getExpensesAmount()).setScale(2, RoundingMode.HALF_DOWN)
+        );
 
         //Test with received debt
 
@@ -92,10 +105,14 @@ public class BudgetStatisticTestIt {
 
         budgetStatistics = this.budgetService.getStatistics(1L);
 
-        assertEquals(BigDecimal.valueOf(0).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(0)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(30),
+                toScale(budgetStatistics.getRealBalance())
+        );
         assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
                 budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
@@ -474,4 +491,11 @@ public class BudgetStatisticTestIt {
         return this.transactionService.create(transactionDto, 1L);
     }
 
+    private BigDecimal toScale(BigDecimal amount) {
+        return amount.setScale(2, RoundingMode.HALF_DOWN);
+    }
+
+    private BigDecimal toScale(Integer amount) {
+        return BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_DOWN);
+    }
 }

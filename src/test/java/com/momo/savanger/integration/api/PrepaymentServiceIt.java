@@ -112,6 +112,7 @@ public class PrepaymentServiceIt {
         assertEquals(createPrepaymentDto.getPaidUntil(),
                 this.prepaymentRepository.findAll().getFirst().getPaidUntil());
 
+        // TODO: fix transient failure in this assert!
         //Test prepayment id
         assertEquals(1, this.recurringTransactionService.findById(1L).getPrepaymentId());
     }
