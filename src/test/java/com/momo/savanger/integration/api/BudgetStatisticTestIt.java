@@ -46,9 +46,6 @@ public class BudgetStatisticTestIt {
     public static BigDecimal BUDGET_ONE_BALANCE = BigDecimal.ZERO;
     public static BigDecimal BUDGET_TWO_BALANCE = BigDecimal.valueOf(100);
     public static BigDecimal BUDGET_THREE_BALANCE = BigDecimal.valueOf(200);
-    public static Long BUDGET_ONE_ID = 1L;
-    public static Long BUDGET_TWO_ID = 2L;
-    public static Long BUDGET_THREE_ID = 3L;
     private static final BigDecimal ZERO = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN);
 
     @Autowired
@@ -63,22 +60,27 @@ public class BudgetStatisticTestIt {
     @Autowired
     private TransactionService transactionService;
 
+    Long budgetOneId;
+    Long budgetTwoId;
+    Long budgetThreeId;
+
     @BeforeEach
     void setUp() {
         Budget budgetOne = this.createBudget("Chocolate", BUDGET_ONE_BALANCE);
-        Budget budgetTwo = this.createBudget("Sol", BUDGET_TWO_BALANCE);
-        Budget budgetThree = this.createBudget("Knigi", BUDGET_THREE_BALANCE);
+        budgetOneId = budgetOne.getId();
 
-        budgetOne.setId(BUDGET_ONE_ID);
-        budgetTwo.setId(BUDGET_TWO_ID);
-        budgetThree.setId(BUDGET_THREE_ID);
+        Budget budgetTwo = this.createBudget("Sol", BUDGET_TWO_BALANCE);
+        budgetTwoId = budgetTwo.getId();
+
+        Budget budgetThree = this.createBudget("Knigi", BUDGET_THREE_BALANCE);
+        budgetThreeId = budgetThree.getId();
     }
 
     //TODO: Add tests for prepayment transaction when rRule is ready
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testBudgetStatistic_firstBudgetWithBalanceZero() {
-        BudgetStatistics budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+        BudgetStatistics budgetStatistics = this.budgetService.getStatistics(budgetOneId);
 
         //Test without debts, transactions and prepayments
         assertEquals(
@@ -108,9 +110,9 @@ public class BudgetStatisticTestIt {
 
         //Test with received debt
 
-        Debt debtReceived = this.createDebt(BUDGET_THREE_ID, BUDGET_ONE_ID, BigDecimal.valueOf(30));
+        Debt debtReceived = this.createDebt(budgetThreeId, budgetOneId, BigDecimal.valueOf(30));
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetOneId);
 
         assertEquals(
                 toScale(0)
@@ -142,9 +144,9 @@ public class BudgetStatisticTestIt {
 
         //Test with received and lend debt
 
-        Debt debtLend = this.createDebt(BUDGET_ONE_ID, BUDGET_TWO_ID, BigDecimal.valueOf(20));
+        Debt debtLend = this.createDebt(budgetOneId, budgetTwoId, BigDecimal.valueOf(20));
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetOneId);
 
         assertEquals(
                 toScale(0)
@@ -174,11 +176,11 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
-        //Test with 2 received and 1 lend debt
+        //Test with 2 received and 1 lent debt
 
-        debtReceived = this.createDebt(BUDGET_THREE_ID, BUDGET_ONE_ID, BigDecimal.valueOf(50));
+        debtReceived = this.createDebt(budgetThreeId, budgetOneId, BigDecimal.valueOf(50));
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetOneId);
 
         assertEquals(
                 toScale(0)
@@ -207,12 +209,12 @@ public class BudgetStatisticTestIt {
                 toScale(20),
                 toScale(budgetStatistics.getExpensesAmount())
         );
-        //Test with 2 received and 1 lend debt and expense and earning transaction
+        //Test with 2 received and 1 lent debt and expense and earning transaction
 
-        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10), BUDGET_ONE_ID);
-        this.createTransaction(TransactionType.INCOME, BigDecimal.valueOf(500), BUDGET_ONE_ID);
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10), budgetOneId);
+        this.createTransaction(TransactionType.INCOME, BigDecimal.valueOf(500), budgetOneId);
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetOneId);
 
         assertEquals(
                 toScale(490)
@@ -242,11 +244,11 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
-        //Test with 2 received and 1 lend debt, 1 expense and 1 earning transaction, 1 prepayment
+        //Test with 2 received and 1 lent debt, 1 expense and 1 earning transaction, 1 prepayment
 
-        this.createPrepayment(BigDecimal.valueOf(25), "netinet", BUDGET_ONE_ID);
+        this.createPrepayment(BigDecimal.valueOf(25), "netinet", budgetOneId);
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetOneId);
 
         assertEquals(
                 toScale(490)
@@ -278,7 +280,7 @@ public class BudgetStatisticTestIt {
 
         //Test pay debt
         this.payDebt(debtReceived.getId(), BigDecimal.valueOf(20));
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetOneId);
 
         assertEquals(
                 toScale(490)
@@ -308,11 +310,11 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
-        //Test with 2 received and 1 lend debt, 1 expense and 1 earning transaction, 1 income prepayment
+        //Test with 2 received and 1 lent debt, 1 expense and 1 earning transaction, 1 income prepayment
         // and one expense prepayment
 
-        this.createPrepayment(BigDecimal.valueOf(30), "parno", BUDGET_ONE_ID);
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+        this.createPrepayment(BigDecimal.valueOf(30), "parno", budgetOneId);
+        budgetStatistics = this.budgetService.getStatistics(budgetOneId);
 
         assertEquals(
                 toScale(490)
@@ -345,7 +347,7 @@ public class BudgetStatisticTestIt {
         //Receiver pay to you
 
         this.payDebt(debtLend.getId(), BigDecimal.TEN);
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetOneId);
 
         assertEquals(
                 toScale(490)
@@ -375,11 +377,16 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
-        // Test transaction with real number
+        // Test transaction with real numbers
 
-        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10.50), BUDGET_ONE_ID);
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(5.79), budgetOneId);
+        this.createTransaction(
+                TransactionType.EXPENSE,
+                BigDecimal.valueOf(4.71000123),
+                budgetOneId
+        );
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetOneId);
 
         assertEquals(
                 toScale(479.50)
@@ -411,9 +418,9 @@ public class BudgetStatisticTestIt {
 
         //Test what if realBalance is 0
 
-        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(474.50), BUDGET_ONE_ID);
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(474.50), budgetOneId);
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetOneId);
 
         assertEquals(
                 toScale(5)
@@ -445,9 +452,9 @@ public class BudgetStatisticTestIt {
 
         //Real balance is 0, now create expense transaction
 
-        this.createTransaction(TransactionType.EXPENSE, BigDecimal.TEN, BUDGET_ONE_ID);
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.TEN, budgetOneId);
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetOneId);
 
         assertEquals(
                 toScale(-5)
@@ -481,7 +488,7 @@ public class BudgetStatisticTestIt {
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testBudgetStatistic_secondBudgetWithBalanceOneHundred() {
-        BudgetStatistics budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+        BudgetStatistics budgetStatistics = this.budgetService.getStatistics(budgetTwoId);
 
         //Test without debts, transactions and prepayments
 
@@ -512,9 +519,9 @@ public class BudgetStatisticTestIt {
 
         //Test with received debt
 
-        Debt debtReceived = this.createDebt(BUDGET_THREE_ID, BUDGET_TWO_ID, BigDecimal.valueOf(30));
+        Debt debtReceived = this.createDebt(budgetThreeId, budgetTwoId, BigDecimal.valueOf(30));
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetTwoId);
 
         assertEquals(
                 toScale(100),
@@ -541,11 +548,11 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
-        //Test with received and lend debt
+        //Test with received and lent debt
 
-        Debt debtLend = this.createDebt(BUDGET_TWO_ID, BUDGET_ONE_ID, BigDecimal.valueOf(20));
+        Debt debtLend = this.createDebt(budgetTwoId, budgetOneId, BigDecimal.valueOf(20));
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetTwoId);
 
         assertEquals(
                 toScale(100),
@@ -572,11 +579,11 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
-        //Test with 2 received and 1 lend debt
+        //Test with 2 received and 1 lent debt
 
-        debtReceived = this.createDebt(BUDGET_THREE_ID, BUDGET_TWO_ID, BigDecimal.valueOf(50));
+        debtReceived = this.createDebt(budgetThreeId, budgetTwoId, BigDecimal.valueOf(50));
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetTwoId);
 
         assertEquals(
                 toScale(100),
@@ -603,12 +610,12 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
-        //Test with 2 received and 1 lend debt and expense and earning transaction
+        //Test with 2 received and 1 lent debt and expense and earning transaction
 
-        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10), BUDGET_TWO_ID);
-        this.createTransaction(TransactionType.INCOME, BigDecimal.valueOf(500), BUDGET_TWO_ID);
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10), budgetTwoId);
+        this.createTransaction(TransactionType.INCOME, BigDecimal.valueOf(500), budgetTwoId);
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetTwoId);
 
         assertEquals(
                 toScale(590),
@@ -637,9 +644,9 @@ public class BudgetStatisticTestIt {
 
         //Test with 2 received and 1 lend debt, 1 expense and 1 earning transaction, 1 prepayment
 
-        this.createPrepayment(BigDecimal.valueOf(25), "netinet", BUDGET_TWO_ID);
+        this.createPrepayment(BigDecimal.valueOf(25), "netinet", budgetTwoId);
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetTwoId);
 
         assertEquals(
                 toScale(590),
@@ -668,7 +675,7 @@ public class BudgetStatisticTestIt {
 
         //Test pay debt
         this.payDebt(debtReceived.getId(), BigDecimal.valueOf(20));
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetTwoId);
 
         assertEquals(
                 toScale(590),
@@ -698,8 +705,8 @@ public class BudgetStatisticTestIt {
         //Test with 2 received and 1 lend debt, 1 expense and 1 earning transaction, 1 income prepayment
         // and one expense prepayment
 
-        this.createPrepayment(BigDecimal.valueOf(30), "parno", BUDGET_TWO_ID);
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+        this.createPrepayment(BigDecimal.valueOf(30), "parno", budgetTwoId);
+        budgetStatistics = this.budgetService.getStatistics(budgetTwoId);
 
         assertEquals(
                 toScale(590),
@@ -729,7 +736,7 @@ public class BudgetStatisticTestIt {
         //Receiver pay to you
 
         this.payDebt(debtLend.getId(), BigDecimal.TEN);
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetTwoId);
 
         assertEquals(
                 toScale(590),
@@ -758,9 +765,9 @@ public class BudgetStatisticTestIt {
 
         // Test transaction with real number
 
-        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10.50), BUDGET_TWO_ID);
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10.50), budgetTwoId);
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetTwoId);
 
         assertEquals(
                 toScale(579.50)
@@ -792,9 +799,9 @@ public class BudgetStatisticTestIt {
 
         //Test what if realBalance is 0
 
-        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(574.50), BUDGET_TWO_ID);
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(574.50), budgetTwoId);
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetTwoId);
 
         assertEquals(
                 toScale(5)
@@ -826,9 +833,9 @@ public class BudgetStatisticTestIt {
 
         //Real balance is 0, now create expense transaction
 
-        this.createTransaction(TransactionType.EXPENSE, BigDecimal.TEN, BUDGET_TWO_ID);
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.TEN, budgetTwoId);
 
-        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+        budgetStatistics = this.budgetService.getStatistics(budgetTwoId);
 
         assertEquals(
                 toScale(-5)
