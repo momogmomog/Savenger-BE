@@ -46,6 +46,9 @@ public class BudgetStatisticTestIt {
     public static BigDecimal BUDGET_ONE_BALANCE = BigDecimal.ZERO;
     public static BigDecimal BUDGET_TWO_BALANCE = BigDecimal.valueOf(100);
     public static BigDecimal BUDGET_THREE_BALANCE = BigDecimal.valueOf(200);
+    public static Long BUDGET_ONE_ID = 1L;
+    public static Long BUDGET_TWO_ID = 2L;
+    public static Long BUDGET_THREE_ID = 3L;
     private static final BigDecimal ZERO = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN);
 
     @Autowired
@@ -62,16 +65,20 @@ public class BudgetStatisticTestIt {
 
     @BeforeEach
     void setUp() {
-        this.createBudget("Chocolate", BUDGET_ONE_BALANCE);
-        this.createBudget("Sol", BUDGET_TWO_BALANCE);
-        this.createBudget("Knigi", BUDGET_THREE_BALANCE);
+        Budget budgetOne = this.createBudget("Chocolate", BUDGET_ONE_BALANCE);
+        Budget budgetTwo = this.createBudget("Sol", BUDGET_TWO_BALANCE);
+        Budget budgetThree = this.createBudget("Knigi", BUDGET_THREE_BALANCE);
+
+        budgetOne.setId(BUDGET_ONE_ID);
+        budgetTwo.setId(BUDGET_TWO_ID);
+        budgetThree.setId(BUDGET_THREE_ID);
     }
 
     //TODO: Add tests for prepayment transaction when rRule is ready
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testBudgetStatistic_firstBudgetWithBalanceZero() {
-        BudgetStatistics budgetStatistics = this.budgetService.getStatistics(1L);
+        BudgetStatistics budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
 
         //Test without debts, transactions and prepayments
         assertEquals(
@@ -101,9 +108,9 @@ public class BudgetStatisticTestIt {
 
         //Test with received debt
 
-        Debt debtReceived = this.createDebt(3L, 1L, BigDecimal.valueOf(30));
+        Debt debtReceived = this.createDebt(BUDGET_THREE_ID, BUDGET_ONE_ID, BigDecimal.valueOf(30));
 
-        budgetStatistics = this.budgetService.getStatistics(1L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
 
         assertEquals(
                 toScale(0)
@@ -113,315 +120,743 @@ public class BudgetStatisticTestIt {
                 toScale(30),
                 toScale(budgetStatistics.getRealBalance())
         );
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(0),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+
+        assertEquals(
+                toScale(30),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(30),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(0),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Test with received and lend debt
 
-        Debt debtLend = this.createDebt(1L, 2L, BigDecimal.valueOf(20));
+        Debt debtLend = this.createDebt(BUDGET_ONE_ID, BUDGET_TWO_ID, BigDecimal.valueOf(20));
 
-        budgetStatistics = this.budgetService.getStatistics(1L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
 
-        assertEquals(BigDecimal.valueOf(0).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(10).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(0)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(10),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(20),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+
+        assertEquals(
+                toScale(30),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(30),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(20),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Test with 2 received and 1 lend debt
 
-        debtReceived = this.createDebt(3L, 1L, BigDecimal.valueOf(50));
+        debtReceived = this.createDebt(BUDGET_THREE_ID, BUDGET_ONE_ID, BigDecimal.valueOf(50));
 
-        budgetStatistics = this.budgetService.getStatistics(1L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
 
-        assertEquals(BigDecimal.valueOf(0).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(60).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(80).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(80).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(0)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(60),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(20),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
 
+        assertEquals(
+                toScale(80),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(80),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(20),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
         //Test with 2 received and 1 lend debt and expense and earning transaction
 
-        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10), 1L);
-        this.createTransaction(TransactionType.INCOME, BigDecimal.valueOf(500), 1L);
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10), BUDGET_ONE_ID);
+        this.createTransaction(TransactionType.INCOME, BigDecimal.valueOf(500), BUDGET_ONE_ID);
 
-        budgetStatistics = this.budgetService.getStatistics(1L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
 
-        assertEquals(BigDecimal.valueOf(490).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(550).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(80).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(580).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(490)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(550),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(20),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+
+        assertEquals(
+                toScale(80),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(580),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(30),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Test with 2 received and 1 lend debt, 1 expense and 1 earning transaction, 1 prepayment
 
-        this.createPrepayment(BigDecimal.valueOf(25), "netinet", 1L);
+        this.createPrepayment(BigDecimal.valueOf(25), "netinet", BUDGET_ONE_ID);
 
-        budgetStatistics = this.budgetService.getStatistics(1L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
 
-        assertEquals(BigDecimal.valueOf(490).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(525).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(80).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(580).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(490)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(525),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(20),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+
+        assertEquals(
+                toScale(80),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(580),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(30),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Test pay debt
         this.payDebt(debtReceived.getId(), BigDecimal.valueOf(20));
-        budgetStatistics = this.budgetService.getStatistics(1L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
 
-        assertEquals(BigDecimal.valueOf(490).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(505).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(40).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(80).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(580).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(50).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(490)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(505),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(40),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+
+        assertEquals(
+                toScale(80),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(580),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(50),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Test with 2 received and 1 lend debt, 1 expense and 1 earning transaction, 1 income prepayment
         // and one expense prepayment
 
-        this.createPrepayment(BigDecimal.valueOf(30), "parno", 1L);
-        budgetStatistics = this.budgetService.getStatistics(1L);
+        this.createPrepayment(BigDecimal.valueOf(30), "parno", BUDGET_ONE_ID);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
 
-        assertEquals(BigDecimal.valueOf(490).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(475).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(40).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(80).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(580).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(50).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(490)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(475),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(40),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+
+        assertEquals(
+                toScale(80),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(580),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(50),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Receiver pay to you
 
         this.payDebt(debtLend.getId(), BigDecimal.TEN);
-        budgetStatistics = this.budgetService.getStatistics(1L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
 
-        assertEquals(BigDecimal.valueOf(490).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(485).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(40).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(90).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(590).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(50).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(490)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(485),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(40),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+
+        assertEquals(
+                toScale(90),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(590),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(50),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
+
+        // Test transaction with real number
+
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10.50), BUDGET_ONE_ID);
+
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+
+        assertEquals(
+                toScale(479.50)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(474.50),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(40),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+
+        assertEquals(
+                toScale(90),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(590),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(60.50),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
+
+        //Test what if realBalance is 0
+
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(474.50), BUDGET_ONE_ID);
+
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+
+        assertEquals(
+                toScale(5)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(0),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(40),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+
+        assertEquals(
+                toScale(90),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(590),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(535),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
+
+        //Real balance is 0, now create expense transaction
+
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.TEN, BUDGET_ONE_ID);
+
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_ONE_ID);
+
+        assertEquals(
+                toScale(-5)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(-10),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(40),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+
+        assertEquals(
+                toScale(90),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(590),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(545),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
     }
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testBudgetStatistic_secondBudgetWithBalanceOneHundred() {
-        BudgetStatistics budgetStatistics = this.budgetService.getStatistics(2L);
+        BudgetStatistics budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
 
         //Test without debts, transactions and prepayments
-        assertEquals(BigDecimal.valueOf(100).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(100).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+
+        assertEquals(
+                toScale(100),
+                toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(100),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(0),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+        assertEquals(
+                toScale(0),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+        assertEquals(
+                toScale(0),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+        assertEquals(
+                toScale(0),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Test with received debt
 
-        Debt debtReceived = this.createDebt(3L, 2L, BigDecimal.valueOf(30));
+        Debt debtReceived = this.createDebt(BUDGET_THREE_ID, BUDGET_TWO_ID, BigDecimal.valueOf(30));
 
-        budgetStatistics = this.budgetService.getStatistics(2L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
 
-        assertEquals(BigDecimal.valueOf(100).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(130).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(100),
+                toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(130),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(0),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+        assertEquals(
+                toScale(30),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+        assertEquals(
+                toScale(30),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+        assertEquals(
+                toScale(0),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Test with received and lend debt
 
-        Debt debtLend = this.createDebt(2L, 1L, BigDecimal.valueOf(20));
+        Debt debtLend = this.createDebt(BUDGET_TWO_ID, BUDGET_ONE_ID, BigDecimal.valueOf(20));
 
-        budgetStatistics = this.budgetService.getStatistics(2L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
 
-        assertEquals(BigDecimal.valueOf(100).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(110).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(100),
+                toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(110),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(20),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+        assertEquals(
+                toScale(30),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+        assertEquals(
+                toScale(30),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+        assertEquals(
+                toScale(20),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Test with 2 received and 1 lend debt
 
-        debtReceived = this.createDebt(3L, 2L, BigDecimal.valueOf(50));
+        debtReceived = this.createDebt(BUDGET_THREE_ID, BUDGET_TWO_ID, BigDecimal.valueOf(50));
 
-        budgetStatistics = this.budgetService.getStatistics(2L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
 
-        assertEquals(BigDecimal.valueOf(100).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(160).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(80).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(80).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(100),
+                toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(160),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(20),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+        assertEquals(
+                toScale(80),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+        assertEquals(
+                toScale(80),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+        assertEquals(
+                toScale(20),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Test with 2 received and 1 lend debt and expense and earning transaction
 
-        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10), 2L);
-        this.createTransaction(TransactionType.INCOME, BigDecimal.valueOf(500), 2L);
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10), BUDGET_TWO_ID);
+        this.createTransaction(TransactionType.INCOME, BigDecimal.valueOf(500), BUDGET_TWO_ID);
 
-        budgetStatistics = this.budgetService.getStatistics(2L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
 
-        assertEquals(BigDecimal.valueOf(590).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(650).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(80).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(580).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(590),
+                toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(650),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(20),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+        assertEquals(
+                toScale(80),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+        assertEquals(
+                toScale(580),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+        assertEquals(
+                toScale(30),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Test with 2 received and 1 lend debt, 1 expense and 1 earning transaction, 1 prepayment
 
-        this.createPrepayment(BigDecimal.valueOf(25), "netinet", 2L);
+        this.createPrepayment(BigDecimal.valueOf(25), "netinet", BUDGET_TWO_ID);
 
-        budgetStatistics = this.budgetService.getStatistics(2L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
 
-        assertEquals(BigDecimal.valueOf(590).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(625).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(80).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(580).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(590),
+                toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(625),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(20),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+        assertEquals(
+                toScale(80),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+        assertEquals(
+                toScale(580),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+        assertEquals(
+                toScale(30),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Test pay debt
         this.payDebt(debtReceived.getId(), BigDecimal.valueOf(20));
-        budgetStatistics = this.budgetService.getStatistics(2L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
 
-        assertEquals(BigDecimal.valueOf(590).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(605).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(40).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(80).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(580).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(50).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(590),
+                toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(605),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(40),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+        assertEquals(
+                toScale(80),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+        assertEquals(
+                toScale(580),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+        assertEquals(
+                toScale(50),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Test with 2 received and 1 lend debt, 1 expense and 1 earning transaction, 1 income prepayment
         // and one expense prepayment
 
-        this.createPrepayment(BigDecimal.valueOf(30), "parno", 2L);
-        budgetStatistics = this.budgetService.getStatistics(2L);
+        this.createPrepayment(BigDecimal.valueOf(30), "parno", BUDGET_TWO_ID);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
 
-        assertEquals(BigDecimal.valueOf(590).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(575).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(40).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(80).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(580).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(50).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(590),
+                toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(575),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(40),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+        assertEquals(
+                toScale(80),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+        assertEquals(
+                toScale(580),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+        assertEquals(
+                toScale(50),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
 
         //Receiver pay to you
 
         this.payDebt(debtLend.getId(), BigDecimal.TEN);
-        budgetStatistics = this.budgetService.getStatistics(2L);
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
 
-        assertEquals(BigDecimal.valueOf(590).setScale(2, RoundingMode.HALF_DOWN)
-                , budgetStatistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(585).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(40).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtLendedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(90).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getDebtReceivedAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(590).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(50).setScale(2, RoundingMode.HALF_DOWN),
-                budgetStatistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(
+                toScale(590),
+                toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(585),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(40),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+        assertEquals(
+                toScale(90),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+        assertEquals(
+                toScale(590),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+        assertEquals(
+                toScale(50),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
+
+        // Test transaction with real number
+
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10.50), BUDGET_TWO_ID);
+
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+
+        assertEquals(
+                toScale(579.50)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(574.50),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(40),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+
+        assertEquals(
+                toScale(90),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(590),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(60.50),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
+
+        //Test what if realBalance is 0
+
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(574.50), BUDGET_TWO_ID);
+
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+
+        assertEquals(
+                toScale(5)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(0),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(40),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+
+        assertEquals(
+                toScale(90),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(590),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(635),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
+
+        //Real balance is 0, now create expense transaction
+
+        this.createTransaction(TransactionType.EXPENSE, BigDecimal.TEN, BUDGET_TWO_ID);
+
+        budgetStatistics = this.budgetService.getStatistics(BUDGET_TWO_ID);
+
+        assertEquals(
+                toScale(-5)
+                , toScale(budgetStatistics.getBalance())
+        );
+        assertEquals(
+                toScale(-10),
+                toScale(budgetStatistics.getRealBalance())
+        );
+        assertEquals(
+                toScale(40),
+                toScale(budgetStatistics.getDebtLendedAmount())
+        );
+
+        assertEquals(
+                toScale(90),
+                toScale(budgetStatistics.getDebtReceivedAmount())
+        );
+
+        assertEquals(
+                toScale(590),
+                toScale(budgetStatistics.getEarningsAmount())
+        );
+
+        assertEquals(
+                toScale(645),
+                toScale(budgetStatistics.getExpensesAmount())
+        );
     }
 
     private void payDebt(Long debtId, BigDecimal amount) {
@@ -493,6 +928,10 @@ public class BudgetStatisticTestIt {
 
     private BigDecimal toScale(BigDecimal amount) {
         return amount.setScale(2, RoundingMode.HALF_DOWN);
+    }
+
+    private BigDecimal toScale(Double amount) {
+        return BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_DOWN);
     }
 
     private BigDecimal toScale(Integer amount) {
