@@ -16,9 +16,12 @@ set tags.tag_name = name
 where 1 = 1;
 
 alter table budgets
-    drop column name;
+drop
+column name;
 alter table categories
-    drop column name;
+drop
+column name;
 alter table tags
-    drop column name;
+drop
+column name;
 

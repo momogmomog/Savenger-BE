@@ -8,6 +8,6 @@ public interface PrepaymentService {
 
     Prepayment create(CreatePrepaymentDto dto);
 
-    BigDecimal getPrepaymentAmountSumByBudgetId(Long id);
+    BigDecimal getRemainingPrepaymentAmountSumByBudgetId(Long id);
 
 }
