@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.momo.savanger.api.prepayment.CreatePrepaymentDto;
 import com.momo.savanger.api.prepayment.Prepayment;
@@ -21,7 +22,6 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -93,7 +93,8 @@ public class PrepaymentServiceIt {
         createPrepaymentDto.setPaidUntil(LocalDateTime.now().plusMonths(6));
         createPrepaymentDto.setRecurringTransaction(createRecurringTransactionDto);
 
-        this.prepaymentService.create(createPrepaymentDto);
+        // Act
+        var preparymentCreated = this.prepaymentService.create(createPrepaymentDto);
 
         assertEquals(3, this.prepaymentRepository.findAll().size());
 
@@ -112,9 +113,12 @@ public class PrepaymentServiceIt {
         assertEquals(createPrepaymentDto.getPaidUntil(),
                 this.prepaymentRepository.findAll().getFirst().getPaidUntil());
 
-        // TODO: fix transient failure in this assert!
-        //Test prepayment id
-        assertEquals(1, this.recurringTransactionService.findById(1L).getPrepaymentId());
+        var recurringTransaction = this.recurringTransactionRepository.findAll()
+                .stream()
+                .filter(rt -> rt.getPrepaymentId().equals(preparymentCreated.getId()))
+                .findFirst();
+
+        assertTrue(recurringTransaction.isPresent());
     }
 
     @Test
