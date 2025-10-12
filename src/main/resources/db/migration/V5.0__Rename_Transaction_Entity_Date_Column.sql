@@ -6,4 +6,5 @@ set transactions.date_created = date
 where 1 = 1;
 
 alter table transactions
-    drop column date;
+drop
+column date;

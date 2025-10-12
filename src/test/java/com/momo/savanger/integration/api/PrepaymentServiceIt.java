@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.momo.savanger.api.prepayment.CreatePrepaymentDto;
 import com.momo.savanger.api.prepayment.Prepayment;
@@ -21,7 +22,6 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@AutoConfigureTestDatabase
 @Sql("classpath:/sql/user-it-data.sql")
 @Sql("classpath:/sql/prepayment/budget-it-data.sql")
 @Sql("classpath:/sql/prepayment/budgets_participants-it-data.sql")
@@ -94,7 +93,8 @@ public class PrepaymentServiceIt {
         createPrepaymentDto.setPaidUntil(LocalDateTime.now().plusMonths(6));
         createPrepaymentDto.setRecurringTransaction(createRecurringTransactionDto);
 
-        this.prepaymentService.create(createPrepaymentDto);
+        // Act
+        var preparymentCreated = this.prepaymentService.create(createPrepaymentDto);
 
         assertEquals(3, this.prepaymentRepository.findAll().size());
 
@@ -113,8 +113,12 @@ public class PrepaymentServiceIt {
         assertEquals(createPrepaymentDto.getPaidUntil(),
                 this.prepaymentRepository.findAll().getFirst().getPaidUntil());
 
-        //Test prepayment id
-        assertEquals(1, this.recurringTransactionService.findById(1L).getPrepaymentId());
+        var recurringTransaction = this.recurringTransactionRepository.findAll()
+                .stream()
+                .filter(rt -> rt.getPrepaymentId().equals(preparymentCreated.getId()))
+                .findFirst();
+
+        assertTrue(recurringTransaction.isPresent());
     }
 
     @Test
@@ -171,14 +175,30 @@ public class PrepaymentServiceIt {
 
     @Test
     public void testPrepaymentAmountSumByBudgetId_validPayload_shouldSumAmount() {
-        BigDecimal sum = this.prepaymentService.getPrepaymentAmountSumByBudgetId(1001L);
+        BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(1001L);
 
         assertEquals(BigDecimal.valueOf(200.00), sum.setScale(1, RoundingMode.HALF_DOWN));
     }
 
     @Test
+    public void testPrepaymentAmountSumByBudgetId_withTwoPrepayments_shouldSumAmount() {
+        CreatePrepaymentDto createPrepaymentDto = new CreatePrepaymentDto();
+        createPrepaymentDto.setAmount(BigDecimal.valueOf(200));
+        createPrepaymentDto.setBudgetId(1001L);
+        createPrepaymentDto.setName("NETI");
+        createPrepaymentDto.setPaidUntil(LocalDateTime.now().plusMonths(6));
+        createPrepaymentDto.setRecurringTransactionId(1001L);
+
+        this.prepaymentService.create(createPrepaymentDto);
+
+        BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(1001L);
+
+        assertEquals(BigDecimal.valueOf(400.00), sum.setScale(1, RoundingMode.HALF_DOWN));
+    }
+
+    @Test
     public void testPrepaymentAmountSumByBudgetId_withoutPrepaymentsBudget_shouldThrowException() {
-        BigDecimal sum = this.prepaymentService.getPrepaymentAmountSumByBudgetId(1003L);
+        BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(1003L);
 
         assertEquals(BigDecimal.ZERO.setScale(1, RoundingMode.HALF_DOWN),
                 sum.setScale(1, RoundingMode.HALF_DOWN));
@@ -186,7 +206,7 @@ public class PrepaymentServiceIt {
 
     @Test
     public void testPrepaymentAmountSumByBudgetId_invalidId() {
-        BigDecimal sum = this.prepaymentService.getPrepaymentAmountSumByBudgetId(10099L);
+        BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(10099L);
 
         assertEquals(BigDecimal.ZERO.setScale(1, RoundingMode.HALF_DOWN),
                 sum.setScale(1, RoundingMode.HALF_DOWN));
