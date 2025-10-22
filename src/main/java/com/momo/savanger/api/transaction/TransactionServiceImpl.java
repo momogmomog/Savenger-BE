@@ -5,6 +5,7 @@ import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
+import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
 import com.momo.savanger.error.ApiErrorCode;
@@ -60,17 +61,26 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
+    public Transaction createPrepaymentTransaction(RecurringTransaction recurringTransaction, Long userId) {
+        final CreateTransactionDto transactionDto = this.transactionMapper.toCreateTransactionDto(
+                recurringTransaction);
+        transactionDto.setDateCreated(null);
+
+        return this.create(transactionDto, null);
+    }
+
+    @Override
+    @Transactional
     public void createDebtTransactions(Debt debt, BigDecimal amount) {
-        final Long userId = SecurityUtils.getCurrentUser().getId();
 
         this.create(
                 this.createTransactionDto(amount, debt.getId(), TransactionType.EXPENSE,
-                        debt.getLenderBudgetId()), userId
+                        debt.getLenderBudgetId()), null
         );
 
         this.create(
                 this.createTransactionDto(amount, debt.getId(), TransactionType.INCOME,
-                        debt.getReceiverBudgetId()), userId
+                        debt.getReceiverBudgetId()), null
         );
     }
 

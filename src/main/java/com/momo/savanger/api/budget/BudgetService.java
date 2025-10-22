@@ -8,6 +8,7 @@ import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.user.User;
 import java.util.Optional;
+import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.springframework.data.domain.Page;
 
 public interface BudgetService {
@@ -18,7 +19,8 @@ public interface BudgetService {
 
     Optional<Budget> findIfValid(Long id);
 
-    Budget create(CreateBudgetDto createBudgetDto, Long ownerId);
+    Budget create(CreateBudgetDto createBudgetDto, Long ownerId)
+            throws InvalidRecurrenceRuleException;
 
     boolean isBudgetValid(Long id);
 
@@ -30,7 +32,8 @@ public interface BudgetService {
 
     Page<Budget> searchBudget(BudgetSearchQuery query, User user);
 
-    void updateBudgetAfterRevision(Long id, Revision revision);
+    void updateBudgetAfterRevision(Long id, Revision revision)
+            throws InvalidRecurrenceRuleException;
 
     BudgetStatistics getStatistics(Long budgetId);
 

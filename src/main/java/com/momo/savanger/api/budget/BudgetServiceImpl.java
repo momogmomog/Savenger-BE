@@ -8,6 +8,7 @@ import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.prepayment.PrepaymentService;
+import com.momo.savanger.api.recurringRule.RecurringRuleService;
 import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.user.User;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,8 @@ public class BudgetServiceImpl implements BudgetService {
     private final TransactionService transactionService;
 
     private final PrepaymentService prepaymentService;
+
+    private final RecurringRuleService recurringRuleService;
 
     @Override
     public Budget findById(Long id) {
@@ -66,11 +70,17 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public Budget create(CreateBudgetDto createBudgetDto, Long ownerId) {
+    public Budget create(CreateBudgetDto createBudgetDto, Long ownerId)
+            throws InvalidRecurrenceRuleException {
 
         final Budget budget = this.budgetMapper.toBudget(createBudgetDto);
 
         budget.setOwnerId(ownerId);
+
+        budget.setDueDate(
+                this.recurringRuleService.convertRecurringRuleToDate(createBudgetDto.getRecurringRule(),
+                createBudgetDto.getDateStarted())
+        );
 
         if (budget.getBudgetCap() == null) {
             budget.setBudgetCap(BigDecimal.ZERO);
@@ -146,12 +156,15 @@ public class BudgetServiceImpl implements BudgetService {
 
     @Override
     @Transactional
-    public void updateBudgetAfterRevision(Long id, Revision revision) {
+    public void updateBudgetAfterRevision(Long id, Revision revision)
+            throws InvalidRecurrenceRuleException {
         final Budget budget = this.findById(id);
 
         budget.setBalance(revision.getBalance());
         budget.setDateStarted(revision.getRevisionDate());
-        //TODO: set due date with RRule calculation
+        budget.setDueDate(this.recurringRuleService.convertRecurringRuleToDate(
+                budget.getRecurringRule(), budget.getDateStarted())
+        );
 
         this.budgetRepository.save(budget);
     }

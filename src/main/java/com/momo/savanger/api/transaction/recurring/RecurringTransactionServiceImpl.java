@@ -1,5 +1,6 @@
 package com.momo.savanger.api.transaction.recurring;
 
+import com.momo.savanger.api.recurringRule.RecurringRuleService;
 import com.momo.savanger.constants.EntityGraphs;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,18 +18,25 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecurringTransactionServiceImpl implements RecurringTransactionService {
 
     private final RecurringTransactionRepository recurringTransactionRepository;
+
     private final RecurringTransactionMapper recurringTransactionMapper;
+
+    private final RecurringRuleService recurringRuleService;
 
     @Override
     @Transactional
-    public RecurringTransaction create(CreateRecurringTransactionDto dto) {
+    public RecurringTransaction create(CreateRecurringTransactionDto dto)
+            throws InvalidRecurrenceRuleException {
         final RecurringTransaction recurringTransaction = this.recurringTransactionMapper.ToRecurringTransaction(
                 dto);
 
         recurringTransaction.setCompleted(false);
-
-        //While implementing RRule
-        recurringTransaction.setNextDate(LocalDateTime.now());
+        recurringTransaction.setNextDate(
+                this.recurringRuleService.convertRecurringRuleToDate(
+                        dto.getRecurringRule(),
+                        LocalDateTime.now()
+                )
+        );
 
         this.recurringTransactionRepository.saveAndFlush(recurringTransaction);
 

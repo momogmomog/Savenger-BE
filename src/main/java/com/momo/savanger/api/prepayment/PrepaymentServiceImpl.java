@@ -6,6 +6,7 @@ import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
+import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
 
     @Override
     @Transactional
-    public Prepayment create(CreatePrepaymentDto dto) {
+    public Prepayment create(CreatePrepaymentDto dto) throws InvalidRecurrenceRuleException {
         final Prepayment prepayment = this.prepaymentMapper.toPrepayment(dto);
 
         prepayment.setCompleted(false);

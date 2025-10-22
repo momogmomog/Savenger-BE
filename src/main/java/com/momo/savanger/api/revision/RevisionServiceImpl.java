@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +34,7 @@ public class RevisionServiceImpl implements RevisionService {
 
     @Override
     @Transactional
-    public Revision create(CreateRevisionDto dto) {
+    public Revision create(CreateRevisionDto dto) throws InvalidRecurrenceRuleException {
 
         final Revision revision = this.revisionMapper.toRevision(dto);
 

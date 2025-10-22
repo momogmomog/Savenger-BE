@@ -4,6 +4,7 @@ import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
+import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.user.User;
 import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,8 @@ public interface TransactionService {
     Transaction findById(Long id);
 
     Transaction create(CreateTransactionDto dto, Long userId);
+
+    Transaction createPrepaymentTransaction(RecurringTransaction recurringTransaction, Long userId);
 
     Page<Transaction> searchTransactions(TransactionSearchQuery query, User user);
 
