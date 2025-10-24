@@ -17,4 +17,5 @@ public class Endpoints {
     public static final String DEBTS = "/debts";
     public static final String PAY_DEBT = "/debts/{id}/payDebt";
     public static final String PREPAYMENTS = "/prepayments";
+    public static final String PAY_PREPAYMENT = "/prepayments/{id}/payPrepayment";
 }

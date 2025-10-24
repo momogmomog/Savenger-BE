@@ -35,7 +35,8 @@ public class RecurringRuleServiceImpl implements RecurringRuleService {
 
             newDate = occurrence;
 
-            if (!this.getLocalDateFromDateTime(date).isEqual(this.getLocalDateFromDateTime(newDate))) {
+            if (!this.getLocalDateFromDateTime(date)
+                    .isEqual(this.getLocalDateFromDateTime(newDate))) {
                 break;
             }
         }

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,12 @@ public class PrepaymentController {
     public PrepaymentDto create(@Valid @RequestBody CreatePrepaymentDto dto)
             throws InvalidRecurrenceRuleException {
         return this.prepaymentMapper.toPrepaymentDto(this.prepaymentService.create(dto));
+    }
+
+    @PostMapping(Endpoints.PAY_PREPAYMENT)
+    public PrepaymentDto pay(@PathVariable Long id) throws InvalidRecurrenceRuleException {
+
+        return this.prepaymentMapper.toPrepaymentDto(this.prepaymentService.pay(id));
     }
 
 }

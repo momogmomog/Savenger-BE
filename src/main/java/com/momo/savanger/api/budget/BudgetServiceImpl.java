@@ -78,8 +78,9 @@ public class BudgetServiceImpl implements BudgetService {
         budget.setOwnerId(ownerId);
 
         budget.setDueDate(
-                this.recurringRuleService.convertRecurringRuleToDate(createBudgetDto.getRecurringRule(),
-                createBudgetDto.getDateStarted())
+                this.recurringRuleService.convertRecurringRuleToDate(
+                        createBudgetDto.getRecurringRule(),
+                        createBudgetDto.getDateStarted())
         );
 
         if (budget.getBudgetCap() == null) {

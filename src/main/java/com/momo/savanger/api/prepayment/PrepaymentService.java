@@ -9,6 +9,10 @@ public interface PrepaymentService {
 
     Prepayment create(CreatePrepaymentDto dto) throws InvalidRecurrenceRuleException;
 
+    Prepayment pay(Long recurringTransactionId) throws InvalidRecurrenceRuleException;
+
+    Prepayment updatePrepaymentAfterPay(Prepayment prepayment, BigDecimal amount);
+
     BigDecimal getRemainingPrepaymentAmountSumByBudgetId(Long id);
 
 }

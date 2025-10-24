@@ -1,5 +1,7 @@
 package com.momo.savanger.api.transaction.recurring;
 
+import com.momo.savanger.api.prepayment.Prepayment;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 
@@ -9,6 +11,9 @@ public interface RecurringTransactionService {
             throws InvalidRecurrenceRuleException;
 
     RecurringTransaction findById(Long id);
+
+    void updateRTransactionAfterPay(RecurringTransaction rTransaction,
+            LocalDateTime nextDate, Prepayment prepayment);
 
     Optional<RecurringTransaction> findByIdIfExists(Long id);
 

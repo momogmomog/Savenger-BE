@@ -1,6 +1,8 @@
 package com.momo.savanger.api.transaction.recurring;
 
+import com.momo.savanger.api.prepayment.Prepayment;
 import com.momo.savanger.api.recurringRule.RecurringRuleService;
+import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.constants.EntityGraphs;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
@@ -22,6 +24,8 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     private final RecurringTransactionMapper recurringTransactionMapper;
 
     private final RecurringRuleService recurringRuleService;
+
+    private final TransactionService transactionService;
 
     @Override
     @Transactional
@@ -56,6 +60,20 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     public void addPrepaymentId(Long prepaymentId, RecurringTransaction recurringTransaction) {
         recurringTransaction.setPrepaymentId(prepaymentId);
         this.recurringTransactionRepository.save(recurringTransaction);
+    }
+
+    @Override
+    @Transactional
+    public void updateRTransactionAfterPay(RecurringTransaction rTransaction,
+            LocalDateTime nextDate, Prepayment prepayment) {
+
+        if (prepayment.getCompleted()) {
+            rTransaction.setCompleted(true);
+        } else {
+            rTransaction.setNextDate(nextDate);
+        }
+
+        this.recurringTransactionRepository.save(rTransaction);
     }
 
     @Override

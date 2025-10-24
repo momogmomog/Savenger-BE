@@ -61,7 +61,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public Transaction createPrepaymentTransaction(RecurringTransaction recurringTransaction, Long userId) {
+    public Transaction createPrepaymentTransaction(RecurringTransaction recurringTransaction,
+            Long userId) {
         final CreateTransactionDto transactionDto = this.transactionMapper.toCreateTransactionDto(
                 recurringTransaction);
         transactionDto.setDateCreated(null);
