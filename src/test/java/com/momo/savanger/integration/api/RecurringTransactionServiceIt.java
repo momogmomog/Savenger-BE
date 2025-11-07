@@ -18,10 +18,10 @@ import com.momo.savanger.util.AssertUtil;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -68,7 +68,8 @@ public class RecurringTransactionServiceIt {
 
     @Test
     @Transactional
-    public void testCreate_prepaymentPayload_shouldCreateRTransaction() {
+    public void testCreate_prepaymentPayload_shouldCreateRTransaction()
+            throws InvalidRecurrenceRuleException {
         assertEquals(1, this.rTransactionRepository.findAll().size());
 
         CreateRecurringTransactionDto transactionDto = new CreateRecurringTransactionDto();
@@ -93,7 +94,8 @@ public class RecurringTransactionServiceIt {
 
     @Test
     @Transactional
-    public void testCreate_validPayload_shouldCreateRTransaction() {
+    public void testCreate_validPayload_shouldCreateRTransaction()
+            throws InvalidRecurrenceRuleException {
         assertEquals(1, this.rTransactionRepository.findAll().size());
 
         CreateRecurringTransactionDto transactionDto = new CreateRecurringTransactionDto();
@@ -104,24 +106,23 @@ public class RecurringTransactionServiceIt {
         transactionDto.setAutoExecute(false);
         transactionDto.setAmount(BigDecimal.valueOf(0.80));
 
-        this.rTransactionService.create(transactionDto);
+        RecurringTransaction rTransaction = this.rTransactionService.create(transactionDto);
 
         assertEquals(2, this.rTransactionRepository.findAll().size());
 
         //Test data
         assertEquals(transactionDto.getBudgetId(),
-                this.rTransactionRepository.findAll().getFirst().getBudgetId());
+                rTransaction.getId());
         assertEquals(transactionDto.getType(),
-                this.rTransactionRepository.findAll().getFirst().getType());
+                rTransaction.getType());
         assertEquals(transactionDto.getRecurringRule(),
-                this.rTransactionRepository.findAll().getFirst().getRecurringRule());
+                rTransaction.getRecurringRule());
         assertEquals(transactionDto.getCategoryId(),
-                this.rTransactionRepository.findAll().getFirst().getCategoryId());
+                rTransaction.getCategoryId());
         assertEquals(transactionDto.getAutoExecute(),
-                this.rTransactionRepository.findAll().getFirst().getAutoExecute());
+                rTransaction.getAutoExecute());
         assertEquals(transactionDto.getAmount(),
-                this.rTransactionRepository.findAll().getFirst().getAmount());
-
+                rTransaction.getAmount());
     }
 
     @Test

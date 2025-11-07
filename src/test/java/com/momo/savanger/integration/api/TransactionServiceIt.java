@@ -12,6 +12,7 @@ import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.debt.DebtService;
+import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.transaction.Transaction;
 import com.momo.savanger.api.transaction.TransactionRepository;
@@ -20,6 +21,7 @@ import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
+import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
 import com.momo.savanger.api.util.BetweenQuery;
@@ -37,7 +39,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -57,6 +58,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Sql("classpath:/sql/transaction-it-data.sql")
 @Sql("classpath:/sql/transactions_tags-it-data.sql")
 @Sql("classpath:/sql/debt/debt-it-data.sql")
+@Sql("classpath:/sql/prepayment/prepayment-it-data.sql")
+@Sql("classpath:/sql/prepayment/recurring_transaction-it-data.sql")
+@Sql(value = "classpath:/sql/prepayment/del-recurring_transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/prepayment/del-prepayment-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-transactions_tags-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/debt/del-debt-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -82,6 +87,12 @@ public class TransactionServiceIt {
     @Autowired
     private DebtService debtService;
 
+    @Autowired
+    private PrepaymentService prepaymentService;
+
+    @Autowired
+    private RecurringTransactionService recurringTransactionService;
+
     @Test
     @Transactional
     public void testCreateTransaction_validPayload_shouldSaveTransaction() {
@@ -101,7 +112,10 @@ public class TransactionServiceIt {
 
         User user = this.userService.getById(1L);
 
-        Transaction transaction = this.transactionService.create(dto, user.getId());
+        Transaction transaction = this.transactionService.create(
+                dto,
+                user.getId()
+        );
 
         assertEquals(5, this.transactionRepository.findAll().size());
 
@@ -408,7 +422,7 @@ public class TransactionServiceIt {
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
-    public void testGetDebtLendedAmount_validId_shouldCreateDebtTransactions() {
+    public void testGetDebtLendedAmount_validId_shouldGetLendedAmount() {
         Debt debt = this.debtService.findById(101L);
 
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
@@ -421,7 +435,7 @@ public class TransactionServiceIt {
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
-    public void testGetDebtReceivedAmount_validId_shouldCreateDebtTransactions() {
+    public void testGetDebtReceivedAmount_validId_shouldGetReceivedAmount() {
         Debt debt = this.debtService.findById(101L);
 
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
@@ -435,7 +449,7 @@ public class TransactionServiceIt {
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
-    public void testGetDebtLendedAmount_invalidId_shouldCreateDebtTransactions() {
+    public void testGetDebtLendedAmount_invalidId_shouldReturnZero() {
         Debt debt = this.debtService.findById(101L);
 
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
@@ -448,7 +462,7 @@ public class TransactionServiceIt {
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
-    public void testGetDebtReceivedAmount_invalidId_shouldCreateDebtTransactions() {
+    public void testGetDebtReceivedAmount_invalidId_shouldReturnZero() {
         Debt debt = this.debtService.findById(101L);
 
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
@@ -457,6 +471,25 @@ public class TransactionServiceIt {
         BigDecimal receivedAmount = this.transactionService.getDebtReceivedAmount(1004L);
 
         assertEquals(BigDecimal.ZERO, receivedAmount);
+    }
+
+    @Test
+    @Transactional
+    public void testCreatePrepaymentTransaction_shouldSaveTransaction() {
+
+        this.transactionService.createPrepaymentTransaction(
+                recurringTransactionService.findById(1001L));
+
+        assertEquals(5, this.transactionRepository.findAll().size());
+    }
+
+    @Test
+    @Transactional
+    public void testCreatePrepaymentTransaction_emptyRecurringTransaction_shouldThrowException() {
+
+        assertThrows(ApiException.class, () -> this.transactionService.createPrepaymentTransaction(
+                recurringTransactionService.findById(102L)
+        ));
     }
 
 }

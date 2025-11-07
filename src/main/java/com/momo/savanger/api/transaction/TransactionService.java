@@ -15,7 +15,7 @@ public interface TransactionService {
 
     Transaction create(CreateTransactionDto dto, Long userId);
 
-    Transaction createPrepaymentTransaction(RecurringTransaction recurringTransaction, Long userId);
+    Transaction createPrepaymentTransaction(RecurringTransaction recurringTransaction);
 
     Page<Transaction> searchTransactions(TransactionSearchQuery query, User user);
 
