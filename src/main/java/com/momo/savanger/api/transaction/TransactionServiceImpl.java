@@ -221,4 +221,13 @@ public class TransactionServiceImpl implements TransactionService {
                 this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(budgetId,
                         type), BigDecimal.ZERO);
     }
+
+    @Override
+    public BigDecimal getPrepaymentPaidAmount(Long prepaymentId) {
+
+        return this.transactionRepository.sumByPrepaymentIdAndType(
+                TransactionType.EXPENSE,
+                prepaymentId
+        );
+    }
 }

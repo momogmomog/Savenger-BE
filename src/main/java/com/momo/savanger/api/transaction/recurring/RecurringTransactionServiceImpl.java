@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +24,9 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
 
     private final RecurringRuleService recurringRuleService;
 
-    private final TransactionService transactionService;
-
     @Override
     @Transactional
-    public RecurringTransaction create(CreateRecurringTransactionDto dto)
-            throws InvalidRecurrenceRuleException {
+    public RecurringTransaction create(CreateRecurringTransactionDto dto) {
         final RecurringTransaction recurringTransaction = this.recurringTransactionMapper.ToRecurringTransaction(
                 dto);
 
@@ -64,16 +60,9 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
 
     @Override
     @Transactional
-    public void updateRTransactionAfterPay(RecurringTransaction rTransaction,
-            LocalDateTime nextDate, Prepayment prepayment) {
+    public void updateRecurringTransaction(RecurringTransaction recurringTransaction) {
 
-        if (prepayment.getCompleted()) {
-            rTransaction.setCompleted(true);
-        } else {
-            rTransaction.setNextDate(nextDate);
-        }
-
-        this.recurringTransactionRepository.save(rTransaction);
+        this.recurringTransactionRepository.save(recurringTransaction);
     }
 
     @Override

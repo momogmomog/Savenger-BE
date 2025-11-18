@@ -26,6 +26,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
             + " where t.budgetId = :budgetId and t.revised = false and t.type = :type and t.debtId is not null ")
     BigDecimal sumDebtAmountByBudgetIdAndTypeOfNonRevised(Long budgetId, TransactionType type);
 
+    @Query("select sum(t.amount) from Transaction t where t.type = :type and t.prepaymentId = :prepaymentId")
+    BigDecimal sumByPrepaymentIdAndType(TransactionType type, Long prepaymentId);
+
     @Modifying
     @Query("update Transaction t "
             + " set t.revised = true "

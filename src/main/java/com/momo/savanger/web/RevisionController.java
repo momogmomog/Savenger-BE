@@ -7,7 +7,6 @@ import com.momo.savanger.api.revision.RevisionService;
 import com.momo.savanger.constants.Endpoints;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,8 +22,7 @@ public class RevisionController {
     private final RevisionMapper revisionMapper;
 
     @PostMapping(Endpoints.REVISIONS)
-    public RevisionDto create(@Valid @RequestBody CreateRevisionDto dto)
-            throws InvalidRecurrenceRuleException {
+    public RevisionDto create(@Valid @RequestBody CreateRevisionDto dto) {
 
         return this.revisionMapper.toRevisionDto(this.revisionService.create(dto));
     }

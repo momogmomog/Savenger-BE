@@ -15,7 +15,6 @@ import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.springframework.data.web.PagedModel;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,7 +38,7 @@ public class BudgetController {
 
     @PostMapping(Endpoints.BUDGETS)
     public BudgetDto create(@Valid @RequestBody CreateBudgetDto createBudgetDto,
-            @AuthenticationPrincipal User user) throws InvalidRecurrenceRuleException {
+            @AuthenticationPrincipal User user) {
 
         return this.budgetMapper.toBudgetDto(
                 this.budgetService.create(createBudgetDto, user.getId())

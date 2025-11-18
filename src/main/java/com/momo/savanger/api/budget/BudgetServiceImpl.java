@@ -20,7 +20,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -70,8 +69,7 @@ public class BudgetServiceImpl implements BudgetService {
     }
 
     @Override
-    public Budget create(CreateBudgetDto createBudgetDto, Long ownerId)
-            throws InvalidRecurrenceRuleException {
+    public Budget create(CreateBudgetDto createBudgetDto, Long ownerId) {
 
         final Budget budget = this.budgetMapper.toBudget(createBudgetDto);
 
@@ -157,8 +155,7 @@ public class BudgetServiceImpl implements BudgetService {
 
     @Override
     @Transactional
-    public void updateBudgetAfterRevision(Long id, Revision revision)
-            throws InvalidRecurrenceRuleException {
+    public void updateBudgetAfterRevision(Long id, Revision revision) {
         final Budget budget = this.findById(id);
 
         budget.setBalance(revision.getBalance());

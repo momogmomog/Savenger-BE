@@ -1,5 +1,7 @@
 package com.momo.savanger.api.recurringRule;
 
+import com.momo.savanger.error.ApiErrorCode;
+import com.momo.savanger.error.ApiException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,34 +21,37 @@ public class RecurringRuleServiceImpl implements RecurringRuleService {
 
 
     @Override
-    public LocalDateTime convertRecurringRuleToDate(String recurringRule, LocalDateTime startDate)
-            throws InvalidRecurrenceRuleException {
-        RecurrenceRule rule = new RecurrenceRule(recurringRule);
+    public LocalDateTime convertRecurringRuleToDate(String recurringRule, LocalDateTime startDate) {
 
-        long startMillis = startDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        try {
+            final RecurrenceRule rule = new RecurrenceRule(recurringRule);
 
-        DateTime date = new DateTime(TimeZone.getDefault(), startMillis);
+            final long startMillis = startDate.atZone(ZoneId.systemDefault()).toInstant()
+                    .toEpochMilli();
 
-        DateTime newDate = null;
+            final DateTime date = new DateTime(TimeZone.getDefault(), startMillis);
 
-        for (DateTime occurrence :
-                new First<>(2, new OfRule(rule, date))
-        ) {
+            DateTime newDate = null;
 
-            newDate = occurrence;
+            for (DateTime occurrence :
+                    new First<>(2, new OfRule(rule, date))
+            ) {
 
-            if (!this.getLocalDateFromDateTime(date)
-                    .isEqual(this.getLocalDateFromDateTime(newDate))) {
-                break;
+                newDate = occurrence;
+
+                if (!this.getLocalDateFromDateTime(date)
+                        .isEqual(this.getLocalDateFromDateTime(newDate))) {
+                    break;
+                }
             }
+
+            return LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(newDate.getTimestamp()),
+                    ZoneId.systemDefault()
+            );
+        } catch (InvalidRecurrenceRuleException exception) {
+            throw ApiException.with(ApiErrorCode.ERR_0017);
         }
-
-        LocalDateTime local = LocalDateTime.ofInstant(
-                java.time.Instant.ofEpochMilli(newDate.getTimestamp()),
-                ZoneId.systemDefault()
-        );
-
-        return local;
     }
 
 
