@@ -6,10 +6,9 @@ WORKDIR /application
 COPY gradlew ./
 COPY gradle ./gradle
 
-RUN chmod +x gradlew
-
 COPY . ./
 
+RUN chmod +x gradlew
 RUN ./gradlew clean bootJar
 
 CMD java -jar build/libs/*.jar
