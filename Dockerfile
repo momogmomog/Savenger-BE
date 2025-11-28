@@ -1,12 +1,15 @@
-#FROM maven:3.8.6-eclipse-temurin-11-alpine
-FROM gradle:8.9.0-jdk21-alpine
+FROM eclipse-temurin:21-jdk-alpine
 
 WORKDIR /application
 
+# Copy just the Gradle wrapper files first (more efficient caching)
+COPY gradlew ./
+COPY gradle ./gradle
+
+RUN chmod +x gradlew
+
 COPY . ./
 
+RUN ./gradlew clean bootJar
 
-RUN gradle clean bootJar
-
-WORKDIR /
-CMD java -jar /application/build/libs/*.jar
+CMD java -jar build/libs/*.jar
