@@ -22,8 +22,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -55,7 +53,6 @@ public class BudgetControllerIt extends BaseControllerIt {
         createBudgetDto.setBudgetName("Test");
         createBudgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
         createBudgetDto.setDateStarted(LocalDateTime.now());
-        createBudgetDto.setDueDate(LocalDateTime.now().plusMonths(5));
         createBudgetDto.setBalance(BigDecimal.valueOf(243.4));
         createBudgetDto.setBudgetCap(BigDecimal.valueOf(323));
         createBudgetDto.setActive(true);
@@ -102,7 +99,6 @@ public class BudgetControllerIt extends BaseControllerIt {
         createBudgetDto.setBudgetName("Test");
         createBudgetDto.setRecurringRule("FREuQ=DAILY;INTERVAL=1");
         createBudgetDto.setDateStarted(LocalDateTime.now());
-        createBudgetDto.setDueDate(LocalDateTime.now().plusMonths(5));
         createBudgetDto.setBalance(BigDecimal.valueOf(-4));
         createBudgetDto.setBudgetCap(BigDecimal.valueOf(-323));
         createBudgetDto.setActive(true);

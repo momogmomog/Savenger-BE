@@ -41,6 +41,8 @@ public class CreateTransactionDto implements ITransactionDto {
 
     private Long debtId;
 
+    private Long prepaymentId;
+
     private List<Long> tagIds;
 
     public List<Long> getTagIds() {

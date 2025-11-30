@@ -1,6 +1,7 @@
 package com.momo.savanger.api.transaction.recurring;
 
 import com.momo.savanger.api.common.model.Audit;
+import com.momo.savanger.api.prepayment.Prepayment;
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.constants.EntityGraphs;
@@ -15,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
@@ -65,6 +67,10 @@ public class RecurringTransaction extends Audit {
     private Long budgetId;
 
     private Long debtId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "prepaymentId", insertable = false, updatable = false)
+    private Prepayment prepayment;
 
     @Exclude
     @ManyToMany(fetch = FetchType.LAZY)

@@ -1,5 +1,6 @@
 package com.momo.savanger.api.transaction.recurring;
 
+import com.momo.savanger.api.prepayment.PrepaymentDto;
 import com.momo.savanger.api.transaction.TransactionType;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -29,5 +30,7 @@ public class RecurringTransactionDto {
     private Long budgetId;
 
     private Long debtId;
+
+    private PrepaymentDto prepayment;
 
 }

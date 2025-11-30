@@ -19,6 +19,7 @@ import com.momo.savanger.util.AssertUtil;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,8 @@ public class PrepaymentServiceIt {
 
     @Test
     @Transactional
-    public void testCreate_validPayload_shouldCreatePayment() {
+    public void testCreate_validPayload_shouldCreatePayment()
+            throws InvalidRecurrenceRuleException {
 
         assertEquals(2, this.prepaymentRepository.findAll().size());
 
@@ -123,7 +125,8 @@ public class PrepaymentServiceIt {
 
     @Test
     @Transactional
-    public void testCreate_withExistingRTransactionId_shouldCreatePrepaymentWithExistingRTransaction() {
+    public void testCreate_withExistingRTransactionId_shouldCreatePrepaymentWithExistingRTransaction()
+            throws InvalidRecurrenceRuleException {
 
         assertEquals(2, this.prepaymentRepository.findAll().size());
 
@@ -181,7 +184,8 @@ public class PrepaymentServiceIt {
     }
 
     @Test
-    public void testPrepaymentAmountSumByBudgetId_withTwoPrepayments_shouldSumAmount() {
+    public void testPrepaymentAmountSumByBudgetId_withTwoPrepayments_shouldSumAmount()
+            throws InvalidRecurrenceRuleException {
         CreatePrepaymentDto createPrepaymentDto = new CreatePrepaymentDto();
         createPrepaymentDto.setAmount(BigDecimal.valueOf(200));
         createPrepaymentDto.setBudgetId(1001L);

@@ -23,7 +23,8 @@ public enum ApiErrorCode {
     ERR_0013(HttpStatus.NOT_FOUND, "Debt not found"),
     ERR_0014(HttpStatus.BAD_REQUEST, "Budget does not have enough money"),
     ERR_0015(HttpStatus.NOT_FOUND, "Prepayment not found"),
-    ERR_0016(HttpStatus.NOT_FOUND, "Recurring transaction not found");
+    ERR_0016(HttpStatus.NOT_FOUND, "Recurring transaction not found"),
+    ERR_0017(HttpStatus.BAD_REQUEST, "Recurring rule is not valid");
 
     public final HttpStatus status;
     public final String message;
