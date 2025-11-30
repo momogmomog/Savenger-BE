@@ -4,11 +4,11 @@ import com.momo.savanger.api.prepayment.CreatePrepaymentDto;
 import com.momo.savanger.api.prepayment.PrepaymentDto;
 import com.momo.savanger.api.prepayment.PrepaymentMapper;
 import com.momo.savanger.api.prepayment.PrepaymentService;
+import com.momo.savanger.api.transaction.recurring.RTransactionPrepaymentService;
 import com.momo.savanger.constants.Endpoints;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,15 +22,12 @@ public class PrepaymentController {
 
     private final PrepaymentMapper prepaymentMapper;
 
+    private final RTransactionPrepaymentService rTransactionPrepaymentService;
+
     @PostMapping(Endpoints.PREPAYMENTS)
     public PrepaymentDto create(@Valid @RequestBody CreatePrepaymentDto dto) {
         return this.prepaymentMapper.toPrepaymentDto(this.prepaymentService.create(dto));
     }
 
-    @PostMapping(Endpoints.PAY_PREPAYMENT)
-    public PrepaymentDto pay(@PathVariable Long id) {
-
-        return this.prepaymentMapper.toPrepaymentDto(this.prepaymentService.pay(id));
-    }
 
 }

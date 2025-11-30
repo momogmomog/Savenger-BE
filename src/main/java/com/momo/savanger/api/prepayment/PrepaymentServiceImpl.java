@@ -2,6 +2,7 @@ package com.momo.savanger.api.prepayment;
 
 import com.momo.savanger.api.recurringRule.RecurringRuleService;
 import com.momo.savanger.api.transaction.TransactionService;
+import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
 import com.momo.savanger.error.ApiErrorCode;
@@ -44,9 +45,13 @@ public class PrepaymentServiceImpl implements PrepaymentService {
                 dto.getAmount()
         );
 
+        this.prepaymentRepository.saveAndFlush(prepayment);
+
         final RecurringTransaction rTransaction;
 
         if (dto.getRecurringTransaction() != null) {
+            dto.getRecurringTransaction().setType(TransactionType.EXPENSE);
+
             rTransaction = this.recurringTransactionService.create(
                     dto.getRecurringTransaction()
             );
@@ -54,68 +59,27 @@ public class PrepaymentServiceImpl implements PrepaymentService {
             rTransaction = this.recurringTransactionService.findById(
                     dto.getRecurringTransactionId()
             );
-
-            rTransaction.setPrepaymentId(prepayment.getId());
-            rTransaction.setUpdateDate(LocalDateTime.now());
-
-            this.recurringTransactionService.updateRecurringTransaction(rTransaction);
-
         } else {
             rTransaction = null;
         }
 
         if (rTransaction != null) {
-            this.recurringTransactionService.addPrepaymentId(prepayment.getId(), rTransaction);
 
+            rTransaction.setPrepaymentId(prepayment.getId());
             rTransaction.setNextDate(this.recurringRuleService
                     .convertRecurringRuleToDate(
                             rTransaction.getRecurringRule(),
                             rTransaction.getCreateDate()
                     )
             );
-        }
 
-        this.prepaymentRepository.saveAndFlush(prepayment);
+            this.recurringTransactionService.updateRecurringTransaction(rTransaction);
+        }
 
         return this.findById(
                 prepayment.getId()
         );
     }
-
-    @Override
-    @Transactional
-    public Prepayment pay(Long recurringTransactionId) {
-
-        final RecurringTransaction recurringTransaction = this.recurringTransactionService.findByIdIfExists(
-                recurringTransactionId).orElseThrow();
-
-        final Prepayment prepayment = this.findById(recurringTransaction.getPrepaymentId());
-
-        if (prepayment.getRemainingAmount().compareTo(recurringTransaction.getAmount()) < 0) {
-            recurringTransaction.setAmount(prepayment.getAmount());
-        }
-
-        this.transactionService.createPrepaymentTransaction(recurringTransaction);
-
-        this.updatePrepaymentAfterPay(prepayment);
-
-        if (prepayment.getCompleted()) {
-            recurringTransaction.setCompleted(true);
-        } else {
-            final LocalDateTime nextDate = this.recurringRuleService
-                    .convertRecurringRuleToDate(
-                            recurringTransaction.getRecurringRule(),
-                            recurringTransaction.getNextDate()
-                    );
-
-            recurringTransaction.setNextDate(nextDate);
-        }
-
-        this.recurringTransactionService.updateRecurringTransaction(recurringTransaction);
-
-        return prepayment;
-    }
-
 
     @Override
     public BigDecimal getRemainingPrepaymentAmountSumByBudgetId(Long budgetId) {
@@ -127,7 +91,8 @@ public class PrepaymentServiceImpl implements PrepaymentService {
         return sum;
     }
 
-    private void updatePrepaymentAfterPay(Prepayment prepayment) {
+    @Override
+    public void updatePrepaymentAfterPay(Prepayment prepayment) {
 
         prepayment.setRemainingAmount(
                 prepayment.getAmount().subtract(
@@ -140,6 +105,8 @@ public class PrepaymentServiceImpl implements PrepaymentService {
         if (prepayment.getRemainingAmount().compareTo(BigDecimal.ZERO) <= 0) {
             prepayment.setCompleted(true);
         }
+
+        prepayment.setUpdateDate(LocalDateTime.now());
 
         this.prepaymentRepository.save(prepayment);
     }

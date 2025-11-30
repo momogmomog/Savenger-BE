@@ -8,7 +8,7 @@ public interface PrepaymentService {
 
     Prepayment create(CreatePrepaymentDto dto);
 
-    Prepayment pay(Long recurringTransactionId);
+    void updatePrepaymentAfterPay(Prepayment prepayment);
 
     BigDecimal getRemainingPrepaymentAmountSumByBudgetId(Long id);
 

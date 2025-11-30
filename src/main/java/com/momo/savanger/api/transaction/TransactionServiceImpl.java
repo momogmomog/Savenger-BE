@@ -225,9 +225,15 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public BigDecimal getPrepaymentPaidAmount(Long prepaymentId) {
 
-        return this.transactionRepository.sumByPrepaymentIdAndType(
+        final BigDecimal amount = this.transactionRepository.sumByPrepaymentIdAndType(
                 TransactionType.EXPENSE,
                 prepaymentId
         );
+
+        if (amount == null) {
+            return BigDecimal.ZERO;
+        }
+
+        return amount;
     }
 }
