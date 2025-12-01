@@ -30,13 +30,11 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
@@ -76,11 +74,11 @@ public class BudgetServiceIt {
     private RevisionService revisionService;
 
     @Test
-    public void testCreate_validPayload_shouldCreate() throws InvalidRecurrenceRuleException {
+    public void testCreate_validPayload_shouldCreate() {
         CreateBudgetDto createBudgetDto = new CreateBudgetDto();
         createBudgetDto.setBudgetName("Test");
         createBudgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
-        createBudgetDto.setDateStarted(LocalDateTime.now());
+        createBudgetDto.setDateStarted(LocalDateTime.of(2025, 11, 7, 15, 51));
         createBudgetDto.setBalance(BigDecimal.valueOf(243.4));
         createBudgetDto.setBudgetCap(BigDecimal.valueOf(323));
         createBudgetDto.setActive(true);
@@ -116,7 +114,7 @@ public class BudgetServiceIt {
     public void testCreate_emptyPayload_shouldThrowException() {
         CreateBudgetDto createBudgetDto = new CreateBudgetDto();
 
-        assertThrows(DataIntegrityViolationException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             this.budgetService.create(createBudgetDto, 1L);
         });
     }
@@ -154,8 +152,7 @@ public class BudgetServiceIt {
     }
 
     @Test
-    public void testIsBudgetValid_notActive_shouldReturnFalse()
-            throws InvalidRecurrenceRuleException {
+    public void testIsBudgetValid_notActive_shouldReturnFalse() {
         CreateBudgetDto budgetDto = new CreateBudgetDto();
         budgetDto.setBudgetName("Test");
         budgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
@@ -396,8 +393,7 @@ public class BudgetServiceIt {
 
     @Test
     @Transactional
-    public void testUpdateBudgetAfterRevision_shouldUpdateBudget()
-            throws InvalidRecurrenceRuleException {
+    public void testUpdateBudgetAfterRevision_shouldUpdateBudget() {
 
         Revision revision = this.revisionService.findById(1001L);
 

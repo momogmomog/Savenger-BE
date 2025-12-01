@@ -77,7 +77,7 @@ public class BudgetControllerIt extends BaseControllerIt {
                 Endpoints.BUDGETS,
                 createBudgetDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(8)),
+                jsonPath("fieldErrors.length()", is(6)),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"budgetName\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
@@ -87,13 +87,9 @@ public class BudgetControllerIt extends BaseControllerIt {
                 jsonPath(
                         "fieldErrors.[?(@.field == \"dateStarted\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"dueDate\" && @.constraintName == \"NotNull\")]").exists(),
-                jsonPath(
                         "fieldErrors.[?(@.field == \"active\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"autoRevise\" && @.constraintName == \"NotNull\")]").exists(),
-                jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"RRule\")]").exists()
+                        "fieldErrors.[?(@.field == \"autoRevise\" && @.constraintName == \"NotNull\")]").exists()
         );
 
         createBudgetDto.setBudgetName("Test");

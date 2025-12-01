@@ -17,5 +17,5 @@ public class Endpoints {
     public static final String DEBTS = "/debts";
     public static final String PAY_DEBT = "/debts/{id}/pay-debt";
     public static final String PREPAYMENTS = "/prepayments";
-    public static final String PAY_PREPAYMENT = "/recurring-transaction/{rTransactionId}/pay-r-transaction";
+    public static final String PAY_R_TRANSACTION = "/recurring-transaction/{rTransactionId}/pay-r-transaction";
 }

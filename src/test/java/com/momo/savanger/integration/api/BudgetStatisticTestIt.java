@@ -23,7 +23,6 @@ import com.momo.savanger.integration.web.WithLocalMockedUser;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,7 +65,7 @@ public class BudgetStatisticTestIt {
     Long budgetThreeId;
 
     @BeforeEach
-    void setUp() throws InvalidRecurrenceRuleException {
+    void setUp() {
         Budget budgetOne = this.createBudget("Chocolate", BUDGET_ONE_BALANCE);
         budgetOneId = budgetOne.getId();
 
@@ -80,8 +79,7 @@ public class BudgetStatisticTestIt {
     //TODO: Add tests for prepayment transaction when rRule is ready
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
-    public void testBudgetStatistic_firstBudgetWithBalanceZero()
-            throws InvalidRecurrenceRuleException {
+    public void testBudgetStatistic_firstBudgetWithBalanceZero() {
         BudgetStatistics budgetStatistics = this.budgetService.getStatistics(budgetOneId);
 
         //Test without debts, transactions and prepayments
@@ -489,8 +487,7 @@ public class BudgetStatisticTestIt {
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
-    public void testBudgetStatistic_secondBudgetWithBalanceOneHundred()
-            throws InvalidRecurrenceRuleException {
+    public void testBudgetStatistic_secondBudgetWithBalanceOneHundred() {
         BudgetStatistics budgetStatistics = this.budgetService.getStatistics(budgetTwoId);
 
         //Test without debts, transactions and prepayments
@@ -876,8 +873,7 @@ public class BudgetStatisticTestIt {
         this.debtService.pay(debtId, payDebtDto);
     }
 
-    private Budget createBudget(String name, BigDecimal balance)
-            throws InvalidRecurrenceRuleException {
+    private Budget createBudget(String name, BigDecimal balance) {
         CreateBudgetDto budgetDto = new CreateBudgetDto();
         budgetDto.setBudgetName(name);
         budgetDto.setBalance(balance);
@@ -898,8 +894,7 @@ public class BudgetStatisticTestIt {
         return this.debtService.create(debtDto);
     }
 
-    private Prepayment createPrepayment(BigDecimal amount, String name, Long budgetId)
-            throws InvalidRecurrenceRuleException {
+    private Prepayment createPrepayment(BigDecimal amount, String name, Long budgetId) {
         CreateRecurringTransactionDto rTransactionDto = this.createRecurringTransactionDto(
                 TransactionType.EXPENSE, amount, budgetId
         );

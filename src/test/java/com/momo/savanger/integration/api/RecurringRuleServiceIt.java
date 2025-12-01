@@ -6,7 +6,6 @@ import com.momo.savanger.api.recurringRule.RecurringRuleService;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +20,7 @@ public class RecurringRuleServiceIt {
     private RecurringRuleService recurringRuleService;
 
     @Test
-    public void testConvertRecurringRuleToDate_dailyRecurringRule_shouldReturnNewDate()
-            throws InvalidRecurrenceRuleException {
+    public void testConvertRecurringRuleToDate_dailyRecurringRule_shouldReturnNewDate() {
 
         String recurringRule = "FREQ=DAILY;INTERVAL=1";
         LocalDateTime date = LocalDateTime.of(2025, 11, 6, 13, 27);
@@ -34,8 +32,7 @@ public class RecurringRuleServiceIt {
     }
 
     @Test
-    public void testConvertRecurringRuleToDate_weeklyRecurringRule_shouldReturnNewDate()
-            throws InvalidRecurrenceRuleException {
+    public void testConvertRecurringRuleToDate_weeklyRecurringRule_shouldReturnNewDate() {
 
         String recurringRule = "FREQ=WEEKLY;INTERVAL=1;BYDAY=MO";
 
@@ -51,8 +48,7 @@ public class RecurringRuleServiceIt {
     }
 
     @Test
-    public void testConvertRecurringRuleToDate_monthlyRecurringRule_shouldReturnNewDate()
-            throws InvalidRecurrenceRuleException {
+    public void testConvertRecurringRuleToDate_monthlyRecurringRule_shouldReturnNewDate() {
 
         String recurringRule = "FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=06";
 
@@ -67,8 +63,7 @@ public class RecurringRuleServiceIt {
     }
 
     @Test
-    public void testConvertRecurringRuleToDate_yearlyRecurringRule_shouldReturnNewDate()
-            throws InvalidRecurrenceRuleException {
+    public void testConvertRecurringRuleToDate_yearlyRecurringRule_shouldReturnNewDate() {
 
         String recurringRule = "FREQ=YEARLY;INTERVAL=1;BYMONTH=11;BYMONTHDAY=06";
 

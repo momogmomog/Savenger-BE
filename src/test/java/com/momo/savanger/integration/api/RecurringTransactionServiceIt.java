@@ -8,23 +8,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.momo.savanger.api.prepayment.CreatePrepaymentDto;
 import com.momo.savanger.api.prepayment.PrepaymentService;
+import com.momo.savanger.api.transaction.TransactionRepository;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
+import com.momo.savanger.api.transaction.recurring.RTransactionPrepaymentService;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionRepository;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
 import com.momo.savanger.error.ApiErrorCode;
+import com.momo.savanger.error.ApiException;
 import com.momo.savanger.util.AssertUtil;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -66,10 +68,15 @@ public class RecurringTransactionServiceIt {
     @Autowired
     private PrepaymentService prepaymentService;
 
+    @Autowired
+    private RTransactionPrepaymentService rTransactionPrepaymentService;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
     @Test
     @Transactional
-    public void testCreate_prepaymentPayload_shouldCreateRTransaction()
-            throws InvalidRecurrenceRuleException {
+    public void testCreate_prepaymentPayload_shouldCreateRTransaction() {
         assertEquals(1, this.rTransactionRepository.findAll().size());
 
         CreateRecurringTransactionDto transactionDto = new CreateRecurringTransactionDto();
@@ -94,8 +101,7 @@ public class RecurringTransactionServiceIt {
 
     @Test
     @Transactional
-    public void testCreate_validPayload_shouldCreateRTransaction()
-            throws InvalidRecurrenceRuleException {
+    public void testCreate_validPayload_shouldCreateRTransaction() {
         assertEquals(1, this.rTransactionRepository.findAll().size());
 
         CreateRecurringTransactionDto transactionDto = new CreateRecurringTransactionDto();
@@ -112,7 +118,7 @@ public class RecurringTransactionServiceIt {
 
         //Test data
         assertEquals(transactionDto.getBudgetId(),
-                rTransaction.getId());
+                rTransaction.getBudgetId());
         assertEquals(transactionDto.getType(),
                 rTransaction.getType());
         assertEquals(transactionDto.getRecurringRule(),
@@ -131,7 +137,7 @@ public class RecurringTransactionServiceIt {
 
         CreateRecurringTransactionDto transactionDto = new CreateRecurringTransactionDto();
 
-        assertThrows(DataIntegrityViolationException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> this.rTransactionService.create(transactionDto)
         );
     }
@@ -163,16 +169,6 @@ public class RecurringTransactionServiceIt {
         assertFalse(this.rTransactionService.recurringTransactionExists(1001L, 1002L));
     }
 
-    @Test
-    public void testAddPrepaymentId_validId_shouldAddPrepaymentId() {
-
-        RecurringTransaction recurringTransaction = this.rTransactionService.findById(1001L);
-        assertEquals(1001L, recurringTransaction.getPrepaymentId());
-
-        this.rTransactionService.addPrepaymentId(1002L, recurringTransaction);
-
-        assertEquals(1002L, recurringTransaction.getPrepaymentId());
-    }
 
     @Test
     public void testFindByIdIfExist_validId_shouldReturnRTransaction() {
@@ -182,6 +178,68 @@ public class RecurringTransactionServiceIt {
     @Test
     public void testFindByIdIfExist_invalidId_shouldReturnOptionalEmpty() {
         assertEquals(Optional.empty(), this.rTransactionService.findByIdIfExists(10001L));
+    }
+
+    @Test
+    public void testUpdateRecurringTransaction_shouldUpdateRTransaction() {
+        RecurringTransaction recurringTransaction = this.rTransactionService.findById(1001L);
+
+        assertEquals(BigDecimal.valueOf(101).setScale(2, RoundingMode.HALF_DOWN),
+                recurringTransaction.getAmount());
+
+        recurringTransaction.setAmount(BigDecimal.valueOf(20));
+
+        this.rTransactionService.updateRecurringTransaction(recurringTransaction);
+
+        recurringTransaction = this.rTransactionService.findById(1001L);
+
+        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
+                recurringTransaction.getAmount());
+    }
+
+    @Test
+    @Transactional
+    public void testPay_validPayload_shouldCreateTransaction() {
+
+        RecurringTransaction recurringTransaction = this.rTransactionPrepaymentService.pay(1001L);
+
+        //Test remaining amount
+        assertEquals(
+                BigDecimal.valueOf(99).setScale(2, RoundingMode.HALF_DOWN),
+                recurringTransaction.getPrepayment().getRemainingAmount()
+        );
+
+        //Test update date in prepayment
+        assertEquals(LocalDateTime.now().toLocalDate(),
+                recurringTransaction.getUpdateDate().toLocalDate());
+
+        //Test next date in rTransactions
+        assertEquals(LocalDateTime.of(2025, 8, 4, 14, 14, 52),
+                recurringTransaction.getNextDate());
+
+        //Test transaction size
+        assertEquals(2, this.transactionRepository.findAll().size());
+
+        //Test if remaining amount is smaller than transaction amount
+
+        recurringTransaction = this.rTransactionPrepaymentService.pay(1001L);
+
+        assertEquals(BigDecimal.valueOf(0).setScale(2, RoundingMode.HALF_DOWN),
+                recurringTransaction.getPrepayment().getRemainingAmount());
+
+        //Test is prepayment completed
+        assertEquals(true, recurringTransaction.getCompleted());
+
+        //Test if prepayment is completed already
+
+        assertThrows(ApiException.class, () -> this.rTransactionPrepaymentService.pay(1001L));
+    }
+
+    @Test
+    public void testPay_invalidId_shouldThrowException() {
+
+        assertThrows(ApiException.class, () -> this.rTransactionPrepaymentService.pay(10001L));
+
     }
 
 }

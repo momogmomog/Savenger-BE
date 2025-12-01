@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.context.jdbc.SqlMergeMode.MergeMode.MERGE;
 
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
@@ -45,6 +46,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import org.springframework.test.context.jdbc.SqlMergeMode;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,8 +60,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Sql("classpath:/sql/transaction-it-data.sql")
 @Sql("classpath:/sql/transactions_tags-it-data.sql")
 @Sql("classpath:/sql/debt/debt-it-data.sql")
-@Sql("classpath:/sql/prepayment/prepayment-it-data.sql")
-@Sql("classpath:/sql/prepayment/recurring_transaction-it-data.sql")
 @Sql(value = "classpath:/sql/prepayment/del-recurring_transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/prepayment/del-prepayment-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-transactions_tags-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -70,6 +70,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Sql(value = "classpath:/sql/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-user-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@SqlMergeMode(MERGE)
 public class TransactionServiceIt {
 
     @Autowired
@@ -475,6 +476,8 @@ public class TransactionServiceIt {
 
     @Test
     @Transactional
+    @Sql("classpath:/sql/prepayment/prepayment-it-data.sql")
+    @Sql("classpath:/sql/prepayment/recurring_transaction-it-data.sql")
     public void testCreatePrepaymentTransaction_shouldSaveTransaction() {
 
         this.transactionService.createPrepaymentTransaction(
@@ -490,6 +493,24 @@ public class TransactionServiceIt {
         assertThrows(ApiException.class, () -> this.transactionService.createPrepaymentTransaction(
                 recurringTransactionService.findById(102L)
         ));
+    }
+
+    @Test
+    @Sql("classpath:/sql/prepayment-it-data.sql")
+    @Sql("classpath:/sql/transaction-prepayment-data.sql")
+    public void testGetPrepaymentPaidAmount_validId_shouldGetPrepaidAmount() {
+        BigDecimal amount = this.transactionService.getPrepaymentPaidAmount(1001L);
+
+        assertEquals(BigDecimal.valueOf(101).setScale(2, RoundingMode.HALF_DOWN), amount);
+    }
+
+    @Test
+    @Sql("classpath:/sql/prepayment-it-data.sql")
+    @Sql("classpath:/sql/transaction-prepayment-data.sql")
+    public void testGetPrepaymentPaidAmount_invalidId_shouldGetPrepaidAmount() {
+        BigDecimal amount = this.transactionService.getPrepaymentPaidAmount(10013L);
+
+        assertEquals(BigDecimal.ZERO, amount);
     }
 
 }

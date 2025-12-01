@@ -23,7 +23,7 @@ public class RecurringTransactionController {
     private final RTransactionPrepaymentService rTransactionPrepaymentService;
     private final RecurringTransactionMapper recurringTransactionMapper;
 
-    @PostMapping(Endpoints.PAY_PREPAYMENT)
+    @PostMapping(Endpoints.PAY_R_TRANSACTION)
     public RecurringTransactionDto pay(
             @PathVariable("rTransactionId") @ValidRecurringTransaction Long rTransactionId) {
 

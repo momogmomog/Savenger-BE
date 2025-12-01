@@ -22,8 +22,6 @@ public class PrepaymentController {
 
     private final PrepaymentMapper prepaymentMapper;
 
-    private final RTransactionPrepaymentService rTransactionPrepaymentService;
-
     @PostMapping(Endpoints.PREPAYMENTS)
     public PrepaymentDto create(@Valid @RequestBody CreatePrepaymentDto dto) {
         return this.prepaymentMapper.toPrepaymentDto(this.prepaymentService.create(dto));

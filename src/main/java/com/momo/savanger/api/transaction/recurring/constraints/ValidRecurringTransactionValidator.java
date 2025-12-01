@@ -40,12 +40,7 @@ public class ValidRecurringTransactionValidator implements
 
         User user = SecurityUtils.getCurrentUser();
 
-        if (rTransaction.getCompleted()) {
-            return ValidationUtil.fail(constraintValidatorContext, null,
-                    ValidationMessages.R_TRANSACTION_IS_COMPLETED);
-        }
-
-        if (budgetService.isUserPermitted(user, rTransaction.getBudgetId())) {
+        if (!budgetService.isUserPermitted(user, rTransaction.getBudgetId())) {
             return ValidationUtil.fail(constraintValidatorContext, null,
                     ValidationMessages.ACCESS_DENIED);
         }

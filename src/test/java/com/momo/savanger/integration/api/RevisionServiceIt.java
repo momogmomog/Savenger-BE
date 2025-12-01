@@ -22,7 +22,6 @@ import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.temporal.ChronoUnit;
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +68,7 @@ public class RevisionServiceIt {
     UserService userService;
 
     @Test
-    public void testCreate_lessDtoBalance_shouldCreateRevision()
-            throws InvalidRecurrenceRuleException {
+    public void testCreate_lessDtoBalance_shouldCreateRevision() {
         CreateRevisionDto dto = new CreateRevisionDto();
         dto.setBalance(BigDecimal.valueOf(23.32));
         dto.setBudgetId(1001L);
@@ -107,8 +105,7 @@ public class RevisionServiceIt {
     }
 
     @Test
-    public void testCreate_biggerDtoBalance_shouldCreateRevision()
-            throws InvalidRecurrenceRuleException {
+    public void testCreate_biggerDtoBalance_shouldCreateRevision() {
         CreateRevisionDto dto = new CreateRevisionDto();
         dto.setBalance(BigDecimal.valueOf(239.32));
         dto.setBudgetId(1001L);
@@ -137,8 +134,7 @@ public class RevisionServiceIt {
     }
 
     @Test
-    public void testCreate_withoutDtoBalance_shouldCreateRevision()
-            throws InvalidRecurrenceRuleException {
+    public void testCreate_withoutDtoBalance_shouldCreateRevision() {
         CreateRevisionDto dto = new CreateRevisionDto();
         dto.setBudgetId(1001L);
 
@@ -185,8 +181,7 @@ public class RevisionServiceIt {
     }
 
     @Test
-    public void testCreate_validPayload_shouldReviseAllTransactions()
-            throws InvalidRecurrenceRuleException {
+    public void testCreate_validPayload_shouldReviseAllTransactions() {
         CreateRevisionDto dto = new CreateRevisionDto();
         dto.setBudgetId(1001L);
 

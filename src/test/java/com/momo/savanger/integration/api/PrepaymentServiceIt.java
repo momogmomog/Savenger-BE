@@ -12,6 +12,7 @@ import com.momo.savanger.api.prepayment.PrepaymentRepository;
 import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
+import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionRepository;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
 import com.momo.savanger.error.ApiErrorCode;
@@ -19,7 +20,6 @@ import com.momo.savanger.util.AssertUtil;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +72,7 @@ public class PrepaymentServiceIt {
 
     @Test
     @Transactional
-    public void testCreate_validPayload_shouldCreatePayment()
-            throws InvalidRecurrenceRuleException {
+    public void testCreate_validPayload_shouldCreatePayment() {
 
         assertEquals(2, this.prepaymentRepository.findAll().size());
 
@@ -125,8 +124,7 @@ public class PrepaymentServiceIt {
 
     @Test
     @Transactional
-    public void testCreate_withExistingRTransactionId_shouldCreatePrepaymentWithExistingRTransaction()
-            throws InvalidRecurrenceRuleException {
+    public void testCreate_withExistingRTransactionId_shouldCreatePrepaymentWithExistingRTransaction() {
 
         assertEquals(2, this.prepaymentRepository.findAll().size());
 
@@ -142,7 +140,7 @@ public class PrepaymentServiceIt {
         createPrepaymentDto.setPaidUntil(LocalDateTime.now().plusMonths(6));
         createPrepaymentDto.setRecurringTransactionId(1001L);
 
-        this.prepaymentService.create(createPrepaymentDto);
+        final Prepayment prepayment = this.prepaymentService.create(createPrepaymentDto);
 
         assertEquals(3, this.prepaymentRepository.findAll().size());
 
@@ -150,12 +148,17 @@ public class PrepaymentServiceIt {
 
         //Test addPrepaymentId method
         assertNotEquals(1001L, this.recurringTransactionService.findById(1001L).getPrepaymentId());
+
+        //Test prepaymentId in rTransaction is correct after change
+        final RecurringTransaction recurringTransaction = this.recurringTransactionService.findById(
+                1001L);
+        assertEquals(prepayment.getId(), recurringTransaction.getPrepaymentId());
     }
 
     @Test
     @Transactional
     public void testCreate_emptyPayload_shouldThrowException() {
-        CreatePrepaymentDto dto = new CreatePrepaymentDto();
+        final CreatePrepaymentDto dto = new CreatePrepaymentDto();
 
         assertThrows(DataIntegrityViolationException.class, () -> {
             this.prepaymentService.create(dto);
@@ -165,7 +168,7 @@ public class PrepaymentServiceIt {
 
     @Test
     public void testFindById_validPayload_shouldFindPayment() {
-        Prepayment prepayment = this.prepaymentService.findById(1001L);
+        final Prepayment prepayment = this.prepaymentService.findById(1001L);
 
         assertNotNull(prepayment);
     }
@@ -178,15 +181,15 @@ public class PrepaymentServiceIt {
 
     @Test
     public void testPrepaymentAmountSumByBudgetId_validPayload_shouldSumAmount() {
-        BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(1001L);
+        final BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(
+                1001L);
 
         assertEquals(BigDecimal.valueOf(200.00), sum.setScale(1, RoundingMode.HALF_DOWN));
     }
 
     @Test
-    public void testPrepaymentAmountSumByBudgetId_withTwoPrepayments_shouldSumAmount()
-            throws InvalidRecurrenceRuleException {
-        CreatePrepaymentDto createPrepaymentDto = new CreatePrepaymentDto();
+    public void testPrepaymentAmountSumByBudgetId_withTwoPrepayments_shouldSumAmount() {
+        final CreatePrepaymentDto createPrepaymentDto = new CreatePrepaymentDto();
         createPrepaymentDto.setAmount(BigDecimal.valueOf(200));
         createPrepaymentDto.setBudgetId(1001L);
         createPrepaymentDto.setName("NETI");
@@ -195,14 +198,16 @@ public class PrepaymentServiceIt {
 
         this.prepaymentService.create(createPrepaymentDto);
 
-        BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(1001L);
+        final BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(
+                1001L);
 
         assertEquals(BigDecimal.valueOf(400.00), sum.setScale(1, RoundingMode.HALF_DOWN));
     }
 
     @Test
     public void testPrepaymentAmountSumByBudgetId_withoutPrepaymentsBudget_shouldThrowException() {
-        BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(1003L);
+        final BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(
+                1003L);
 
         assertEquals(BigDecimal.ZERO.setScale(1, RoundingMode.HALF_DOWN),
                 sum.setScale(1, RoundingMode.HALF_DOWN));
@@ -210,7 +215,8 @@ public class PrepaymentServiceIt {
 
     @Test
     public void testPrepaymentAmountSumByBudgetId_invalidId() {
-        BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(10099L);
+        final BigDecimal sum = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(
+                10099L);
 
         assertEquals(BigDecimal.ZERO.setScale(1, RoundingMode.HALF_DOWN),
                 sum.setScale(1, RoundingMode.HALF_DOWN));
