@@ -59,7 +59,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testCreate_validPayload_shouldCreateRecurringTransaction() throws Exception {
 
-        CreateRecurringTransactionDto rTransactionDto = new CreateRecurringTransactionDto();
+        final CreateRecurringTransactionDto rTransactionDto = new CreateRecurringTransactionDto();
 
         rTransactionDto.setType(TransactionType.EXPENSE);
         rTransactionDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
