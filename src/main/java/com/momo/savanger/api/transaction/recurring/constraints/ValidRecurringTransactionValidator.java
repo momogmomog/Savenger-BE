@@ -30,7 +30,8 @@ public class ValidRecurringTransactionValidator implements
     @Override
     public boolean isValid(Long id, ConstraintValidatorContext constraintValidatorContext) {
 
-        RecurringTransaction rTransaction = this.recurringTransactionService.findByIdIfExists(id)
+        final RecurringTransaction rTransaction = this.recurringTransactionService.findByIdIfExists(
+                        id)
                 .orElse(null);
 
         if (rTransaction == null) {
@@ -38,7 +39,7 @@ public class ValidRecurringTransactionValidator implements
                     ValidationMessages.R_TRANSACTION_ID_NOT_EXIST);
         }
 
-        User user = SecurityUtils.getCurrentUser();
+        final User user = SecurityUtils.getCurrentUser();
 
         if (!budgetService.isUserPermitted(user, rTransaction.getBudgetId())) {
             return ValidationUtil.fail(constraintValidatorContext, null,
