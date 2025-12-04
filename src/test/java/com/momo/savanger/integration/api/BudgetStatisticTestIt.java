@@ -880,7 +880,6 @@ public class BudgetStatisticTestIt {
         budgetDto.setActive(true);
         budgetDto.setAutoRevise(false);
         budgetDto.setDateStarted(LocalDateTime.now());
-        budgetDto.setDueDate(LocalDateTime.now().plusMonths(8));
         budgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
 
         return this.budgetService.create(budgetDto, 1L);

@@ -8,6 +8,7 @@ import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.prepayment.PrepaymentService;
+import com.momo.savanger.api.recurringRule.RecurringRuleService;
 import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.user.User;
@@ -37,6 +38,8 @@ public class BudgetServiceImpl implements BudgetService {
     private final TransactionService transactionService;
 
     private final PrepaymentService prepaymentService;
+
+    private final RecurringRuleService recurringRuleService;
 
     @Override
     public Budget findById(Long id) {
@@ -71,6 +74,12 @@ public class BudgetServiceImpl implements BudgetService {
         final Budget budget = this.budgetMapper.toBudget(createBudgetDto);
 
         budget.setOwnerId(ownerId);
+
+        budget.setDueDate(
+                this.recurringRuleService.convertRecurringRuleToDate(
+                        createBudgetDto.getRecurringRule(),
+                        createBudgetDto.getDateStarted())
+        );
 
         if (budget.getBudgetCap() == null) {
             budget.setBudgetCap(BigDecimal.ZERO);
@@ -151,7 +160,9 @@ public class BudgetServiceImpl implements BudgetService {
 
         budget.setBalance(revision.getBalance());
         budget.setDateStarted(revision.getRevisionDate());
-        //TODO: set due date with RRule calculation
+        budget.setDueDate(this.recurringRuleService.convertRecurringRuleToDate(
+                budget.getRecurringRule(), budget.getDateStarted())
+        );
 
         this.budgetRepository.save(budget);
     }

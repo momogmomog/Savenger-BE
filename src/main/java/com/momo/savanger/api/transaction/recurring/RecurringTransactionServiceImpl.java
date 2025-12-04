@@ -1,5 +1,6 @@
 package com.momo.savanger.api.transaction.recurring;
 
+import com.momo.savanger.api.recurringRule.RecurringRuleService;
 import com.momo.savanger.constants.EntityGraphs;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
@@ -16,7 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecurringTransactionServiceImpl implements RecurringTransactionService {
 
     private final RecurringTransactionRepository recurringTransactionRepository;
+
     private final RecurringTransactionMapper recurringTransactionMapper;
+
+    private final RecurringRuleService recurringRuleService;
 
     @Override
     @Transactional
@@ -25,9 +29,12 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
                 dto);
 
         recurringTransaction.setCompleted(false);
-
-        //While implementing RRule
-        recurringTransaction.setNextDate(LocalDateTime.now());
+        recurringTransaction.setNextDate(
+                this.recurringRuleService.convertRecurringRuleToDate(
+                        dto.getRecurringRule(),
+                        LocalDateTime.now()
+                )
+        );
 
         this.recurringTransactionRepository.saveAndFlush(recurringTransaction);
 
@@ -43,9 +50,17 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     }
 
     @Override
+    public RecurringTransaction findByIdFetchAll(Long id) {
+        return this.findByIdIfExists(id)
+                .orElseThrow(
+                        () -> ApiException.with(ApiErrorCode.ERR_0016)
+                );
+    }
+
+    @Override
     @Transactional
-    public void addPrepaymentId(Long prepaymentId, RecurringTransaction recurringTransaction) {
-        recurringTransaction.setPrepaymentId(prepaymentId);
+    public void updateRecurringTransaction(RecurringTransaction recurringTransaction) {
+        recurringTransaction.setUpdateDate(LocalDateTime.now());
         this.recurringTransactionRepository.save(recurringTransaction);
     }
 

@@ -33,11 +33,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
@@ -81,14 +78,15 @@ public class BudgetServiceIt {
         CreateBudgetDto createBudgetDto = new CreateBudgetDto();
         createBudgetDto.setBudgetName("Test");
         createBudgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
-        createBudgetDto.setDateStarted(LocalDateTime.now());
-        createBudgetDto.setDueDate(LocalDateTime.now().plusMonths(5));
+        createBudgetDto.setDateStarted(LocalDateTime.of(2025, 11, 7, 15, 51));
         createBudgetDto.setBalance(BigDecimal.valueOf(243.4));
         createBudgetDto.setBudgetCap(BigDecimal.valueOf(323));
         createBudgetDto.setActive(true);
         createBudgetDto.setAutoRevise(true);
 
-        assertNotNull(this.budgetService.create(createBudgetDto, 1L));
+        Budget budget = this.budgetService.create(createBudgetDto, 1L);
+
+        assertNotNull(budget);
 
         List<Budget> budgets = this.budgetRepository.findAll();
 
@@ -98,13 +96,25 @@ public class BudgetServiceIt {
                 .hasSameElementsAs(
                         budgets.stream().map(Budget::getBudgetName).toList()
                 );
+
+        assertEquals("Test", budget.getBudgetName());
+        assertEquals("FREQ=DAILY;INTERVAL=1", budget.getRecurringRule());
+        assertEquals(BigDecimal.valueOf(243.4).setScale(2, RoundingMode.HALF_DOWN),
+                budget.getBalance());
+        assertEquals(BigDecimal.valueOf(323).setScale(2, RoundingMode.HALF_DOWN),
+                budget.getBudgetCap());
+        assertEquals(true, budget.getActive());
+        assertEquals(true, budget.getAutoRevise());
+        assertEquals(budget.getDateStarted().plusDays(1).toLocalDate(),
+                budget.getDueDate().toLocalDate());
+        assertEquals(1L, budget.getOwnerId());
     }
 
     @Test
     public void testCreate_emptyPayload_shouldThrowException() {
         CreateBudgetDto createBudgetDto = new CreateBudgetDto();
 
-        assertThrows(DataIntegrityViolationException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             this.budgetService.create(createBudgetDto, 1L);
         });
     }
@@ -147,7 +157,6 @@ public class BudgetServiceIt {
         budgetDto.setBudgetName("Test");
         budgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
         budgetDto.setDateStarted(LocalDateTime.now());
-        budgetDto.setDueDate(LocalDateTime.now().plusMonths(5));
         budgetDto.setActive(false);
         budgetDto.setAutoRevise(true);
 
@@ -394,6 +403,8 @@ public class BudgetServiceIt {
 
         assertEquals(revision.getRevisionDate(), budget.getDateStarted());
         assertEquals(revision.getBalance(), budget.getBalance());
+        assertEquals(budget.getDateStarted().plusDays(1).toLocalDate(),
+                budget.getDueDate().toLocalDate());
     }
 
     @Test

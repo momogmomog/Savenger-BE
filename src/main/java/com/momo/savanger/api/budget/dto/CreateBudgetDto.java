@@ -29,10 +29,6 @@ public class CreateBudgetDto {
     private LocalDateTime dateStarted;
 
     @NotNull
-    @DateTimeConverter
-    private LocalDateTime dueDate;
-
-    @NotNull
     private Boolean active;
 
     @MinValueZero

@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -139,7 +138,7 @@ public class DebtControllerIt extends BaseControllerIt {
     public void testPay_invalidPayload() throws Exception {
         PayDebtDto dto = new PayDebtDto();
 
-        super.post("/debts/101/payDebt",
+        super.post("/debts/101/pay-debt",
                 dto,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
@@ -149,7 +148,7 @@ public class DebtControllerIt extends BaseControllerIt {
 
         dto.setAmount(BigDecimal.valueOf(-23));
 
-        super.post("/debts/101/payDebt",
+        super.post("/debts/101/pay-debt",
                 dto,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),

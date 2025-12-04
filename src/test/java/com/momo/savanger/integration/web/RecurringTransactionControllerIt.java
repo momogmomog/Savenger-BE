@@ -5,17 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.momo.savanger.api.prepayment.CreatePrepaymentDto;
+import com.momo.savanger.api.transaction.TransactionRepository;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionRepository;
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -53,24 +52,25 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @Autowired
     private RecurringTransactionRepository recurringTransactionRepository;
 
+    @Autowired
+    private TransactionRepository transactionRepository;
+
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testCreate_validPayload_shouldCreateRecurringTransaction() throws Exception {
 
-        assertEquals(1, this.recurringTransactionRepository.findAll().size());
+        final CreateRecurringTransactionDto rTransactionDto = new CreateRecurringTransactionDto();
 
-        CreateRecurringTransactionDto rTransactionDto = new CreateRecurringTransactionDto();
-
-        rTransactionDto.setAmount(BigDecimal.valueOf(0.05));
-        rTransactionDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
-        rTransactionDto.setBudgetId(1002L);
-        rTransactionDto.setAutoExecute(false);
         rTransactionDto.setType(TransactionType.EXPENSE);
+        rTransactionDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
+        rTransactionDto.setAmount(BigDecimal.valueOf(20));
+        rTransactionDto.setBudgetId(1001L);
+        rTransactionDto.setAutoExecute(false);
 
-        CreatePrepaymentDto prepaymentDto = new CreatePrepaymentDto();
-        prepaymentDto.setAmount(BigDecimal.valueOf(1));
+        final CreatePrepaymentDto prepaymentDto = new CreatePrepaymentDto();
+        prepaymentDto.setAmount(BigDecimal.valueOf(100));
         prepaymentDto.setRecurringTransaction(rTransactionDto);
-        prepaymentDto.setBudgetId(1002L);
+        prepaymentDto.setBudgetId(1001L);
         prepaymentDto.setName("kroki");
         prepaymentDto.setPaidUntil(LocalDateTime.now().plusMonths(10));
 
@@ -85,9 +85,9 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     public void testCreate_invalidPayload_shouldThrowException() throws Exception {
 
         //Test empty recurring transaction
-        CreateRecurringTransactionDto rTransactionDto = new CreateRecurringTransactionDto();
+        final CreateRecurringTransactionDto rTransactionDto = new CreateRecurringTransactionDto();
 
-        CreatePrepaymentDto prepaymentDto = new CreatePrepaymentDto();
+        final CreatePrepaymentDto prepaymentDto = new CreatePrepaymentDto();
         prepaymentDto.setAmount(BigDecimal.valueOf(1));
         prepaymentDto.setRecurringTransaction(rTransactionDto);
         prepaymentDto.setBudgetId(1002L);
@@ -97,7 +97,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         super.post(Endpoints.PREPAYMENTS,
                 prepaymentDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(7)),
+                jsonPath("fieldErrors.length()", is(6)),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.type\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
@@ -109,103 +109,109 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransaction.recurringRule\" && @.constraintName == \"RRule\")]").exists(),
-                jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"ValidPrepaymentDto\")]").exists()
 
         );
 
-        //Test recurringRule
-
         rTransactionDto.setType(TransactionType.EXPENSE);
+        rTransactionDto.setRecurringRule("FRE=DAILY;INTERVAL=1");
+        rTransactionDto.setAmount(BigDecimal.valueOf(-20));
+        rTransactionDto.setBudgetId(101L);
         rTransactionDto.setAutoExecute(false);
-
-        rTransactionDto.setRecurringRule("FREQ=DAILY;INTERVA=1");
 
         super.post(Endpoints.PREPAYMENTS,
                 prepaymentDto,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(4)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransaction.amount\" && @.constraintName == \"NotNull\")]").exists(),
-                jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"NotNull\")]").exists(),
-                jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.recurringRule\" && @.constraintName == \"RRule\")]").exists(),
-                jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"ValidPrepaymentDto\")]").exists()
-
-        );
-
-        //Test amount
-        rTransactionDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
-        rTransactionDto.setAmount(BigDecimal.valueOf(-34));
-
-        super.post(Endpoints.PREPAYMENTS,
-                prepaymentDto,
-                HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(3)),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.amount\" && @.constraintName == \"MinValueZero\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"NotNull\")]").exists(),
+                        "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"ValidPrepaymentDto\")]").exists(),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"ValidPrepaymentDto\")]").exists()
-
+                        "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
         );
+    }
 
-        //Test budgetID
+    @Test
+    @WithLocalMockedUser(username = Constants.THIRD_USER_USERNAME)
+    public void testCreate_invalidUser() throws Exception {
 
-        rTransactionDto.setAmount(BigDecimal.ZERO);
-        rTransactionDto.setBudgetId(1003L);
-        prepaymentDto.setBudgetId(1003L);
-
-        super.post(Endpoints.PREPAYMENTS,
-                prepaymentDto,
-                HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(2)),
-                jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists(),
-                jsonPath(
-                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
-
-        );
-
+        final CreatePrepaymentDto prepaymentDto = new CreatePrepaymentDto();
+        prepaymentDto.setAmount(BigDecimal.valueOf(100));
+        prepaymentDto.setRecurringTransactionId(1001L);
         prepaymentDto.setBudgetId(1001L);
-        rTransactionDto.setBudgetId(1001L);
-        rTransactionDto.setCategoryId(1002L);
+        prepaymentDto.setName("kroki");
+        prepaymentDto.setPaidUntil(LocalDateTime.now().plusMonths(10));
 
         super.post(Endpoints.PREPAYMENTS,
                 prepaymentDto,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransaction.categoryId\" && @.constraintName == \"ValidRecurringTransactionDto\" "
-                                + "&& @.message == \"Category does not exist or budget is not valid.\")]").exists()
+                        "fieldErrors.[?(@.field == \"budgetId\" && "
+                                + "@.constraintName == \"CanAccessBudget\")]").exists()
+
         );
 
-        rTransactionDto.setCategoryId(1001L);
-        rTransactionDto.setDebtId(1001L);
+    }
 
-        super.post(Endpoints.PREPAYMENTS,
-                prepaymentDto,
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testPay_validPayload_shouldPayTransaction() throws Exception {
+
+        super.postOK("/recurring-transaction/1001/pay-r-transaction", null);
+
+        assertEquals(2, this.transactionRepository.findAll().size());
+
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.THIRD_USER_USERNAME)
+    public void testPay_invalidBudgetOwner_shouldThrowException() throws Exception {
+
+        super.post("/recurring-transaction/1001/pay-r-transaction",
+                null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransaction.debtId\" && @.constraintName == \"ValidRecurringTransactionDto\" "
-                                + "&& @.message == \"Debt is not valid.\")]").exists()
+                        "fieldErrors.[?(@.field == \"rTransactionId\" && "
+                                + "@.constraintName == \"ValidRecurringTransaction\" &&"
+                                + "@.message == \"Access denied\")]").exists()
+
         );
+    }
 
-        rTransactionDto.setDebtId(101L);
-        rTransactionDto.setTagIds(List.of(1001L, 1002L, 1003L));
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testCreate_invalidPayload() throws Exception {
 
-        super.post(Endpoints.PREPAYMENTS,
-                prepaymentDto,
+        super.post("/recurring-transaction/1002/pay-r-transaction",
+                null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath(
-                        "fieldErrors.[?(@.field == \"recurringTransaction.tagIds\" && @.constraintName == \"ValidRecurringTransactionDto\" "
-                                + "&& @.message == \"Invalid tags: [1002, 1003]\")]").exists()
+                        "fieldErrors.[?(@.field == \"rTransactionId\" && "
+                                + "@.constraintName == \"ValidRecurringTransaction\" &&"
+                                + "@.message == \"Recurring transaction with this id and budget id does not exist.\")]").exists()
+
         );
+
+        super.postOK("/recurring-transaction/1001/pay-r-transaction", null);
+
+        super.postOK("/recurring-transaction/1001/pay-r-transaction", null);
+
+        super.post("/recurring-transaction/1001/pay-r-transaction",
+                null,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"rTransactionId\" && "
+                                + "@.constraintName == \"ValidRecurringTransaction\" &&"
+                                + "@.message == \"Recurring transaction with this id and budget id does not exist.\")]").exists()
+
+        );
+
     }
 }

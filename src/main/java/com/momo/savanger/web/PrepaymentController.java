@@ -4,6 +4,7 @@ import com.momo.savanger.api.prepayment.CreatePrepaymentDto;
 import com.momo.savanger.api.prepayment.PrepaymentDto;
 import com.momo.savanger.api.prepayment.PrepaymentMapper;
 import com.momo.savanger.api.prepayment.PrepaymentService;
+import com.momo.savanger.api.transaction.recurring.RTransactionPrepaymentService;
 import com.momo.savanger.constants.Endpoints;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,5 +26,6 @@ public class PrepaymentController {
     public PrepaymentDto create(@Valid @RequestBody CreatePrepaymentDto dto) {
         return this.prepaymentMapper.toPrepaymentDto(this.prepaymentService.create(dto));
     }
+
 
 }

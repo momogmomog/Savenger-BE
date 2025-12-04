@@ -23,5 +23,7 @@ public class ValidationMessages {
     public static final String AMOUNT_CANNOT_BE_BIGGER_THAN_BALANCE = "Amount cannot be bigger than budget balance";
     public static final String ONE_FIELD_SHOULD_BE_NULL = "One of these fields %s, %s should be null.";
     public static final String R_TRANSACTION_ID_NOT_EXIST = "Recurring transaction with this id and budget id does not exist.";
+    public static final String ACCESS_DENIED = "Access denied";
+    public static final String R_TRANSACTION_IS_COMPLETED = "Recurring transaction is already completed.";
 
 }

@@ -8,10 +8,12 @@ public interface RecurringTransactionService {
 
     RecurringTransaction findById(Long id);
 
+    RecurringTransaction findByIdFetchAll(Long id);
+
     Optional<RecurringTransaction> findByIdIfExists(Long id);
 
-    void addPrepaymentId(Long prepaymentId, RecurringTransaction recurringTransaction);
-
     boolean recurringTransactionExists(Long rTransactionId, Long budgetId);
+
+    void updateRecurringTransaction(RecurringTransaction recurringTransaction);
 
 }

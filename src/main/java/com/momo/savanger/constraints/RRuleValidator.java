@@ -17,8 +17,12 @@ public class RRuleValidator implements ConstraintValidator<RRule, String> {
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+        if (s == null) {
+            return true;
+        }
+
         try {
-            RecurrenceRule recurrenceRule = new RecurrenceRule(s, RfcMode.RFC2445_STRICT);
+            new RecurrenceRule(s, RfcMode.RFC2445_STRICT);
         } catch (Exception e) {
             constraintValidatorContext.disableDefaultConstraintViolation();
             constraintValidatorContext.buildConstraintViolationWithTemplate(
