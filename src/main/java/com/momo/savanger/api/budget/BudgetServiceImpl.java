@@ -139,8 +139,10 @@ public class BudgetServiceImpl implements BudgetService {
 
     @Override
     public Page<Budget> searchBudget(BudgetSearchQuery query, User user) {
-        final Specification<Budget> specification = BudgetSpecifications.ownerIdEquals(user.getId())
-                .or(BudgetSpecifications.containsParticipant(user.getId()))
+        final Specification<Budget> specification = Specification.anyOf(
+                        BudgetSpecifications.ownerIdEquals(user.getId()),
+                        BudgetSpecifications.containsParticipant(user.getId())
+                )
                 .and(BudgetSpecifications.sort(query.getSort()))
                 .and(BudgetSpecifications.isActive(query.getActive()))
                 .and(BudgetSpecifications.budgetNameContains(query.getBudgetName()))
@@ -169,9 +171,18 @@ public class BudgetServiceImpl implements BudgetService {
 
     @Override
     public BudgetStatistics getStatistics(Long budgetId) {
-
         final Budget budget = this.findById(budgetId);
+        return this.getStatistics(budget);
+    }
 
+    @Override
+    public BudgetStatistics getStatisticsFetchAll(Long budgetId) {
+        final Budget budget = this.findByIdFetchAll(budgetId);
+        return this.getStatistics(budget);
+    }
+
+    private BudgetStatistics getStatistics(Budget budget) {
+        final Long budgetId = budget.getId();
         final BudgetStatistics statisticDto = new BudgetStatistics();
 
         final BigDecimal earnings = this.transactionService.getEarningsAmount(budgetId);

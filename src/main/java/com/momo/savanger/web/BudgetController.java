@@ -7,6 +7,8 @@ import com.momo.savanger.api.budget.constraints.ValidBudget;
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
 import com.momo.savanger.api.budget.dto.BudgetDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
+import com.momo.savanger.api.budget.dto.BudgetSearchResponseDto;
+import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.user.User;
@@ -50,6 +52,14 @@ public class BudgetController {
         return this.budgetMapper.toBudgetDto(this.budgetService.findByIdFetchAll(budgetId));
     }
 
+    @GetMapping(Endpoints.BUDGET_STATISTICS)
+    public BudgetStatisticsDto getBudgetStatistics(
+            @PathVariable("id") @CanAccessBudget Long budgetId) {
+        return this.budgetMapper.toStatisticsDto(
+                this.budgetService.getStatisticsFetchAll(budgetId)
+        );
+    }
+
     @PostMapping(Endpoints.PARTICIPANTS)
     public BudgetDto assignParticipants(@PathVariable @ValidBudget Long id,
             @Valid @RequestBody AssignParticipantDto dto) {
@@ -73,12 +83,13 @@ public class BudgetController {
     }
 
     @PostMapping(Endpoints.BUDGET_SEARCH)
-    public PagedModel<BudgetDto> searchBudget(@Valid @RequestBody BudgetSearchQuery query
+    public PagedModel<BudgetSearchResponseDto> searchBudget(
+            @Valid @RequestBody BudgetSearchQuery query
             , @AuthenticationPrincipal User user) {
 
         return new PagedModel<>(this.budgetService
                 .searchBudget(query, user)
-                .map(this.budgetMapper::toBudgetDto));
+                .map(this.budgetMapper::toBudgetSearchResponseDto));
     }
 
 

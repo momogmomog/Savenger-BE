@@ -138,7 +138,7 @@ public class DebtControllerIt extends BaseControllerIt {
     public void testPay_invalidPayload() throws Exception {
         PayDebtDto dto = new PayDebtDto();
 
-        super.post("/debts/101/pay-debt",
+        super.post("/debts/101/pay",
                 dto,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
@@ -148,7 +148,7 @@ public class DebtControllerIt extends BaseControllerIt {
 
         dto.setAmount(BigDecimal.valueOf(-23));
 
-        super.post("/debts/101/pay-debt",
+        super.post("/debts/101/pay",
                 dto,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
