@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.momo.savanger.api.recurringRule.RecurringRuleService;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import org.junit.jupiter.api.Test;
@@ -73,6 +74,59 @@ public class RecurringRuleServiceIt {
                 date);
 
         LocalDateTime expectedDate = date.plusYears(1);
+
+        assertEquals(expectedDate.toLocalDate(), newDate.toLocalDate());
+    }
+
+    @Test
+    public void testConvertRecurringRuleToDate_dailyRecurringRuleIntervalThree_shouldReturnNewDate() {
+
+        String recurringRule = "FREQ=DAILY;INTERVAL=3";
+        LocalDateTime date = LocalDateTime.of(2025, 11, 6, 13, 27);
+
+        LocalDateTime newDate = this.recurringRuleService.convertRecurringRuleToDate(recurringRule,
+                date);
+
+        assertEquals(date.plusDays(3).toLocalDate(), newDate.toLocalDate());
+    }
+
+    @Test
+    public void testConvertRecurringRuleToDate_weeklyRecurringRuleIntervalThree_shouldReturnNewDate() {
+
+        String recurringRule = "FREQ=WEEKLY;INTERVAL=3;BYDAY=MO";
+
+        LocalDateTime date = LocalDateTime.of(2025, 11, 6, 13, 27);
+
+        LocalDateTime newDate = this.recurringRuleService.convertRecurringRuleToDate(recurringRule,
+                date);
+
+        assertEquals(LocalDateTime.of(2025, 11, 24, 13, 27).toLocalDate(), newDate.toLocalDate());
+    }
+
+    @Test
+    public void testConvertRecurringRuleToDate_monthlyRecurringRuleIntervalThree_shouldReturnNewDate() {
+
+        String recurringRule = "FREQ=MONTHLY;INTERVAL=3;BYMONTHDAY=06";
+
+        LocalDateTime date = LocalDateTime.of(2025, 11, 6, 13, 27);
+
+        LocalDateTime newDate = this.recurringRuleService.convertRecurringRuleToDate(recurringRule,
+                date);
+
+        assertEquals(LocalDate.of(2026, 2, 6), newDate.toLocalDate());
+    }
+
+    @Test
+    public void testConvertRecurringRuleToDate_yearlyRecurringRulentervalThree_shouldReturnNewDate() {
+
+        String recurringRule = "FREQ=YEARLY;INTERVAL=3;BYMONTH=11;BYMONTHDAY=06";
+
+        LocalDateTime date = LocalDateTime.of(2025, 11, 6, 13, 27);
+
+        LocalDateTime newDate = this.recurringRuleService.convertRecurringRuleToDate(recurringRule,
+                date);
+
+        LocalDateTime expectedDate = date.plusYears(3);
 
         assertEquals(expectedDate.toLocalDate(), newDate.toLocalDate());
     }

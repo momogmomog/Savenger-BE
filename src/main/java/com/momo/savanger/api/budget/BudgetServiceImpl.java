@@ -103,9 +103,14 @@ public class BudgetServiceImpl implements BudgetService {
 
     @Override
     public boolean isUserPermitted(User user, Long budgetId) {
+        return this.isUserPermitted(user, budgetId, true);
+    }
 
+    @Override
+    public boolean isUserPermitted(User user, Long budgetId, boolean filterOnlyActiveBudgets) {
         final Specification<Budget> specification = BudgetSpecifications.idEquals(budgetId)
-                .and(BudgetSpecifications.isActive())
+                .and(filterOnlyActiveBudgets ? BudgetSpecifications.isActive()
+                        : Specification.where(null))
                 .and(
                         ownerIdEquals(user.getId())
                                 .or(BudgetSpecifications.containsParticipant(user.getId()))

@@ -12,6 +12,8 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = CanAccessBudgetValidator.class)
 public @interface CanAccessBudget {
 
+    boolean onlyEnabled() default true;
+
     String message() default "Invalid budget ID!";
 
     Class<?>[] groups() default {};

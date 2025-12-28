@@ -14,6 +14,8 @@ public class CanAccessBudgetValidator implements ConstraintValidator<CanAccessBu
 
     private final BudgetService budgetService;
 
+    private boolean onlyEnabled;
+
     @Override
     public boolean isValid(Long budgetId, ConstraintValidatorContext constraintValidatorContext) {
 
@@ -23,11 +25,12 @@ public class CanAccessBudgetValidator implements ConstraintValidator<CanAccessBu
 
         final User user = SecurityUtils.getCurrentUser();
 
-        return this.budgetService.isUserPermitted(user, budgetId);
+        return this.budgetService.isUserPermitted(user, budgetId, this.onlyEnabled);
     }
 
     @Override
     public void initialize(CanAccessBudget constraintAnnotation) {
+        this.onlyEnabled = constraintAnnotation.onlyEnabled();
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 }

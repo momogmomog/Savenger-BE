@@ -426,4 +426,31 @@ public class BudgetControllerIt extends BaseControllerIt {
 
     }
 
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testGetBudgetStatistics_validId_shouldReturnStatistics() throws Exception {
+        super.getOK("/budgets/1001/statistics");
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.THIRD_USER_USERNAME)
+    public void testGetBudgetStatistics_invalid() throws Exception {
+
+        //Test owner cannot access budget
+        super.get("/budgets/1002/statistics", HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath("fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
+        );
+
+        Budget budget = this.budgetService.findById(1003L);
+        budget.setActive(false);
+        this.budgetRepository.save(budget);
+
+        //Test budget is not active
+        super.get("/budgets/1/statistics", HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath("fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
+        );
+    }
+
 }

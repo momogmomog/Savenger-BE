@@ -60,7 +60,7 @@ public class BudgetController {
     }
 
     @GetMapping(Endpoints.BUDGET)
-    public BudgetDto getBudget(@PathVariable("id") @CanAccessBudget Long budgetId) {
+    public BudgetDto getBudget(@PathVariable("id") @CanAccessBudget(onlyEnabled = false) Long budgetId) {
         return this.budgetMapper.toBudgetDto(this.budgetService.findByIdFetchAll(budgetId));
     }
 
