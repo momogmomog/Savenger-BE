@@ -161,7 +161,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testPay_validPayload_shouldPayTransaction() throws Exception {
 
-        super.postOK("/recurring-transaction/1001/pay-r-transaction", null);
+        super.postOK("/recurring-transaction/1001/pay", null);
 
         assertEquals(2, this.transactionRepository.findAll().size());
 
@@ -171,7 +171,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.THIRD_USER_USERNAME)
     public void testPay_invalidBudgetOwner_shouldThrowException() throws Exception {
 
-        super.post("/recurring-transaction/1001/pay-r-transaction",
+        super.post("/recurring-transaction/1001/pay",
                 null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
@@ -187,7 +187,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testCreate_invalidPayload() throws Exception {
 
-        super.post("/recurring-transaction/1002/pay-r-transaction",
+        super.post("/recurring-transaction/1002/pay",
                 null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
@@ -198,11 +198,11 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
 
         );
 
-        super.postOK("/recurring-transaction/1001/pay-r-transaction", null);
+        super.postOK("/recurring-transaction/1001/pay", null);
 
-        super.postOK("/recurring-transaction/1001/pay-r-transaction", null);
+        super.postOK("/recurring-transaction/1001/pay", null);
 
-        super.post("/recurring-transaction/1001/pay-r-transaction",
+        super.post("/recurring-transaction/1001/pay",
                 null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),

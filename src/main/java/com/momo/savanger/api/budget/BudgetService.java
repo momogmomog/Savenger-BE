@@ -34,4 +34,5 @@ public interface BudgetService {
 
     BudgetStatistics getStatistics(Long budgetId);
 
+    BudgetStatistics getStatisticsFetchAll(Long budgetId);
 }
