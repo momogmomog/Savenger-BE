@@ -172,9 +172,9 @@ public class BudgetServiceIt {
     @Test
     public void testIsUserPermitted_validOwnerId_shouldReturnTrue() {
 
-        User user = this.userRepository.findByUsername("Ignat");
+        Optional<User> user = this.userRepository.findByUsername("Ignat");
 
-        boolean isUserPermitted = this.budgetService.isUserPermitted(user, 1001L);
+        boolean isUserPermitted = this.budgetService.isUserPermitted(user.get(), 1001L);
 
         assertTrue(isUserPermitted);
     }
@@ -183,9 +183,9 @@ public class BudgetServiceIt {
     @Transactional
     public void testIsUserPermitted_invalidId_shouldReturnFalse() {
 
-        User user = this.userRepository.findByUsername("Coco");
+        Optional<User>  user = this.userRepository.findByUsername("Coco");
 
-        boolean isUserPermitted = this.budgetService.isUserPermitted(user, 1001L);
+        boolean isUserPermitted = this.budgetService.isUserPermitted(user.get(), 1001L);
 
         assertFalse(isUserPermitted);
 
@@ -195,9 +195,9 @@ public class BudgetServiceIt {
     @Transactional
     public void testIsUserPermitted_validParticipantId_shouldReturnTrue() {
 
-        User user = this.userRepository.findByUsername("Roza");
+        Optional<User>  user = this.userRepository.findByUsername("Roza");
 
-        boolean isUserPermitted = this.budgetService.isUserPermitted(user, 1001L);
+        boolean isUserPermitted = this.budgetService.isUserPermitted(user.get(), 1001L);
         assertTrue(isUserPermitted);
 
     }
