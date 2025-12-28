@@ -16,12 +16,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        final User user = this.userRepository.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException(String.format("%s does not exist!", username));
-        }
-
-        return user;
+        return this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        String.format("%s does not exist!", username)
+                ));
     }
 
     @Override
@@ -32,6 +30,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getById(Long id) {
         return this.userRepository.findById(id)
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0009));
+    }
+
+    @Override
+    public User getByUsername(String username) {
+        return this.userRepository.findByUsername(username)
                 .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0009));
     }
 }
