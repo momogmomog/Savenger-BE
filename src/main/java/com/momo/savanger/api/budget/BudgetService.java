@@ -24,6 +24,8 @@ public interface BudgetService {
 
     boolean isUserPermitted(User user, Long budgetId);
 
+    boolean isUserPermitted(User user, Long budgetId, boolean filterOnlyActiveBudgets);
+
     void addParticipant(AssignParticipantDto dto);
 
     void deleteParticipant(UnassignParticipantDto dto);
