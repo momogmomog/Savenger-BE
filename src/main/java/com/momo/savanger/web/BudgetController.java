@@ -11,6 +11,7 @@ import com.momo.savanger.api.budget.dto.BudgetSearchResponseDto;
 import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
+import com.momo.savanger.api.budget.dto.UpdateBudgetDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.constants.Endpoints;
 import com.momo.savanger.error.ApiErrorCode;
@@ -54,13 +55,14 @@ public class BudgetController {
     @PutMapping(Endpoints.BUDGET)
     public BudgetDto edit(
             @PathVariable("id") @CanAccessBudget Long budgetId,
-            @Valid @RequestBody CreateBudgetDto createBudgetDto,
-            @AuthenticationPrincipal User user) {
-        return null;
+            @Valid @RequestBody UpdateBudgetDto updateBudgetDto) {
+
+        return this.budgetMapper.toBudgetDto(this.budgetService.update(updateBudgetDto, budgetId));
     }
 
     @GetMapping(Endpoints.BUDGET)
-    public BudgetDto getBudget(@PathVariable("id") @CanAccessBudget(onlyEnabled = false) Long budgetId) {
+    public BudgetDto getBudget(
+            @PathVariable("id") @CanAccessBudget(onlyEnabled = false) Long budgetId) {
         return this.budgetMapper.toBudgetDto(this.budgetService.findByIdFetchAll(budgetId));
     }
 

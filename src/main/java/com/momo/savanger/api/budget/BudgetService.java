@@ -5,6 +5,7 @@ import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
+import com.momo.savanger.api.budget.dto.UpdateBudgetDto;
 import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.user.User;
 import java.util.Optional;
@@ -19,6 +20,8 @@ public interface BudgetService {
     Optional<Budget> findIfValid(Long id);
 
     Budget create(CreateBudgetDto createBudgetDto, Long ownerId);
+
+    Budget update(UpdateBudgetDto updateBudgetDto, Long budgetId);
 
     boolean isBudgetValid(Long id);
 
