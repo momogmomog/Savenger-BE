@@ -5,6 +5,7 @@ import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -40,5 +41,16 @@ public class TagServiceImpl implements TagService {
                 .and(TagSpecification.budgetIdEquals(budgetId));
 
         return this.tagRepository.findAll(specification, null);
+    }
+
+    @Override
+    public Page<Tag> searchTags(TagQuery query) {
+        final Specification<Tag> specification = TagSpecification
+                .budgetIdEquals(query.getBudgetId())
+                .and(TagSpecification.nameContains(query.getTagName()))
+                .and(TagSpecification.capBetween(query.getBudgetCap()))
+                .and(TagSpecification.sort(query.getSort()));
+
+        return this.tagRepository.findAll(specification, query.getPage(), null);
     }
 }

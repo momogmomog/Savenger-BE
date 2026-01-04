@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = IsBudgetOwnerValidator.class)
 public @interface IsBudgetOwner {
 
-    String message() default "User is not allowed to add participants";
+    String message() default "User is not a budget owner";
 
     Class<?>[] groups() default {};
 

@@ -10,7 +10,9 @@ public class Endpoints {
     public static final String BUDGET_STATISTICS = "/budgets/{id}/statistics";
     public static final String BUDGET_SEARCH = "/budgets/search";
     public static final String CATEGORIES = "/categories";
+    public static final String CATEGORIES_SEARCH = "/categories/search";
     public static final String TAGS = "/tags";
+    public static final String TAGS_SEARCH = "/tags/search";
     public static final String PARTICIPANTS = "/budgets/{id}/participants";
     public static final String TRANSACTIONS = "/transactions";
     public static final String TRANSACTIONS_SEARCH = "/transactions/search";

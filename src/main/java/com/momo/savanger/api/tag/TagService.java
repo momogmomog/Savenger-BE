@@ -1,6 +1,7 @@
 package com.momo.savanger.api.tag;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface TagService {
 
@@ -10,4 +11,5 @@ public interface TagService {
 
     List<Tag> findByBudgetAndIdContaining(List<Long> tagsId, Long budgetId);
 
+    Page<Tag> searchTags(TagQuery query);
 }

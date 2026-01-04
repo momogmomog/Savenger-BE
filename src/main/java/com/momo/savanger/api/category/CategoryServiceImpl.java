@@ -4,6 +4,7 @@ import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -41,5 +42,16 @@ public class CategoryServiceImpl implements CategoryService {
                 .and(CategorySpecification.budgetIdEquals(budgetId));
 
         return this.categoryRepository.exists(specification);
+    }
+
+    @Override
+    public Page<Category> searchCategories(CategoryQuery query) {
+        final Specification<Category> specification = CategorySpecification
+                .budgetIdEquals(query.getBudgetId())
+                .and(CategorySpecification.nameContains(query.getCategoryName()))
+                .and(CategorySpecification.capBetween(query.getBudgetCap()))
+                .and(CategorySpecification.sort(query.getSort()));
+
+        return this.categoryRepository.findAll(specification, query.getPage(), null);
     }
 }
