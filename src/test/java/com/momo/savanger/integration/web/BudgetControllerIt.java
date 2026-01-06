@@ -10,6 +10,7 @@ import com.momo.savanger.api.budget.BudgetRepository;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
+import com.momo.savanger.api.budget.dto.UpdateBudgetDto;
 import com.momo.savanger.api.util.PageQuery;
 import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.constants.Endpoints;
@@ -439,7 +440,8 @@ public class BudgetControllerIt extends BaseControllerIt {
         //Test owner cannot access budget
         super.get("/budgets/1002/statistics", HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
-                jsonPath("fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
         );
 
         Budget budget = this.budgetService.findById(1003L);
@@ -449,8 +451,89 @@ public class BudgetControllerIt extends BaseControllerIt {
         //Test budget is not active
         super.get("/budgets/1/statistics", HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
-                jsonPath("fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
         );
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testUpdateBudget_validPayload_shouldUpdateBudget() throws Exception {
+
+        UpdateBudgetDto updateBudgetDto = new UpdateBudgetDto();
+        updateBudgetDto.setBudgetName("Pesto");
+        updateBudgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=2");
+        updateBudgetDto.setActive(false);
+        updateBudgetDto.setBudgetCap(BigDecimal.valueOf(100));
+        updateBudgetDto.setBalance(BigDecimal.valueOf(45.22));
+        updateBudgetDto.setAutoRevise(false);
+
+        super.putOK("/budgets/1001", updateBudgetDto);
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    public void testUpdate_InvalidPayload() throws Exception {
+        UpdateBudgetDto updateBudgetDto = new UpdateBudgetDto();
+
+        super.put(
+                "/budgets/1001",
+                updateBudgetDto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(5)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetName\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetName\" && @.constraintName == \"LengthName\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"active\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"autoRevise\" && @.constraintName == \"NotNull\")]").exists()
+        );
+
+        updateBudgetDto.setBudgetName("Test");
+        updateBudgetDto.setRecurringRule("FREuQ=DAILY;INTERVAL=1");
+        updateBudgetDto.setBalance(BigDecimal.valueOf(-4));
+        updateBudgetDto.setBudgetCap(BigDecimal.valueOf(-323));
+        updateBudgetDto.setActive(true);
+        updateBudgetDto.setAutoRevise(true);
+
+        super.put(
+                "/budgets/1001",
+                updateBudgetDto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"balance\" && @.constraintName == \"MinValueZero\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetCap\" && @.constraintName == \"MinValueZero\")]").exists(),
+
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"RRule\")]").exists()
+        );
+
+        updateBudgetDto.setRecurringRule("");
+        updateBudgetDto.setBudgetName("");
+        updateBudgetDto.setBalance(BigDecimal.valueOf(4));
+        updateBudgetDto.setBudgetCap(BigDecimal.valueOf(323));
+
+        super.put(
+                "/budgets/1001",
+                updateBudgetDto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"RRule\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringRule\" && @.constraintName == \"Length\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetName\" && @.constraintName == \"LengthName\")]").exists()
+        );
+
+        updateBudgetDto.setBudgetName("Test");
+        updateBudgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
     }
 
 }
