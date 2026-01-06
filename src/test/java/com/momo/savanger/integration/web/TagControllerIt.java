@@ -6,7 +6,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.momo.savanger.api.tag.CreateTagDto;
 import com.momo.savanger.api.tag.Tag;
+import com.momo.savanger.api.tag.TagQuery;
 import com.momo.savanger.api.tag.TagRepository;
+import com.momo.savanger.api.util.BetweenQuery;
+import com.momo.savanger.api.util.PageQuery;
+import com.momo.savanger.api.util.SortDirection;
+import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.constants.Endpoints;
 import java.math.BigDecimal;
 import java.util.List;
@@ -137,5 +142,87 @@ public class TagControllerIt extends BaseControllerIt {
                         "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
         );
 
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testSearchTags_validPayload_shouldReturnTags() throws Exception {
+
+        TagQuery query = new TagQuery();
+
+        PageQuery pageQuery = new PageQuery(0, 1);
+
+        SortQuery sortQuery = new SortQuery("id", SortDirection.ASC);
+
+        BetweenQuery<BigDecimal> budgetCap = new BetweenQuery<>(BigDecimal.valueOf(0),
+                BigDecimal.valueOf(1000));
+
+        query.setSort(sortQuery);
+        query.setPage(pageQuery);
+        query.setBudgetId(1001L);
+        query.setTagName("Home");
+        query.setBudgetCap(budgetCap);
+
+        super.postOK(Endpoints.TAGS_SEARCH, query);
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testSearchTags_invalidPayload_shouldThrowExceptions() throws Exception {
+
+        //Test empty query
+        TagQuery query = new TagQuery();
+
+        super.post(Endpoints.TAGS_SEARCH,
+                query,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"page\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"sort\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"NotNull\")]").exists()
+        );
+
+        //Test negative page and invalid budget id
+        PageQuery pageQuery = new PageQuery(-1, 0);
+
+        SortQuery sortQuery = new SortQuery("id", SortDirection.ASC);
+
+        query.setPage(pageQuery);
+        query.setSort(sortQuery);
+        query.setBudgetId(1007L);
+
+        super.post(Endpoints.TRANSACTIONS_SEARCH,
+                query,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(3)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"page.pageNumber\" && @.constraintName == \"Min\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"page.pageSize\" && @.constraintName == \"Min\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"budgetId\" && @.constraintName == \"CanAccessBudget\")]").exists()
+        );
+
+        pageQuery.setPageNumber(0);
+        pageQuery.setPageSize(1);
+        query.setBudgetId(1001L);
+
+        //Test empty sort
+        sortQuery = new SortQuery();
+
+        query.setSort(sortQuery);
+
+        super.post(Endpoints.TRANSACTIONS_SEARCH,
+                query,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(2)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"sort.field\" && @.constraintName == \"NotEmpty\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"sort.direction\" && @.constraintName == \"NotNull\")]").exists()
+        );
     }
 }
