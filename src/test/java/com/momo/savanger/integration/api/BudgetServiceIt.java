@@ -449,7 +449,7 @@ public class BudgetServiceIt {
 
         UpdateBudgetDto updateBudgetDto = new UpdateBudgetDto();
         updateBudgetDto.setBudgetName("Pesto");
-        updateBudgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=2");
+        updateBudgetDto.setRecurringRule("FREQ=YEARLY;INTERVAL=2");
         updateBudgetDto.setActive(false);
         updateBudgetDto.setBudgetCap(BigDecimal.valueOf(100));
         updateBudgetDto.setBalance(BigDecimal.valueOf(45.22));

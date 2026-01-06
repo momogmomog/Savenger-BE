@@ -462,7 +462,7 @@ public class BudgetControllerIt extends BaseControllerIt {
 
         UpdateBudgetDto updateBudgetDto = new UpdateBudgetDto();
         updateBudgetDto.setBudgetName("Pesto");
-        updateBudgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=2");
+        updateBudgetDto.setRecurringRule("FREQ=MONTHLY;INTERVAL=2");
         updateBudgetDto.setActive(false);
         updateBudgetDto.setBudgetCap(BigDecimal.valueOf(100));
         updateBudgetDto.setBalance(BigDecimal.valueOf(45.22));
@@ -533,7 +533,9 @@ public class BudgetControllerIt extends BaseControllerIt {
         );
 
         updateBudgetDto.setBudgetName("Test");
-        updateBudgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
+        updateBudgetDto.setRecurringRule("FREQ=YEARLY;INTERVAL=1");
+
+        super.putOK("/budgets/1001", updateBudgetDto);
     }
 
 }

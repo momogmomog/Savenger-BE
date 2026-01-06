@@ -97,8 +97,9 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     @Transactional
     public Budget update(UpdateBudgetDto updateBudgetDto, Long budgetId) {
-        Budget budget = this.findById(budgetId);
-        budget = this.budgetMapper.mergeIntoBudget(updateBudgetDto, budget);
+        final Budget budget = this.findById(budgetId);
+
+        this.budgetMapper.mergeIntoBudget(updateBudgetDto, budget);
 
         this.budgetRepository.save(budget);
 

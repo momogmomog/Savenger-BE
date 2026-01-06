@@ -14,8 +14,7 @@ public interface BudgetMapper {
 
     Budget toBudget(CreateBudgetDto createBudgetDto);
 
-
-    Budget mergeIntoBudget(UpdateBudgetDto updateBudgetDto, @MappingTarget Budget budget);
+    void mergeIntoBudget(UpdateBudgetDto updateBudgetDto, @MappingTarget Budget budget);
 
     BudgetDto toBudgetDto(Budget budget);
 
