@@ -97,6 +97,10 @@ public class BudgetServiceImpl implements BudgetService {
     @Override
     @Transactional
     public Budget update(UpdateBudgetDto updateBudgetDto, Long budgetId) {
+
+        if (updateBudgetDto.getBalance() == null){
+            updateBudgetDto.setBalance(BigDecimal.ZERO);
+        }
         final Budget budget = this.findById(budgetId);
 
         this.budgetMapper.mergeIntoBudget(updateBudgetDto, budget);

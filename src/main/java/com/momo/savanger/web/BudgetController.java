@@ -51,10 +51,9 @@ public class BudgetController {
         );
     }
 
-    //TODO: allow inactive budgets to be edited, implement logic
     @PutMapping(Endpoints.BUDGET)
     public BudgetDto edit(
-            @PathVariable("id") @CanAccessBudget Long budgetId,
+            @PathVariable("id") @CanAccessBudget(onlyEnabled = false) Long budgetId,
             @Valid @RequestBody UpdateBudgetDto updateBudgetDto) {
 
         return this.budgetMapper.toBudgetDto(this.budgetService.update(updateBudgetDto, budgetId));
@@ -64,13 +63,6 @@ public class BudgetController {
     public BudgetDto getBudget(
             @PathVariable("id") @CanAccessBudget(onlyEnabled = false) Long budgetId) {
         return this.budgetMapper.toBudgetDto(this.budgetService.findByIdFetchAll(budgetId));
-    }
-
-    //TODO: allow inactive budgets to be edited, implement logic
-    @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping(Endpoints.BUDGET)
-    public void archive(@PathVariable("id") @CanAccessBudget Long budgetId) {
-        // find by id, set status to inactive, save
     }
 
     @GetMapping(Endpoints.BUDGET_STATISTICS)

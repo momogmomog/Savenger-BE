@@ -452,7 +452,6 @@ public class BudgetServiceIt {
         updateBudgetDto.setRecurringRule("FREQ=YEARLY;INTERVAL=2");
         updateBudgetDto.setActive(false);
         updateBudgetDto.setBudgetCap(BigDecimal.valueOf(100));
-        updateBudgetDto.setBalance(BigDecimal.valueOf(45.22));
         updateBudgetDto.setAutoRevise(false);
 
         this.budgetService.update(updateBudgetDto, budget.getId());
@@ -462,7 +461,7 @@ public class BudgetServiceIt {
         assertEquals(updateBudgetDto.getBudgetName(), budget.getBudgetName());
         assertEquals(updateBudgetDto.getRecurringRule(), budget.getRecurringRule());
         assertEquals(false, budget.getActive());
-        assertEquals(updateBudgetDto.getBalance().setScale(2, RoundingMode.HALF_DOWN),
+        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
                 budget.getBalance().setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(updateBudgetDto.getBudgetCap().setScale(2, RoundingMode.HALF_DOWN),
                 budget.getBudgetCap().setScale(2, RoundingMode.HALF_DOWN));
