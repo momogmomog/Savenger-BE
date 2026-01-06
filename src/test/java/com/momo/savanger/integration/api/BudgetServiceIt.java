@@ -15,6 +15,7 @@ import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
+import com.momo.savanger.api.budget.dto.UpdateBudgetDto;
 import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.revision.RevisionService;
 import com.momo.savanger.api.user.User;
@@ -183,7 +184,7 @@ public class BudgetServiceIt {
     @Transactional
     public void testIsUserPermitted_invalidId_shouldReturnFalse() {
 
-        Optional<User>  user = this.userRepository.findByUsername("Coco");
+        Optional<User> user = this.userRepository.findByUsername("Coco");
 
         boolean isUserPermitted = this.budgetService.isUserPermitted(user.get(), 1001L);
 
@@ -195,7 +196,7 @@ public class BudgetServiceIt {
     @Transactional
     public void testIsUserPermitted_validParticipantId_shouldReturnTrue() {
 
-        Optional<User>  user = this.userRepository.findByUsername("Roza");
+        Optional<User> user = this.userRepository.findByUsername("Roza");
 
         boolean isUserPermitted = this.budgetService.isUserPermitted(user.get(), 1001L);
         assertTrue(isUserPermitted);
@@ -430,6 +431,56 @@ public class BudgetServiceIt {
 
         assertThrows(ApiException.class, () -> this.budgetService.getStatistics(100231L));
 
+    }
+
+    @Test
+    @Transactional
+    public void testUpdateBudget_validPayload_shouldUpdateBudget() {
+        Budget budget = this.budgetService.findById(1001L);
+
+        assertEquals("Food", budget.getBudgetName());
+        assertEquals("FREQ=DAILY;INTERVAL=1", budget.getRecurringRule());
+        assertEquals(true, budget.getActive());
+        assertEquals(BigDecimal.valueOf(23).setScale(2, RoundingMode.HALF_DOWN),
+                budget.getBalance().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.valueOf(50).setScale(2, RoundingMode.HALF_DOWN),
+                budget.getBudgetCap().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(true, budget.getAutoRevise());
+
+        UpdateBudgetDto updateBudgetDto = new UpdateBudgetDto();
+        updateBudgetDto.setBudgetName("Pesto");
+        updateBudgetDto.setRecurringRule("FREQ=YEARLY;INTERVAL=2");
+        updateBudgetDto.setActive(false);
+        updateBudgetDto.setBudgetCap(BigDecimal.valueOf(100));
+        updateBudgetDto.setAutoRevise(false);
+
+        this.budgetService.update(updateBudgetDto, budget.getId());
+
+        budget = this.budgetService.findById(1001L);
+
+        assertEquals(updateBudgetDto.getBudgetName(), budget.getBudgetName());
+        assertEquals(updateBudgetDto.getRecurringRule(), budget.getRecurringRule());
+        assertEquals(false, budget.getActive());
+        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
+                budget.getBalance().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(updateBudgetDto.getBudgetCap().setScale(2, RoundingMode.HALF_DOWN),
+                budget.getBudgetCap().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(false, budget.getAutoRevise());
+    }
+
+    @Test
+    @Transactional
+    public void testUpdateBudget_invalidId_shouldThrowException() {
+
+        UpdateBudgetDto updateBudgetDto = new UpdateBudgetDto();
+        updateBudgetDto.setBudgetName("Pesto");
+        updateBudgetDto.setRecurringRule("FREQ=DAILY;INTERVAL=2");
+        updateBudgetDto.setActive(false);
+        updateBudgetDto.setBudgetCap(BigDecimal.valueOf(100));
+        updateBudgetDto.setBalance(BigDecimal.valueOf(45.22));
+        updateBudgetDto.setAutoRevise(false);
+
+        assertThrows(ApiException.class, () -> this.budgetService.update(updateBudgetDto, 10055L));
     }
 
 }

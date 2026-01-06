@@ -7,6 +7,7 @@ import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
 import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
+import com.momo.savanger.api.budget.dto.UpdateBudgetDto;
 import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.recurringRule.RecurringRuleService;
 import com.momo.savanger.api.revision.Revision;
@@ -91,6 +92,22 @@ public class BudgetServiceImpl implements BudgetService {
         this.budgetRepository.saveAndFlush(budget);
 
         return this.findById(budget.getId());
+    }
+
+    @Override
+    @Transactional
+    public Budget update(UpdateBudgetDto updateBudgetDto, Long budgetId) {
+
+        if (updateBudgetDto.getBalance() == null){
+            updateBudgetDto.setBalance(BigDecimal.ZERO);
+        }
+        final Budget budget = this.findById(budgetId);
+
+        this.budgetMapper.mergeIntoBudget(updateBudgetDto, budget);
+
+        this.budgetRepository.save(budget);
+
+        return this.findById(budgetId);
     }
 
     @Override
