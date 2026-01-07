@@ -11,6 +11,7 @@ import lombok.Data;
 
 @Data
 public class CategoryQuery {
+
     @Valid
     @NotNull
     private PageQuery page;
