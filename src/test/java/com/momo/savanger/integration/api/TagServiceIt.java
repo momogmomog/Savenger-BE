@@ -92,7 +92,7 @@ public class TagServiceIt {
         dto.setBudgetId(1001L);
         dto.setBudgetCap(BigDecimal.valueOf(100));
 
-        this.tagService.create(dto);
+        Tag tag = this.tagService.create(dto);
 
         TagQuery query = new TagQuery();
 
@@ -109,7 +109,7 @@ public class TagServiceIt {
 
         assertEquals(2, tags.getTotalElements());
 
-        assertEquals(1L, tags.getContent().getFirst().getId());
+        assertEquals(tag.getId(), tags.getContent().getFirst().getId());
         assertEquals(1001L, tags.getContent().getLast().getId());
 
         //Test by name

@@ -2,6 +2,7 @@ package com.momo.savanger.integration.api;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -75,7 +77,7 @@ public class UserServiceIt {
 
     @Test
     public void testLoadUserByUsername_invalidUsername_shouldReturnNull() {
-        AssertUtil.assertApiException(ApiErrorCode.ERR_0009,
+        assertThrows(UsernameNotFoundException.class,
                 () -> this.userService.loadUserByUsername("Godji"));
     }
 

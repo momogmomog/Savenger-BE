@@ -92,7 +92,7 @@ public class CategoryServiceIt {
         dto.setBudgetId(1001L);
         dto.setBudgetCap(BigDecimal.valueOf(100));
 
-        this.categoryService.create(dto);
+        Category category = this.categoryService.create(dto);
 
         CategoryQuery query = new CategoryQuery();
 
@@ -109,7 +109,7 @@ public class CategoryServiceIt {
 
         assertEquals(2, categories.getTotalElements());
 
-        assertEquals(1L, categories.getContent().getFirst().getId());
+        assertEquals(category.getId(), categories.getContent().getFirst().getId());
         assertEquals(1001L, categories.getContent().getLast().getId());
 
         //Test by name
