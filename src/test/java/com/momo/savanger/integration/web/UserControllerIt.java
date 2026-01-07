@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -24,9 +25,28 @@ public class UserControllerIt extends BaseControllerIt {
     }
 
     @Test
+    public void testGetDetails_withoutMockedUser() throws Exception {
+
+        this.get(Endpoints.USER_DETAILS, HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testGetOtherUser() throws Exception {
 
         this.getOK("/user-details/Coco");
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testGetOtherUser_invalidUsername() throws Exception {
+
+        this.get("/user-details/momo", HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void testGetOtherUser_withNoMockedUser() throws Exception {
+
+        this.get("/user-details/Coco", HttpStatus.UNAUTHORIZED);
     }
 }

@@ -6,7 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
+import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
+import com.momo.savanger.util.AssertUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +53,7 @@ public class UserServiceIt {
 
     @Test
     public void testGetById_invalidId_shouldReturnNull() {
-        assertThrows(ApiException.class, () -> this.userService.getById(989L));
+        AssertUtil.assertApiException(ApiErrorCode.ERR_0009, () -> this.userService.getById(989L));
     }
 
     @Test
@@ -63,7 +65,7 @@ public class UserServiceIt {
 
     @Test
     public void testGetByUsername_invalidUsername_shouldReturnNull() {
-        assertThrows(ApiException.class, () -> this.userService.getByUsername("Godji"));
+        AssertUtil.assertApiException(ApiErrorCode.ERR_0009, () -> this.userService.getByUsername("Godji"));
     }
 
     @Test
@@ -75,8 +77,7 @@ public class UserServiceIt {
 
     @Test
     public void testLoadUserByUsername_invalidUsername_shouldReturnNull() {
-        assertThrows(UsernameNotFoundException.class,
-                () -> this.userService.loadUserByUsername("Godji"));
+        AssertUtil.assertApiException(ApiErrorCode.ERR_0009, () -> this.userService.loadUserByUsername("Godji"));
     }
 
 
