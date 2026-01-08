@@ -6,10 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.momo.savanger.api.category.Category;
+import com.momo.savanger.api.category.CategoryQuery;
 import com.momo.savanger.api.category.CategoryRepository;
 import com.momo.savanger.api.category.CategoryService;
 import com.momo.savanger.api.category.CreateCategoryDto;
+import com.momo.savanger.api.util.BetweenQuery;
+import com.momo.savanger.api.util.PageQuery;
+import com.momo.savanger.api.util.SortDirection;
+import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.error.ApiException;
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -76,5 +83,69 @@ public class CategoryServiceIt {
         assertThrows(ApiException.class, () -> {
             this.categoryService.findById(544L);
         });
+    }
+
+    @Test
+    public void testSearchCategories_valid_shouldReturnCategories() {
+        CreateCategoryDto dto = new CreateCategoryDto();
+        dto.setCategoryName("Smetki");
+        dto.setBudgetId(1001L);
+        dto.setBudgetCap(BigDecimal.valueOf(100));
+
+        Category category = this.categoryService.create(dto);
+
+        CategoryQuery query = new CategoryQuery();
+
+        PageQuery pageQuery = new PageQuery(0, 3);
+
+        SortQuery sortQuery = new SortQuery("ds", SortDirection.ASC);
+
+        // Search by budgetId
+        query.setSort(sortQuery);
+        query.setPage(pageQuery);
+        query.setBudgetId(1001L);
+
+        Page<Category> categories = this.categoryService.searchCategories(query);
+
+        assertEquals(2, categories.getTotalElements());
+
+        assertEquals(category.getId(), categories.getContent().getFirst().getId());
+        assertEquals(1001L, categories.getContent().getLast().getId());
+
+        //Test by name
+
+        query.setBudgetId(1001L);
+        query.setCategoryName("Smetki");
+
+        categories = this.categoryService.searchCategories(query);
+
+        assertEquals(1, categories.getTotalElements());
+
+        assertEquals("Smetki", categories.getContent().getFirst().getCategoryName());
+
+        // Test by budget cap
+
+        query.setCategoryName(null);
+
+        BetweenQuery<BigDecimal> budgetCap = new BetweenQuery<>(BigDecimal.valueOf(0),
+                BigDecimal.valueOf(500));
+
+        query.setBudgetCap(budgetCap);
+        categories = this.categoryService.searchCategories(query);
+
+        assertEquals(2, categories.getTotalElements());
+
+        assertEquals("Smetki", categories.getContent().getFirst().getCategoryName());
+        assertEquals("Home", categories.getContent().getLast().getCategoryName());
+
+        //Test budget cap 2
+        budgetCap = new BetweenQuery<>(BigDecimal.valueOf(20), BigDecimal.valueOf(299));
+
+        query.setBudgetCap(budgetCap);
+
+        categories = this.categoryService.searchCategories(query);
+
+        assertEquals(1, categories.getTotalElements());
+        assertEquals("Smetki", categories.getContent().getFirst().getCategoryName());
     }
 }

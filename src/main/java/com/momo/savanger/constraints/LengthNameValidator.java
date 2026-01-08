@@ -1,7 +1,6 @@
 package com.momo.savanger.constraints;
 
 import com.momo.savanger.constants.Lengths;
-import com.momo.savanger.error.ApiErrorCode;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
