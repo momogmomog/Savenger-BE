@@ -31,8 +31,16 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction findById(Long id) {
-        return this.transactionRepository.findById(id).orElseThrow(() -> ApiException.with(
-                ApiErrorCode.ERR_0010));
+        return this.transactionRepository
+                .findById(id)
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0010));
+    }
+
+    @Override
+    public Transaction findByIdFetchTags(Long id) {
+        return this.transactionRepository
+                .findTransactionById(id)
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0010));
     }
 
     @Override

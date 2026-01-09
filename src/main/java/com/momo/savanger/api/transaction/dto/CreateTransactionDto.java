@@ -17,7 +17,7 @@ import org.hibernate.validator.constraints.Length;
 
 @Data
 @ValidTransactionDto
-public class CreateTransactionDto implements ITransactionDto {
+public class CreateTransactionDto implements IModifyTransactionDto {
 
     @NotNull
     private TransactionType type;

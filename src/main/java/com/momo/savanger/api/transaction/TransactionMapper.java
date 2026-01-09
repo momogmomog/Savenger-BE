@@ -4,6 +4,7 @@ import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionDto;
+import com.momo.savanger.api.transaction.dto.TransactionDtoDetailed;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -18,6 +19,8 @@ public interface TransactionMapper {
     Transaction toTransaction(CreateTransactionServiceDto createCategoryDto);
 
     TransactionDto toTransactionDto(Transaction transaction);
+
+    TransactionDtoDetailed toTransactionDtoDetailed(Transaction transaction);
 
     Transaction mergeIntoTransaction(EditTransactionDto dto,
             @MappingTarget Transaction transaction);

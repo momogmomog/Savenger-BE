@@ -8,6 +8,7 @@ import com.momo.savanger.api.transaction.constraints.TransactionNotRevised;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionDto;
+import com.momo.savanger.api.transaction.dto.TransactionDtoDetailed;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.constants.Endpoints;
@@ -74,8 +75,9 @@ public class TransactionController {
     }
 
     @GetMapping(Endpoints.TRANSACTION)
-    public TransactionDto getTransaction(@PathVariable @CanViewTransaction Long id) {
-
-        return this.transactionMapper.toTransactionDto(this.transactionService.findById(id));
+    public TransactionDtoDetailed getTransaction(@PathVariable @CanViewTransaction Long id) {
+        return this.transactionMapper.toTransactionDtoDetailed(
+                this.transactionService.findByIdFetchTags(id)
+        );
     }
 }

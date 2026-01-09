@@ -1,6 +1,9 @@
 package com.momo.savanger.api.transaction;
 
+import com.momo.savanger.constants.EntityGraphs;
 import java.math.BigDecimal;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +14,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
         TransactionRepositoryFragment {
 
     boolean existsByIdAndRevisedFalse(Long id);
+
+    // TODO: check the logs if the transaction is fetched with join
+    @EntityGraph(EntityGraphs.TRANSACTION_TAGS)
+    Optional<Transaction> findTransactionById(Long id);
 
     @Query("select count(t) > 0 from Transaction t"
             + " left join t.budget budget "
