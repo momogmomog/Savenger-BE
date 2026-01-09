@@ -19,7 +19,7 @@ import com.momo.savanger.api.transaction.Transaction;
 import com.momo.savanger.api.transaction.TransactionRepository;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.TransactionType;
-import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
+import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
@@ -100,7 +100,7 @@ public class TransactionServiceIt {
 
         assertEquals(4, this.transactionRepository.findAll().size());
 
-        CreateTransactionDto dto = new CreateTransactionDto();
+        CreateTransactionServiceDto dto = new CreateTransactionServiceDto();
         dto.setType(TransactionType.EXPENSE);
         dto.setAmount(BigDecimal.valueOf(43.33));
         dto.setBudgetId(1001L);
@@ -135,7 +135,7 @@ public class TransactionServiceIt {
     @Transactional
     public void testCreateTransaction_emptyPayload_shouldThrowException() {
 
-        CreateTransactionDto dto = new CreateTransactionDto();
+        CreateTransactionServiceDto dto = new CreateTransactionServiceDto();
 
         User user = this.userService.getById(1L);
 

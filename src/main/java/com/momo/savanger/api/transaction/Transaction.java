@@ -2,6 +2,7 @@ package com.momo.savanger.api.transaction;
 
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.tag.Tag;
+import com.momo.savanger.constants.EntityGraphs;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +15,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,6 +31,9 @@ import lombok.ToString.Exclude;
 @Getter
 @Setter
 @ToString
+@NamedEntityGraph(name = EntityGraphs.TRANSACTION_TAGS, attributeNodes = {
+        @NamedAttributeNode("tags")
+})
 public class Transaction {
 
     @Id

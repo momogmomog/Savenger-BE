@@ -2,7 +2,7 @@ package com.momo.savanger.api.transaction;
 
 import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.tag.TagService;
-import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
+import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
@@ -31,13 +31,21 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction findById(Long id) {
-        return this.transactionRepository.findById(id).orElseThrow(() -> ApiException.with(
-                ApiErrorCode.ERR_0010));
+        return this.transactionRepository
+                .findById(id)
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0010));
+    }
+
+    @Override
+    public Transaction findByIdFetchTags(Long id) {
+        return this.transactionRepository
+                .findTransactionById(id)
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0010));
     }
 
     @Override
     @Transactional
-    public Transaction create(CreateTransactionDto dto, Long userId) {
+    public Transaction create(CreateTransactionServiceDto dto, Long userId) {
         final Transaction transaction = this.transactionMapper.toTransaction(dto);
 
         if (transaction.getDateCreated() == null) {
@@ -62,7 +70,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public Transaction createPrepaymentTransaction(RecurringTransaction recurringTransaction) {
-        final CreateTransactionDto transactionDto = this.transactionMapper.toCreateTransactionDto(
+        final CreateTransactionServiceDto transactionDto = this.transactionMapper.toCreateServiceDto(
                 recurringTransaction);
         transactionDto.setDateCreated(null);
 
@@ -100,10 +108,10 @@ public class TransactionServiceImpl implements TransactionService {
         );
     }
 
-    private CreateTransactionDto createTransactionDto(BigDecimal amount, Long debtId,
+    private CreateTransactionServiceDto createTransactionDto(BigDecimal amount, Long debtId,
             TransactionType transactionType, Long budgetId) {
 
-        return CreateTransactionDto.debtDto(amount,
+        return CreateTransactionServiceDto.debtDto(amount,
                 debtId,
                 transactionType,
                 budgetId
@@ -114,7 +122,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public Transaction createCompensationTransaction(Long budgetId, BigDecimal amount) {
 
-        return this.create(CreateTransactionDto.compensateDto(amount, budgetId), null);
+        return this.create(CreateTransactionServiceDto.compensateDto(amount, budgetId), null);
 
     }
 

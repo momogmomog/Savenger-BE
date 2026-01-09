@@ -3,7 +3,7 @@ package com.momo.savanger.api.transaction.constraints;
 import com.momo.savanger.api.category.CategoryService;
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.tag.TagService;
-import com.momo.savanger.api.transaction.dto.ITransactionDto;
+import com.momo.savanger.api.transaction.dto.IModifyTransactionDto;
 import com.momo.savanger.api.util.ValidationUtil;
 import com.momo.savanger.constants.ValidationMessages;
 import jakarta.validation.ConstraintValidator;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ValidTransactionDtoValidator implements
-        ConstraintValidator<ValidTransactionDto, ITransactionDto> {
+        ConstraintValidator<ValidTransactionDto, IModifyTransactionDto> {
 
     private final TagService tagService;
 
@@ -27,7 +27,7 @@ public class ValidTransactionDtoValidator implements
     }
 
     @Override
-    public boolean isValid(ITransactionDto dto,
+    public boolean isValid(IModifyTransactionDto dto,
             ConstraintValidatorContext constraintValidatorContext) {
 
         if (dto.getBudgetId() == null) {

@@ -17,7 +17,7 @@ import org.hibernate.validator.constraints.Length;
 
 @Data
 @ValidTransactionDto
-public class CreateTransactionDto implements ITransactionDto {
+public class CreateTransactionDto implements IModifyTransactionDto {
 
     @NotNull
     private TransactionType type;
@@ -39,34 +39,9 @@ public class CreateTransactionDto implements ITransactionDto {
     @CanAccessBudget
     private Long budgetId;
 
-    private Long debtId;
-
-    private Long prepaymentId;
-
     private List<Long> tagIds;
 
     public List<Long> getTagIds() {
         return Objects.requireNonNullElse(this.tagIds, List.of());
-    }
-
-    public static CreateTransactionDto compensateDto(BigDecimal amount, Long budgetId) {
-        final CreateTransactionDto dto = new CreateTransactionDto();
-        dto.type = TransactionType.COMPENSATE;
-        dto.amount = amount;
-        dto.budgetId = budgetId;
-        return dto;
-    }
-
-    public static CreateTransactionDto debtDto(BigDecimal amount, Long debtId, TransactionType type,
-            Long budgetId) {
-
-        final CreateTransactionDto createDto = new CreateTransactionDto();
-
-        createDto.setAmount(amount);
-        createDto.setBudgetId(budgetId);
-        createDto.setType(type);
-        createDto.setDebtId(debtId);
-
-        return createDto;
     }
 }
