@@ -41,7 +41,11 @@ public class TransactionController {
             @AuthenticationPrincipal User user) {
 
         return this.transactionMapper.toTransactionDto(
-                this.transactionService.create(transactionDto, user.getId()));
+                this.transactionService.create(
+                        this.transactionMapper.toCreateServiceDto(transactionDto),
+                        user.getId()
+                )
+        );
     }
 
     @PostMapping(Endpoints.TRANSACTIONS_SEARCH)

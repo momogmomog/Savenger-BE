@@ -16,7 +16,7 @@ import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.transaction.Transaction;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.TransactionType;
-import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
+import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
 import com.momo.savanger.integration.web.Constants;
 import com.momo.savanger.integration.web.WithLocalMockedUser;
@@ -924,7 +924,7 @@ public class BudgetStatisticTestIt {
 
     private Transaction createTransaction(TransactionType type
             , BigDecimal amount, Long budgetId) {
-        CreateTransactionDto transactionDto = new CreateTransactionDto();
+        CreateTransactionServiceDto transactionDto = new CreateTransactionServiceDto();
         transactionDto.setType(type);
         transactionDto.setBudgetId(budgetId);
         transactionDto.setAmount(amount);

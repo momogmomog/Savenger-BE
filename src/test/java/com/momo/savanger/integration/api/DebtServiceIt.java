@@ -14,7 +14,7 @@ import com.momo.savanger.api.debt.DebtService;
 import com.momo.savanger.api.debt.PayDebtDto;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.TransactionType;
-import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
+import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.integration.web.Constants;
 import com.momo.savanger.integration.web.WithLocalMockedUser;
@@ -410,7 +410,7 @@ public class DebtServiceIt {
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testPay_amountBiggerThanBalance_shouldThrowException() {
-        CreateTransactionDto dto = new CreateTransactionDto();
+        CreateTransactionServiceDto dto = new CreateTransactionServiceDto();
         dto.setAmount(BigDecimal.valueOf(100));
         dto.setType(TransactionType.EXPENSE);
         dto.setBudgetId(1001L);
