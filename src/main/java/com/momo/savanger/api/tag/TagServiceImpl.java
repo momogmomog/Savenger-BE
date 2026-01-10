@@ -49,6 +49,7 @@ public class TagServiceImpl implements TagService {
                 .budgetIdEquals(query.getBudgetId())
                 .and(TagSpecification.nameContains(query.getTagName()))
                 .and(TagSpecification.capBetween(query.getBudgetCap()))
+                .and(TagSpecification.idNotIn(query.getExcludeIds()))
                 .and(TagSpecification.sort(query.getSort()));
 
         return this.tagRepository.findAll(specification, query.getPage(), null);

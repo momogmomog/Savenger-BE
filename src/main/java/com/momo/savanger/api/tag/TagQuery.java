@@ -7,6 +7,7 @@ import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.constraints.NotNull;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -25,6 +26,8 @@ public class TagQuery {
     private Long budgetId;
 
     private String tagName;
+
+    private List<Long> excludeIds;
 
     private BetweenQuery<BigDecimal> budgetCap;
 }
