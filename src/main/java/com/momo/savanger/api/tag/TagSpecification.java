@@ -7,6 +7,7 @@ import com.momo.savanger.api.util.SortQuery;
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.CollectionUtils;
 
 public final class TagSpecification {
 
@@ -28,6 +29,14 @@ public final class TagSpecification {
 
     public static Specification<Tag> capBetween(final BetweenQuery<BigDecimal> betweenQuery) {
         return QuerySpecifications.between(Tag_.budgetCap, betweenQuery);
+    }
+
+    public static Specification<Tag> idNotIn(final List<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Specification.where(null);
+        }
+
+        return (root, query, cb) -> cb.not(root.get(Tag_.id).in(ids));
     }
 
     public static Specification<Tag> sort(SortQuery sortQuery) {
