@@ -15,7 +15,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
 
     boolean existsByIdAndRevisedFalse(Long id);
 
-    // TODO: check the logs if the transaction is fetched with join
     @EntityGraph(EntityGraphs.TRANSACTION_TAGS)
     Optional<Transaction> findTransactionById(Long id);
 

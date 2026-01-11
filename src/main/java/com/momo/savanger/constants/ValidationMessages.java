@@ -25,5 +25,6 @@ public class ValidationMessages {
     public static final String R_TRANSACTION_ID_NOT_EXIST = "Recurring transaction with this id and budget id does not exist.";
     public static final String ACCESS_DENIED = "Access denied";
     public static final String R_TRANSACTION_IS_COMPLETED = "Recurring transaction is already completed.";
+    public static final String CATEGORY_IS_NOT_VALID = "Category with id %s don't belong to this budget or doesn't exist";
 
 }

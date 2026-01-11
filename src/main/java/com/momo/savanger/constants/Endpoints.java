@@ -22,4 +22,7 @@ public class Endpoints {
     public static final String PAY_DEBT = "/debts/{id}/pay";
     public static final String PREPAYMENTS = "/prepayments";
     public static final String PAY_R_TRANSACTION = "/recurring-transaction/{rTransactionId}/pay";
+    public static final String TRANSFERS = "/transfers";
+    public static final String TRANSFER = "/transfers/{id}";
+    public static final String TRANSFER_SEARCH = "/transfers/search";
 }
