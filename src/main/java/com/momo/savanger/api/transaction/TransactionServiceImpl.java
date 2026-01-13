@@ -37,7 +37,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction findByIdFetchTags(Long id) {
+    public Transaction findAndFetchDetails(Long id) {
         return this.transactionRepository
                 .findTransactionById(id)
                 .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0010));
@@ -148,8 +148,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public Transaction edit(Long id, EditTransactionDto dto) {
 
-        final Transaction transaction = this.transactionMapper.mergeIntoTransaction(dto,
-                this.findById(id));
+        final Transaction transaction = this.transactionMapper.mergeIntoTransaction(
+                dto,
+                this.findById(id)
+        );
 
         if (!dto.getTagIds().isEmpty()) {
             transaction.setTags(this.tagService.findByBudgetAndIdContaining(
@@ -158,9 +160,9 @@ public class TransactionServiceImpl implements TransactionService {
             ));
         }
 
-        this.transactionRepository.save(transaction);
+        this.transactionRepository.saveAndFlush(transaction);
 
-        return transaction;
+        return this.findAndFetchDetails(id);
     }
 
     @Override

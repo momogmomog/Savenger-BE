@@ -277,6 +277,9 @@ public class TransactionServiceIt {
     @Test
     @Transactional
     public void testEditTransaction_validPayload_shouldEditTransaction() {
+        Transaction before = this.transactionService.findById(1001L);
+        assertEquals(before.getType(), TransactionType.INCOME);
+
         EditTransactionDto dto = new EditTransactionDto();
         dto.setType(TransactionType.EXPENSE);
         dto.setAmount(BigDecimal.valueOf(254.99));
