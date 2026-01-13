@@ -1,6 +1,7 @@
 package com.momo.savanger.api.transaction;
 
 import com.momo.savanger.api.budget.Budget;
+import com.momo.savanger.api.category.Category;
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.constants.EntityGraphs;
 import jakarta.persistence.Column;
@@ -59,6 +60,10 @@ public class Transaction {
     private Long userId;
 
     private Long categoryId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoryId", insertable = false, updatable = false)
+    private Category category;
 
     @Column(nullable = false)
     private Long budgetId;
