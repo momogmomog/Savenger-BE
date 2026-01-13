@@ -37,7 +37,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction findByIdFetchTags(Long id) {
+    public Transaction findAndFetchDetails(Long id) {
         return this.transactionRepository
                 .findTransactionById(id)
                 .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0010));
@@ -162,7 +162,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         this.transactionRepository.saveAndFlush(transaction);
 
-        return this.findById(id);
+        return this.findAndFetchDetails(id);
     }
 
     @Override
