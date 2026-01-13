@@ -213,8 +213,8 @@ public class BudgetServiceImpl implements BudgetService {
         final BigDecimal debtLendedSum = this.transactionService.getDebtLendedAmount(budgetId);
         final BigDecimal debtReceivedSum = this.transactionService.getDebtReceivedAmount(budgetId);
 
-        final BigDecimal prepaymentsAmount = this.prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(
-                budgetId);
+        final BigDecimal prepaymentsAmount = this.prepaymentService
+                .getRemainingPrepaymentAmountSumByBudgetId(budgetId);
 
         statisticDto.setBudget(budget);
 

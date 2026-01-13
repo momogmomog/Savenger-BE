@@ -3,6 +3,7 @@ package com.momo.savanger.api.revision;
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.BudgetStatistics;
+import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
@@ -24,6 +25,8 @@ public class RevisionServiceImpl implements RevisionService {
     private final BudgetService budgetService;
 
     private final TransactionService transactionService;
+
+    private final PrepaymentService prepaymentService;
 
     @Override
     public Revision findById(Long id) {
@@ -63,8 +66,12 @@ public class RevisionServiceImpl implements RevisionService {
 
             revision.setBalance(dto.getBalance());
         } else {
-            revision.setBalance(statistics.getRealBalance());
+            revision.setBalance(statistics.getBalance());
         }
+
+        // TODO: Save remaining prepayment data here too
+        final BigDecimal prepaymentsAmount = this.prepaymentService
+                .getRemainingPrepaymentAmountSumByBudgetId(budget.getId());
 
         revision.setEarningsAmount(statistics.getEarningsAmount());
         revision.setExpensesAmount(statistics.getExpensesAmount());
