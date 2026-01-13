@@ -381,7 +381,8 @@ public class TransactionControllerIt extends BaseControllerIt {
                 jsonPath("budgetId", is(1001)),
                 jsonPath("tags.length()", is(1)),
                 jsonPath("tags[0].tagName", is("DM")),
-                jsonPath("category.categoryName", is("Home"))
+                jsonPath("category.categoryName", is("Home")),
+                jsonPath("user.username", is("Ignat"))
         );
     }
 }
