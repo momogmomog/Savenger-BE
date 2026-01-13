@@ -133,7 +133,8 @@ public class DebtServiceIt {
         assertEquals(BigDecimal.valueOf(320).setScale(2, RoundingMode.HALF_DOWN),
                 lenderBudget.getBalance().setScale(2, RoundingMode.HALF_DOWN));
 
-        assertEquals(BigDecimal.valueOf(201).setScale(2, RoundingMode.HALF_DOWN),
+        // Lender doesn't register expense
+        assertEquals(BigDecimal.valueOf(1).setScale(2, RoundingMode.HALF_DOWN),
                 lenderBudget.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
 
         assertEquals(BigDecimal.valueOf(0).setScale(2, RoundingMode.HALF_DOWN),
@@ -156,7 +157,8 @@ public class DebtServiceIt {
         assertEquals(BigDecimal.valueOf(0).setScale(2, RoundingMode.HALF_DOWN),
                 receiverBudget.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
 
-        assertEquals(BigDecimal.valueOf(200).setScale(2, RoundingMode.HALF_DOWN),
+        // Receiver doesn't register earning
+        assertEquals(BigDecimal.valueOf(0).setScale(2, RoundingMode.HALF_DOWN),
                 receiverBudget.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
 
         assertEquals(BigDecimal.valueOf(0).setScale(2, RoundingMode.HALF_DOWN),
@@ -275,7 +277,7 @@ public class DebtServiceIt {
         assertEquals(BigDecimal.valueOf(283.00).setScale(2, RoundingMode.HALF_DOWN),
                 receiverBudget.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
 
-        assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
+        assertEquals(BigDecimal.valueOf(0).setScale(2, RoundingMode.HALF_DOWN),
                 lenderBudget.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.valueOf(480).setScale(2, RoundingMode.HALF_DOWN),
                 lenderBudget.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));

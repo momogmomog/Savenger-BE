@@ -226,10 +226,13 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private BigDecimal getSumAmount(Long budgetId, TransactionType type) {
-
         return Objects.requireNonNullElse(
-                this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevised(budgetId,
-                        type), BigDecimal.ZERO);
+                this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevisedNonDebt(
+                        budgetId,
+                        type
+                ),
+                BigDecimal.ZERO
+        );
     }
 
     @Override

@@ -223,32 +223,29 @@ public class BudgetServiceImpl implements BudgetService {
         statisticDto.setDebtLendedAmount(debtLendedSum);
         statisticDto.setDebtReceivedAmount(debtReceivedSum);
 
-        statisticDto.setRealBalance(this.sumRealBalance(
-                budget,
-                earnings,
-                expenses,
-                prepaymentsAmount)
+        statisticDto.setBalance(
+                budget.getBalance()
+                        .add(earnings)
+                        .subtract(expenses)
         );
 
-        statisticDto.setBalance(
-                statisticDto.getRealBalance()
-                        .subtract(statisticDto.getDebtReceivedAmount())
-                        .add(statisticDto.getDebtLendedAmount())
-                        .add(prepaymentsAmount)
+        statisticDto.setRealBalance(
+                budget.getBalance()
+                        .add(earnings)
+                        .subtract(expenses)
+                        .add(debtReceivedSum)
+                        .subtract(debtLendedSum)
+                        .subtract(prepaymentsAmount)
         );
+
+        // Equivalent to initial balance + earnings - expenses, but taken from real balance, further calculations are required.
+//        statisticDto.setBalance(
+//                statisticDto.getRealBalance()
+//                        .subtract(statisticDto.getDebtReceivedAmount())
+//                        .add(statisticDto.getDebtLendedAmount())
+//                        .add(prepaymentsAmount)
+//        );
 
         return statisticDto;
-    }
-
-    private BigDecimal sumRealBalance(
-            Budget budget,
-            BigDecimal earningsAmount,
-            BigDecimal expensesAmount,
-            BigDecimal prepaymentAmount) {
-
-        return earningsAmount
-                .add(budget.getBalance())
-                .subtract(expensesAmount)
-                .subtract(prepaymentAmount);
     }
 }
