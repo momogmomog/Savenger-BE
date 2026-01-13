@@ -3,6 +3,7 @@ package com.momo.savanger.api.transaction;
 import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.category.Category;
 import com.momo.savanger.api.tag.Tag;
+import com.momo.savanger.api.user.User;
 import com.momo.savanger.constants.EntityGraphs;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,8 +33,10 @@ import lombok.ToString.Exclude;
 @Getter
 @Setter
 @ToString
-@NamedEntityGraph(name = EntityGraphs.TRANSACTION_TAGS, attributeNodes = {
-        @NamedAttributeNode("tags")
+@NamedEntityGraph(name = EntityGraphs.TRANSACTION_DETAILED, attributeNodes = {
+        @NamedAttributeNode("tags"),
+        @NamedAttributeNode("user"),
+        @NamedAttributeNode("category"),
 })
 public class Transaction {
 
@@ -58,6 +61,10 @@ public class Transaction {
     private Boolean revised;
 
     private Long userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    private User user;
 
     private Long categoryId;
 

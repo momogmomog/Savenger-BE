@@ -2,6 +2,7 @@ package com.momo.savanger.api.transaction.dto;
 
 import com.momo.savanger.api.category.CategoryDto;
 import com.momo.savanger.api.tag.TagDto;
+import com.momo.savanger.api.user.UserDto;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,7 +11,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class TransactionDtoDetailed extends TransactionDto {
 
-    public List<TagDto> tags;
+    private List<TagDto> tags;
 
-    public CategoryDto category;
+    private CategoryDto category;
+
+    private UserDto user;
 }
