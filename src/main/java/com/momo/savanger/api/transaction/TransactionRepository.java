@@ -25,8 +25,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     boolean existOwnerOrParticipant(Long transactionId, Long userId);
 
     @Query("select sum(t.amount) from Transaction t "
-            + " where t.budgetId = :budgetId and t.revised = false and t.type = :type")
-    BigDecimal sumAmountByBudgetIdAndTypeOfNonRevised(Long budgetId, TransactionType type);
+            + " where t.budgetId = :budgetId and t.revised = false "
+            + " and t.type = :type"
+            + " and t.debtId is null ")
+    BigDecimal sumAmountByBudgetIdAndTypeOfNonRevisedNonDebt(Long budgetId,
+            TransactionType type);
 
     @Query("select sum(t.amount) from Transaction t "
             + " where t.budgetId = :budgetId and t.revised = false and t.type = :type and t.debtId is not null ")
