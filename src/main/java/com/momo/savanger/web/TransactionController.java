@@ -60,11 +60,12 @@ public class TransactionController {
     }
 
     @PutMapping(Endpoints.TRANSACTION)
-    public TransactionDto edit(@PathVariable @TransactionNotRevised Long id,
+    public TransactionDtoDetailed edit(@PathVariable @TransactionNotRevised Long id,
             @Valid @RequestBody EditTransactionDto dto) {
 
-        return this.transactionMapper.toTransactionDto(
-                this.transactionService.edit(id, dto));
+        return this.transactionMapper.toTransactionDtoDetailed(
+                this.transactionService.edit(id, dto)
+        );
     }
 
     @DeleteMapping(Endpoints.TRANSACTION)
@@ -77,7 +78,7 @@ public class TransactionController {
     @GetMapping(Endpoints.TRANSACTION)
     public TransactionDtoDetailed getTransaction(@PathVariable @CanViewTransaction Long id) {
         return this.transactionMapper.toTransactionDtoDetailed(
-                this.transactionService.findByIdFetchTags(id)
+                this.transactionService.findAndFetchDetails(id)
         );
     }
 }

@@ -37,10 +37,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @AutoConfigureMockMvc
+@Sql(value = "classpath:/sql/user-it-data.sql")
 @Sql(value = "classpath:/sql/prepayment/del-recurring_transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/prepayment/del-prepayment-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/prepayment/del-transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/prepayment/del-debt-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/del-user-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 public class BudgetStatisticTestIt {
 
     public static BigDecimal BUDGET_ONE_BALANCE = BigDecimal.ZERO;
@@ -133,7 +135,7 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(30),
+                toScale(0),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
@@ -167,12 +169,12 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(30),
+                toScale(0),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
         assertEquals(
-                toScale(20),
+                toScale(0),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -201,12 +203,12 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(80),
+                toScale(0),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
         assertEquals(
-                toScale(20),
+                toScale(0),
                 toScale(budgetStatistics.getExpensesAmount())
         );
         //Test with 2 received and 1 lent debt and expense and earning transaction
@@ -235,12 +237,12 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(580),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
         assertEquals(
-                toScale(30),
+                toScale(10),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -269,12 +271,12 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(580),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
         assertEquals(
-                toScale(30),
+                toScale(10),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -301,12 +303,12 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(580),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
         assertEquals(
-                toScale(50),
+                toScale(10),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -335,12 +337,12 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(580),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
         assertEquals(
-                toScale(50),
+                toScale(10),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -368,12 +370,12 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(590),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
         assertEquals(
-                toScale(50),
+                toScale(10),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -407,12 +409,12 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(590),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
         assertEquals(
-                toScale(60.50),
+                toScale(20.50),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -441,12 +443,12 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(590),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
         assertEquals(
-                toScale(535),
+                toScale(495),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -475,12 +477,12 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(590),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
         assertEquals(
-                toScale(545),
+                toScale(505),
                 toScale(budgetStatistics.getExpensesAmount())
         );
     }
@@ -540,7 +542,7 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getDebtReceivedAmount())
         );
         assertEquals(
-                toScale(30),
+                toScale(0),
                 toScale(budgetStatistics.getEarningsAmount())
         );
         assertEquals(
@@ -571,11 +573,11 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getDebtReceivedAmount())
         );
         assertEquals(
-                toScale(30),
+                toScale(0),
                 toScale(budgetStatistics.getEarningsAmount())
         );
         assertEquals(
-                toScale(20),
+                toScale(0),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -602,11 +604,11 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getDebtReceivedAmount())
         );
         assertEquals(
-                toScale(80),
+                toScale(0),
                 toScale(budgetStatistics.getEarningsAmount())
         );
         assertEquals(
-                toScale(20),
+                toScale(0),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -634,11 +636,11 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getDebtReceivedAmount())
         );
         assertEquals(
-                toScale(580),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
         assertEquals(
-                toScale(30),
+                toScale(10),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -665,11 +667,11 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getDebtReceivedAmount())
         );
         assertEquals(
-                toScale(580),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
         assertEquals(
-                toScale(30),
+                toScale(10),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -694,11 +696,11 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getDebtReceivedAmount())
         );
         assertEquals(
-                toScale(580),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
         assertEquals(
-                toScale(50),
+                toScale(10),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -725,11 +727,11 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getDebtReceivedAmount())
         );
         assertEquals(
-                toScale(580),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
         assertEquals(
-                toScale(50),
+                toScale(10),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -755,11 +757,11 @@ public class BudgetStatisticTestIt {
                 toScale(budgetStatistics.getDebtReceivedAmount())
         );
         assertEquals(
-                toScale(590),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
         assertEquals(
-                toScale(50),
+                toScale(10),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -788,12 +790,12 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(590),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
         assertEquals(
-                toScale(60.50),
+                toScale(20.50),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -822,12 +824,12 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(590),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
         assertEquals(
-                toScale(635),
+                toScale(595),
                 toScale(budgetStatistics.getExpensesAmount())
         );
 
@@ -856,12 +858,12 @@ public class BudgetStatisticTestIt {
         );
 
         assertEquals(
-                toScale(590),
+                toScale(500),
                 toScale(budgetStatistics.getEarningsAmount())
         );
 
         assertEquals(
-                toScale(645),
+                toScale(605),
                 toScale(budgetStatistics.getExpensesAmount())
         );
     }

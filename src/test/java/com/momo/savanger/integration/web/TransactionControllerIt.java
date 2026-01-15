@@ -371,4 +371,18 @@ public class TransactionControllerIt extends BaseControllerIt {
                 jsonPath("fieldErrors.[?(@.field == \"id\" && "
                         + "@.constraintName == \"CanViewTransaction\")]").exists());
     }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testGetTransaction_validId() throws Exception {
+        super.get("/transactions/1001"
+                , HttpStatus.OK,
+                jsonPath("id", is(1001)),
+                jsonPath("budgetId", is(1001)),
+                jsonPath("tags.length()", is(1)),
+                jsonPath("tags[0].tagName", is("DM")),
+                jsonPath("category.categoryName", is("Home")),
+                jsonPath("user.username", is("Ignat"))
+        );
+    }
 }

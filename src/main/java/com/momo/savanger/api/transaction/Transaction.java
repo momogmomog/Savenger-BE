@@ -1,7 +1,9 @@
 package com.momo.savanger.api.transaction;
 
 import com.momo.savanger.api.budget.Budget;
+import com.momo.savanger.api.category.Category;
 import com.momo.savanger.api.tag.Tag;
+import com.momo.savanger.api.user.User;
 import com.momo.savanger.constants.EntityGraphs;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,8 +33,10 @@ import lombok.ToString.Exclude;
 @Getter
 @Setter
 @ToString
-@NamedEntityGraph(name = EntityGraphs.TRANSACTION_TAGS, attributeNodes = {
-        @NamedAttributeNode("tags")
+@NamedEntityGraph(name = EntityGraphs.TRANSACTION_DETAILED, attributeNodes = {
+        @NamedAttributeNode("tags"),
+        @NamedAttributeNode("user"),
+        @NamedAttributeNode("category"),
 })
 public class Transaction {
 
@@ -41,7 +45,7 @@ public class Transaction {
     @Column(nullable = false, unique = true, updatable = false)
     private Long id;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private TransactionType type;
 
@@ -58,7 +62,15 @@ public class Transaction {
 
     private Long userId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    private User user;
+
     private Long categoryId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoryId", insertable = false, updatable = false)
+    private Category category;
 
     @Column(nullable = false)
     private Long budgetId;

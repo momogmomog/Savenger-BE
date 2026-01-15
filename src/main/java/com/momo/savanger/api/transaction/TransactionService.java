@@ -13,7 +13,7 @@ public interface TransactionService {
 
     Transaction findById(Long id);
 
-    Transaction findByIdFetchTags(Long id);
+    Transaction findAndFetchDetails(Long id);
 
     Transaction create(CreateTransactionServiceDto dto, Long userId);
 

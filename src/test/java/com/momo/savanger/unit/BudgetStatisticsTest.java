@@ -239,13 +239,13 @@ public class BudgetStatisticsTest {
         // Balance 800, Real Balance 800
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
 
-        // Balance 900, Real Balance 800
+        // Balance 800, Real Balance 700
         when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.valueOf(100));
 
-        // Balance 850, Real Balance 800
+        // Balance 800, Real Balance 750
         when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.valueOf(50));
 
-        // Balance 850, Real Balance 570
+        // Balance 800, Real Balance 520
         when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.valueOf(230));
 
@@ -256,7 +256,7 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.valueOf(200), stats.getExpensesAmount());
         assertEquals(BigDecimal.valueOf(100), stats.getDebtLendedAmount());
         assertEquals(BigDecimal.valueOf(50), stats.getDebtReceivedAmount());
-        assertEquals(BigDecimal.valueOf(570), stats.getRealBalance());
-        assertEquals(BigDecimal.valueOf(850), stats.getBalance());
+        assertEquals(BigDecimal.valueOf(520), stats.getRealBalance());
+        assertEquals(BigDecimal.valueOf(800), stats.getBalance());
     }
 }
