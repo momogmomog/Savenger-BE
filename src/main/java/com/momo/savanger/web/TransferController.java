@@ -8,6 +8,9 @@ import com.momo.savanger.api.transfer.TransferMapper;
 import com.momo.savanger.api.transfer.TransferSearchQuery;
 import com.momo.savanger.api.transfer.TransferService;
 import com.momo.savanger.api.transfer.constraints.CanAccessTransfer;
+import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
+import com.momo.savanger.api.transfer.transferTransaction.TransferTransaction;
+import com.momo.savanger.api.transfer.transferTransaction.TransferTransactionDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.constants.Endpoints;
 import jakarta.validation.Valid;
@@ -52,5 +55,10 @@ public class TransferController {
                 .map(this.transferMapper::toTransferDto));
 
        return pagedModel;
+    }
+
+    @PostMapping(Endpoints.TRANSFER_TRANSACTION)
+    public TransferTransactionDto transferTransaction(CreateTransferTransactionDto transferTransactionDto){
+        return null;
     }
 }
