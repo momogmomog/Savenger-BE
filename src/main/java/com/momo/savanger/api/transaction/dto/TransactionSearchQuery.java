@@ -9,6 +9,7 @@ import com.momo.savanger.constraints.NotNull;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -32,13 +33,13 @@ public class TransactionSearchQuery {
 
     private Boolean revised;
 
-    private Long categoryId;
+    private List<Long> categoryIds;
 
-    private Long userId;
+    private List<Long> userIds;
 
     @NotNull
     @CanAccessBudget
     private Long budgetId;
 
-    private Long tagId;
+    private List<Long> tagIds;
 }
