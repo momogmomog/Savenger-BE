@@ -8,7 +8,7 @@ public interface TransferService {
 
     Transfer getById(Long id);
 
-    Optional<Transfer> findById(Long id);
+    Transfer findAndFetchDetails(Long id);
 
     Transfer upsert(CreateTransferDto createTransferDto);
 

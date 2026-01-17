@@ -4,8 +4,12 @@ import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
+import com.momo.savanger.api.transaction.dto.TransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
+import com.momo.savanger.api.transaction.dto.TransferTransactionPair;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
+import com.momo.savanger.api.transfer.Transfer;
+import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
 import com.momo.savanger.error.ApiErrorCode;
@@ -116,6 +120,64 @@ public class TransactionServiceImpl implements TransactionService {
                 transactionType,
                 budgetId
         );
+    }
+
+    private CreateTransactionServiceDto createTransactionDto(BigDecimal amount,
+            TransactionType type, Long budgetId, String comment, Long categoryId,
+            Long transferTransactionId) {
+
+        return CreateTransactionServiceDto.transferDto(transferTransactionId,
+                amount,
+                comment,
+                categoryId,
+                type,
+                budgetId
+        );
+    }
+
+    @Override
+    @Transactional
+    public void createTransferTransactions(CreateTransferTransactionDto dto,
+            Long transferTransactionId, Transfer transfer) {
+
+        Long userId = SecurityUtils.getCurrentUser().getId();
+
+        this.create(
+                this.createTransactionDto(dto.getAmount(), TransactionType.EXPENSE,
+                        transfer.getSourceBudgetId(), dto.getSourceComment(),
+                        dto.getSourceCategoryId(),
+                        transferTransactionId), userId
+        );
+
+        this.create(
+                this.createTransactionDto(dto.getAmount(), TransactionType.INCOME,
+                        transfer.getReceiverBudgetId(), dto.getReceiverComment(),
+                        dto.getReceiverCategoryId(),
+                        transferTransactionId), userId
+        );
+    }
+
+    @Override
+    public TransferTransactionPair getTransferTransactionPair(Long transferTransactionId) {
+
+        TransferTransactionPair transferTransactionPair = new TransferTransactionPair();
+
+        TransactionDto sourceTransaction = this.transactionMapper.toTransactionDto(
+                this.transactionRepository
+                        .getByTransferTransactionIdAndType(transferTransactionId,
+                                TransactionType.EXPENSE)
+        );
+
+        TransactionDto receiverTransaction = this.transactionMapper.toTransactionDto(
+                this.transactionRepository
+                        .getByTransferTransactionIdAndType(transferTransactionId,
+                                TransactionType.INCOME)
+        );
+
+        transferTransactionPair.setSourceTransaction(sourceTransaction);
+        transferTransactionPair.setReceiverTransaction(receiverTransaction);
+
+        return transferTransactionPair;
     }
 
     @Override

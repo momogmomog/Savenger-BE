@@ -26,8 +26,12 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public Optional<Transfer> findById(Long id) {
-        return this.transferRepository.findById(id);
+    public Transfer findAndFetchDetails(Long id) {
+        return this.transferRepository
+                .findTransferById(id)
+                .orElseThrow(
+                        () -> ApiException.with(ApiErrorCode.ERR_0018)
+                );
     }
 
     @Override

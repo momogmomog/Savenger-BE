@@ -1,7 +1,5 @@
 package com.momo.savanger.web;
 
-import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
-import com.momo.savanger.api.budget.dto.BudgetSearchResponseDto;
 import com.momo.savanger.api.transfer.CreateTransferDto;
 import com.momo.savanger.api.transfer.TransferDto;
 import com.momo.savanger.api.transfer.TransferMapper;
@@ -11,13 +9,12 @@ import com.momo.savanger.api.transfer.constraints.CanAccessTransfer;
 import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
 import com.momo.savanger.api.transfer.transferTransaction.TransferTransaction;
 import com.momo.savanger.api.transfer.transferTransaction.TransferTransactionDto;
-import com.momo.savanger.api.user.User;
+import com.momo.savanger.api.transfer.transferTransaction.TransferTransactionService;
 import com.momo.savanger.constants.Endpoints;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedModel;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +30,9 @@ public class TransferController {
     private final TransferService transferService;
 
     private final TransferMapper transferMapper;
+
+    private final TransferTransactionService transferTransactionService;
+
 
     @PutMapping(Endpoints.TRANSFERS)
     public TransferDto transfer(@Valid @RequestBody CreateTransferDto transferDto) {
@@ -50,15 +50,21 @@ public class TransferController {
     public PagedModel<TransferDto> searchTransfer(
             @Valid @RequestBody TransferSearchQuery query) {
 
-       PagedModel<TransferDto> pagedModel =  new PagedModel<>(this.transferService
+        PagedModel<TransferDto> pagedModel = new PagedModel<>(this.transferService
                 .searchTransfer(query)
                 .map(this.transferMapper::toTransferDto));
 
-       return pagedModel;
+        return pagedModel;
     }
 
     @PostMapping(Endpoints.TRANSFER_TRANSACTION)
-    public TransferTransactionDto transferTransaction(CreateTransferTransactionDto transferTransactionDto){
-        return null;
+    public TransferTransactionDto transferTransaction(
+            @Valid @RequestBody CreateTransferTransactionDto transferTransactionDto) {
+
+        TransferTransaction transferTransaction = this.transferTransactionService.create(
+                transferTransactionDto);
+
+        return this.transferTransactionService.getTransferTransactionDto(
+                transferTransactionDto.getTransferId(), transferTransaction.getId());
     }
 }
