@@ -9,10 +9,12 @@ import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Selection;
 import jakarta.persistence.metamodel.SingularAttribute;
+import java.util.Collection;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.query.sqm.function.SelfRenderingSqmAggregateFunction;
 import org.hibernate.query.sqm.function.SelfRenderingSqmFunction;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 public final class QuerySpecifications {
@@ -34,6 +36,19 @@ public final class QuerySpecifications {
 
     public static <T> Predicate equal(Expression<T> field, T value, CriteriaBuilder cb) {
         return cb.equal(field, value);
+    }
+
+    public static <T, V> Specification<T> inIfPresent(SingularAttribute<T, V> attribute,
+            Collection<V> values) {
+        if (CollectionUtils.isEmpty(values)) {
+            return Specification.where(null);
+        }
+        return in(attribute, values);
+    }
+
+    public static <T, V> Specification<T> in(SingularAttribute<T, V> attribute,
+            Collection<V> values) {
+        return (root, query, criteriaBuilder) -> root.get(attribute).in(values);
     }
 
     public static <T> Specification<T> containsIfPresent(SingularAttribute<T, String> attribute,

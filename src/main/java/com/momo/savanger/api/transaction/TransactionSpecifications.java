@@ -11,9 +11,11 @@ import com.momo.savanger.api.util.SortQuery;
 import jakarta.persistence.criteria.Join;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.CollectionUtils;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TransactionSpecifications {
@@ -42,6 +44,11 @@ public final class TransactionSpecifications {
         return QuerySpecifications.equalIfPresent(Transaction_.categoryId, categoryId);
     }
 
+    public static Specification<Transaction> categoryIdContains(
+            final Collection<Long> categoryIds) {
+        return QuerySpecifications.inIfPresent(Transaction_.categoryId, categoryIds);
+    }
+
     public static Specification<Transaction> typeEquals(final TransactionType type) {
         return QuerySpecifications.equalIfPresent(Transaction_.type, type);
     }
@@ -54,6 +61,11 @@ public final class TransactionSpecifications {
         return QuerySpecifications.equalIfPresent(Transaction_.userId, userId);
     }
 
+    public static Specification<Transaction> userIdContains(
+            final Collection<Long> userIds) {
+        return QuerySpecifications.inIfPresent(Transaction_.userId, userIds);
+    }
+
     public static Specification<Transaction> isLinkedToTag(final Long tagId) {
         if (tagId == null) {
             return Specification.where(null);
@@ -62,6 +74,17 @@ public final class TransactionSpecifications {
         return (root, query, criteriaBuilder) -> {
             final Join<Transaction, Tag> join = getOrCreateJoin(root, Transaction_.tags);
             return criteriaBuilder.equal(join.get(Tag_.id), tagId);
+        };
+    }
+
+    public static Specification<Transaction> tagsContain(final Collection<Long> tagIds) {
+        if (CollectionUtils.isEmpty(tagIds)) {
+            return Specification.where(null);
+        }
+
+        return (root, query, criteriaBuilder) -> {
+            final Join<Transaction, Tag> join = getOrCreateJoin(root, Transaction_.tags);
+            return join.get(Tag_.id).in(tagIds);
         };
     }
 

@@ -167,9 +167,9 @@ public class TransactionControllerIt extends BaseControllerIt {
         query.setSort(sortQuery);
         query.setPage(pageQuery);
         query.setAmount(amount);
-        query.setCategoryId(1001L);
+        query.setCategoryIds(List.of(1001L));
         query.setBudgetId(1001L);
-        query.setUserId(1L);
+        query.setUserIds(List.of(1L));
         query.setType(TransactionType.INCOME);
 
         super.postOK(Endpoints.TRANSACTIONS_SEARCH, query);
