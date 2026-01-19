@@ -1,6 +1,19 @@
 package com.momo.savanger.api.transfer;
 
+import static com.momo.savanger.api.util.QuerySpecificationUtils.getOrCreateJoin;
+
+import com.momo.savanger.api.budget.Budget;
+import com.momo.savanger.api.budget.BudgetParticipantFields;
+import com.momo.savanger.api.budget.Budget_;
+import com.momo.savanger.api.tag.Tag;
+import com.momo.savanger.api.tag.Tag_;
+import com.momo.savanger.api.transaction.Transaction;
+import com.momo.savanger.api.transaction.Transaction_;
+import com.momo.savanger.api.user.User;
+import com.momo.savanger.api.user.User_;
 import com.momo.savanger.api.util.QuerySpecifications;
+import jakarta.persistence.criteria.Join;
+import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,4 +37,23 @@ public class TransferSpecifications {
         return QuerySpecifications.equalIfPresent(Transfer_.active, active);
     }
 
+    public static Specification<Transfer> receivedBudgetIdIn(final Collection<Long> receivedBudgetIds)  {
+        return QuerySpecifications.inIfPresent(Transfer_.receiverBudgetId, receivedBudgetIds);
+    }
+
+    public static Specification<Transfer> canAccessReceiverBudget(final Long userId) {
+        if (userId == null) {
+            return Specification.not(null);
+        }
+
+        return (root, query, criteriaBuilder) -> {
+            final Join<Transfer, Budget> budgetJoin = getOrCreateJoin(root, Transfer_.receiverBudget);
+            final Join<Budget, User> participantsJoin = getOrCreateJoin(budgetJoin, Budget_.participants);
+
+            return criteriaBuilder.or(
+                    criteriaBuilder.equal(budgetJoin.get(Budget_.ownerId), userId),
+                    criteriaBuilder.equal(participantsJoin.get(BudgetParticipantFields.USER_ID), userId)
+            );
+        };
+    }
 }

@@ -1,5 +1,8 @@
 package com.momo.savanger.api.transfer;
 
+import com.momo.savanger.api.transfer.dto.CreateTransferDto;
+import com.momo.savanger.api.transfer.dto.TransferSearchQuery;
+import com.momo.savanger.api.util.SecurityUtils;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.util.Optional;
@@ -73,10 +76,13 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public Page<Transfer> searchTransfer(TransferSearchQuery query) {
+
+        final Long userId = SecurityUtils.getCurrentUser().getId();
         final Specification<Transfer> specification = TransferSpecifications.sourceBudgetIdEquals(
                         query.getSourceBudgetId())
-                .and(TransferSpecifications.receiverBudgetIdEquals(query.getReceiverBudgetId()))
-                .and(TransferSpecifications.isActive(query.getActive()));
+                .and(TransferSpecifications.receivedBudgetIdIn(query.getReceiverBudgetIds()))
+                .and(TransferSpecifications.isActive(query.getActive()))
+                .and(TransferSpecifications.canAccessReceiverBudget(userId));
 
         final Page<Transfer> transfers = this.transferRepository.findAll(specification,
                 query.getPage(),

@@ -1,6 +1,6 @@
 package com.momo.savanger.api.transfer.constraints;
 
-import com.momo.savanger.api.transfer.CreateTransferDto;
+import com.momo.savanger.api.transfer.dto.CreateTransferDto;
 import com.momo.savanger.api.util.ValidationUtil;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

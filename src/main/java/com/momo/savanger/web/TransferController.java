@@ -1,9 +1,9 @@
 package com.momo.savanger.web;
 
-import com.momo.savanger.api.transfer.CreateTransferDto;
-import com.momo.savanger.api.transfer.TransferDto;
+import com.momo.savanger.api.transfer.dto.CreateTransferDto;
+import com.momo.savanger.api.transfer.dto.TransferDto;
 import com.momo.savanger.api.transfer.TransferMapper;
-import com.momo.savanger.api.transfer.TransferSearchQuery;
+import com.momo.savanger.api.transfer.dto.TransferSearchQuery;
 import com.momo.savanger.api.transfer.TransferService;
 import com.momo.savanger.api.transfer.constraints.CanAccessTransfer;
 import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;

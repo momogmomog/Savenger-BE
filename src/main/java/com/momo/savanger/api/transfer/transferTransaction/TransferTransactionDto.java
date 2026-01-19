@@ -1,7 +1,7 @@
 package com.momo.savanger.api.transfer.transferTransaction;
 
 import com.momo.savanger.api.transaction.dto.TransactionDto;
-import com.momo.savanger.api.transfer.TransferDto;
+import com.momo.savanger.api.transfer.dto.TransferDto;
 import lombok.Data;
 
 @Data

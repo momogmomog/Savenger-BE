@@ -1,4 +1,4 @@
-package com.momo.savanger.api.transfer;
+package com.momo.savanger.api.transfer.dto;
 
 import com.momo.savanger.api.budget.dto.BudgetDto;
 import lombok.Data;

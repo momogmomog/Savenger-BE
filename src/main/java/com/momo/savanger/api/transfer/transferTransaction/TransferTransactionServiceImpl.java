@@ -3,7 +3,7 @@ package com.momo.savanger.api.transfer.transferTransaction;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.dto.TransferTransactionPair;
 import com.momo.savanger.api.transfer.Transfer;
-import com.momo.savanger.api.transfer.TransferDto;
+import com.momo.savanger.api.transfer.dto.TransferDto;
 import com.momo.savanger.api.transfer.TransferMapper;
 import com.momo.savanger.api.transfer.TransferService;
 import lombok.RequiredArgsConstructor;
