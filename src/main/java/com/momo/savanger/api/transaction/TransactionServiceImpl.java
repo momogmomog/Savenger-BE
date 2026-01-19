@@ -126,22 +126,25 @@ public class TransactionServiceImpl implements TransactionService {
 
     }
 
-
     @Override
     public Page<Transaction> searchTransactions(TransactionSearchQuery query, User user) {
         final Specification<Transaction> specification = TransactionSpecifications
+                .sort(query.getSort())
+                .and(TransactionSpecifications.maybeRevised(query.getRevised()));
+
+        return this.transactionRepository.findAll(specification, query.getPage(), null);
+    }
+
+    private Specification<Transaction> createCoreSearchSpecifications(TransactionSearchQuery query) {
+        return TransactionSpecifications
                 .budgetIdEquals(query.getBudgetId())
-                .and(TransactionSpecifications.sort(query.getSort()))
                 .and(TransactionSpecifications.betweenAmount(query.getAmount()))
-                .and(TransactionSpecifications.maybeRevised(query.getRevised()))
                 .and(TransactionSpecifications.maybeContainsComment(query.getComment()))
                 .and(TransactionSpecifications.betweenDate(query.getDateCreated()))
                 .and(TransactionSpecifications.categoryIdContains(query.getCategoryIds()))
                 .and(TransactionSpecifications.typeEquals(query.getType()))
                 .and(TransactionSpecifications.userIdContains(query.getUserIds()))
                 .and(TransactionSpecifications.tagsContain(query.getTagIds()));
-
-        return this.transactionRepository.findAll(specification, query.getPage(), null);
     }
 
     @Override
