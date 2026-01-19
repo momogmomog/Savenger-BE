@@ -244,7 +244,7 @@ public class TransactionServiceIt {
         assertEquals(1002L, transactions.getContent().get(1).getId());
 
         // Search by budgetId, Type, amount and tag
-        query.setTagId(1001L);
+        query.setTagIds(List.of(1001L));
 
         transactions = this.transactionService.searchTransactions(query, user);
 
@@ -256,7 +256,7 @@ public class TransactionServiceIt {
 
         // Search by budgetId, Type, amount and date
         query.setDateCreated(dateCreated);
-        query.setTagId(null);
+        query.setTagIds(List.of());
 
         transactions = this.transactionService.searchTransactions(query, user);
 
@@ -264,7 +264,7 @@ public class TransactionServiceIt {
         assertEquals(1002L, transactions.getContent().getFirst().getId());
 
         // Search by budgetId, type, amount, date and categoryId
-        query.setCategoryId(1002L);
+        query.setCategoryIds(List.of(1002L));
         amount = new BetweenQuery<>(BigDecimal.ZERO, BigDecimal.valueOf(600));
         query.setAmount(amount);
 

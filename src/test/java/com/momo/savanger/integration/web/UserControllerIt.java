@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserRepository;
 import com.momo.savanger.constants.Endpoints;
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class UserControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testGetDetails() throws Exception {
 
-       User user =  this.userRepository.findById(1L).orElse(null);
+        User user = this.userRepository.findById(1L).orElse(null);
         System.out.println(user.getDateRegistered());
 
         super.getOK(Endpoints.USER_DETAILS,
