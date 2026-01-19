@@ -46,11 +46,11 @@ public class TransferController {
         this.transferService.disable(transferId);
     }
 
-    @PostMapping(Endpoints.TRANSFER_SEARCH)
+    @PostMapping(Endpoints.TRANSFERS_SEARCH)
     public PagedModel<TransferDto> searchTransfer(
             @Valid @RequestBody TransferSearchQuery query) {
 
-        PagedModel<TransferDto> pagedModel = new PagedModel<>(this.transferService
+        final PagedModel<TransferDto> pagedModel = new PagedModel<>(this.transferService
                 .searchTransfer(query)
                 .map(this.transferMapper::toTransferDto));
 
@@ -61,7 +61,7 @@ public class TransferController {
     public TransferTransactionDto transferTransaction(
             @Valid @RequestBody CreateTransferTransactionDto transferTransactionDto) {
 
-        TransferTransaction transferTransaction = this.transferTransactionService.create(
+        final TransferTransaction transferTransaction = this.transferTransactionService.create(
                 transferTransactionDto);
 
         return this.transferTransactionService.getTransferTransactionDto(

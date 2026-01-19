@@ -87,12 +87,14 @@ public class TransactionServiceImpl implements TransactionService {
 
         this.create(
                 this.createTransactionDto(amount, debt.getId(), TransactionType.EXPENSE,
-                        debt.getLenderBudgetId()), null
+                        debt.getLenderBudgetId(), null, null, null)
+                , null
         );
 
         this.create(
                 this.createTransactionDto(amount, debt.getId(), TransactionType.INCOME,
-                        debt.getReceiverBudgetId()), null
+                        debt.getReceiverBudgetId(), null, null, null)
+                , null
         );
     }
 
@@ -103,36 +105,40 @@ public class TransactionServiceImpl implements TransactionService {
 
         this.create(
                 this.createTransactionDto(amount, debt.getId(), TransactionType.EXPENSE,
-                        debt.getReceiverBudgetId()), userId
+                        debt.getReceiverBudgetId(), null, null, null)
+                , userId
         );
 
         this.create(
                 this.createTransactionDto(amount, debt.getId(), TransactionType.INCOME,
-                        debt.getLenderBudgetId()), userId
+                        debt.getLenderBudgetId(), null, null, null)
+                , userId
         );
     }
 
     private CreateTransactionServiceDto createTransactionDto(BigDecimal amount, Long debtId,
-            TransactionType transactionType, Long budgetId) {
-
-        return CreateTransactionServiceDto.debtDto(amount,
-                debtId,
-                transactionType,
-                budgetId
-        );
-    }
-
-    private CreateTransactionServiceDto createTransactionDto(BigDecimal amount,
-            TransactionType type, Long budgetId, String comment, Long categoryId,
+            TransactionType transactionType, Long budgetId, String comment, Long categoryId,
             Long transferTransactionId) {
 
-        return CreateTransactionServiceDto.transferDto(transferTransactionId,
-                amount,
-                comment,
-                categoryId,
-                type,
-                budgetId
-        );
+        CreateTransactionServiceDto dto = null;
+
+        if (debtId != null) {
+            dto = CreateTransactionServiceDto.debtDto(amount,
+                    debtId,
+                    transactionType,
+                    budgetId
+            );
+        } else if (transferTransactionId != null) {
+            dto = CreateTransactionServiceDto.transferDto(transferTransactionId,
+                    amount,
+                    comment,
+                    categoryId,
+                    transactionType,
+                    budgetId
+            );
+        }
+
+        return dto;
     }
 
     @Override
@@ -140,27 +146,38 @@ public class TransactionServiceImpl implements TransactionService {
     public void createTransferTransactions(CreateTransferTransactionDto dto,
             Long transferTransactionId, Transfer transfer) {
 
-        Long userId = SecurityUtils.getCurrentUser().getId();
+        final Long userId = SecurityUtils.getCurrentUser().getId();
 
         this.create(
-                this.createTransactionDto(dto.getAmount(), TransactionType.EXPENSE,
-                        transfer.getSourceBudgetId(), dto.getSourceComment(),
+                this.createTransactionDto(
+                        dto.getAmount(),
+                        null,
+                        TransactionType.EXPENSE,
+                        transfer.getSourceBudgetId(),
+                        dto.getSourceComment(),
                         dto.getSourceCategoryId(),
-                        transferTransactionId), userId
+                        transferTransactionId
+                ),
+                userId
         );
 
         this.create(
-                this.createTransactionDto(dto.getAmount(), TransactionType.INCOME,
-                        transfer.getReceiverBudgetId(), dto.getReceiverComment(),
+                this.createTransactionDto(dto.getAmount(),
+                        null,
+                        TransactionType.INCOME,
+                        transfer.getReceiverBudgetId(),
+                        dto.getReceiverComment(),
                         dto.getReceiverCategoryId(),
-                        transferTransactionId), userId
+                        transferTransactionId
+                ),
+                userId
         );
     }
 
     @Override
     public TransferTransactionPair getTransferTransactionPair(Long transferTransactionId) {
 
-        TransferTransactionPair transferTransactionPair = new TransferTransactionPair();
+        final TransferTransactionPair transferTransactionPair = new TransferTransactionPair();
 
         TransactionDto sourceTransaction = this.transactionMapper.toTransactionDto(
                 this.transactionRepository

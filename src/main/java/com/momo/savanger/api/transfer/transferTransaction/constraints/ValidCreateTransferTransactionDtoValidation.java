@@ -1,5 +1,6 @@
 package com.momo.savanger.api.transfer.transferTransaction.constraints;
 
+import com.momo.savanger.api.category.CategoryService;
 import com.momo.savanger.api.transfer.Transfer;
 import com.momo.savanger.api.transfer.TransferService;
 import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
@@ -17,6 +18,8 @@ public class ValidCreateTransferTransactionDtoValidation implements
 
     private final TransferService transferService;
 
+    private final CategoryService categoryService;
+
 
     @Override
     public void initialize(ValidCreateTransferTransactionDto constraintAnnotation) {
@@ -26,16 +29,18 @@ public class ValidCreateTransferTransactionDtoValidation implements
     @Override
     public boolean isValid(CreateTransferTransactionDto dto,
             ConstraintValidatorContext constraintValidatorContext) {
-        Transfer transfer = this.transferService.getById(dto.getTransferId());
+        final Transfer transfer = this.transferService.getById(dto.getTransferId());
 
-        if (!transfer.getSourceBudgetId().equals(dto.getSourceCategoryId())) {
-            ValidationUtil.fail(constraintValidatorContext, "sourceCategoryId",
+        if (!this.categoryService.isCategoryValid(dto.getSourceCategoryId(),
+                transfer.getSourceBudgetId())) {
+            return ValidationUtil.fail(constraintValidatorContext, "sourceCategoryId",
                     String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
                             dto.getSourceCategoryId()));
         }
 
-        if (!transfer.getReceiverBudgetId().equals(dto.getReceiverCategoryId())) {
-            ValidationUtil.fail(constraintValidatorContext, "receiverCategoryId",
+        if (!this.categoryService.isCategoryValid(dto.getReceiverCategoryId(),
+                transfer.getReceiverBudgetId())) {
+           return ValidationUtil.fail(constraintValidatorContext, "receiverCategoryId",
                     String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
                             dto.getSourceCategoryId()));
         }

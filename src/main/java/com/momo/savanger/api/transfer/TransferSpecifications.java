@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TransferSpecifications {
 
-    public static Specification<Transfer> ifEquals(final Long id) {
+    public static Specification<Transfer> idEquals(final Long id) {
         return QuerySpecifications.equal(Transfer_.id, id);
     }
 
@@ -17,10 +17,11 @@ public class TransferSpecifications {
     }
 
     public static Specification<Transfer> receiverBudgetIdEquals(final Long id) {
-        return QuerySpecifications.equalIfPresent(Transfer_.receiverBudgetId, id);
+        return QuerySpecifications.equal(Transfer_.receiverBudgetId, id);
     }
 
     public static Specification<Transfer> isActive(final Boolean active) {
         return QuerySpecifications.equalIfPresent(Transfer_.active, active);
     }
+
 }

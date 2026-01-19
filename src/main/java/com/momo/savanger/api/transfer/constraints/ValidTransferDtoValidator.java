@@ -17,6 +17,10 @@ public class ValidTransferDtoValidator implements
     public boolean isValid(CreateTransferDto transferDto,
             ConstraintValidatorContext constraintValidatorContext) {
 
+        if (transferDto.getSourceBudgetId() == null || transferDto.getReceiverBudgetId() == null) {
+            return true;
+        }
+
         if (transferDto.getSourceBudgetId().equals(transferDto.getReceiverBudgetId())) {
             return ValidationUtil.fail(constraintValidatorContext, "sourceBudgetId",
                     "Source budget id and receiver budget id should be different.");

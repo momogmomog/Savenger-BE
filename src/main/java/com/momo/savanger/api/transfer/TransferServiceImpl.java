@@ -52,6 +52,7 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
+    @Transactional
     public void disable(Long id) {
 
         final Transfer transfer = this.getById(id);
@@ -72,14 +73,15 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public Page<Transfer> searchTransfer(TransferSearchQuery query) {
-        final Specification<Transfer> specification =
-                TransferSpecifications.sourceBudgetIdEquals(query.getSourceBudgetId())
-                        .and(TransferSpecifications.receiverBudgetIdEquals(
-                                query.getReceiverBudgetId()))
-                        .and(TransferSpecifications.isActive(query.getActive()));
+        final Specification<Transfer> specification = TransferSpecifications.sourceBudgetIdEquals(
+                        query.getSourceBudgetId())
+                .and(TransferSpecifications.receiverBudgetIdEquals(query.getReceiverBudgetId()))
+                .and(TransferSpecifications.isActive(query.getActive()));
 
-        Page<Transfer> transfers = this.transferRepository.findAll(specification, query.getPage(),
-                null);
+        final Page<Transfer> transfers = this.transferRepository.findAll(specification,
+                query.getPage(),
+                null
+        );
 
         return transfers;
     }

@@ -30,8 +30,8 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
 
         final Transfer transfer = this.transferService.getById(dto.getTransferId());
 
-        this.transactionService.createTransferTransactions(
-                dto, transferTransaction.getId(), transfer);
+        this.transactionService.createTransferTransactions(dto, transferTransaction.getId(),
+                transfer);
 
         return transferTransaction;
     }
@@ -40,19 +40,20 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
     public TransferTransactionDto getTransferTransactionDto(Long transferId,
             Long transferTransactionId) {
 
-        TransferDto transferDto = this.transferMapper.toTransferDto(
+        final TransferDto transferDto = this.transferMapper.toTransferDto(
                 this.transferService.findAndFetchDetails(transferId)
         );
 
-        TransferTransactionPair transferTransactionPair = this.transactionService.getTransferTransactionPair(
-                transferTransactionId);
+        final TransferTransactionPair transferTransactionPair = this.transactionService
+                .getTransferTransactionPair(transferTransactionId);
 
-        TransferTransactionDto transferTransactionDto = new TransferTransactionDto();
-        transferTransactionDto.setTransferDto(transferDto);
+        final TransferTransactionDto transferTransactionDto = new TransferTransactionDto();
+        
+        transferTransactionDto.setTransfer(transferDto);
         transferTransactionDto.setTransferTransactionId(transferTransactionId);
-        transferTransactionDto.setReceiverTransactionDto(
+        transferTransactionDto.setReceiverTransaction(
                 transferTransactionPair.getReceiverTransaction());
-        transferTransactionDto.setSourceTransactionDto(
+        transferTransactionDto.setSourceTransaction(
                 transferTransactionPair.getSourceTransaction());
 
         return transferTransactionDto;

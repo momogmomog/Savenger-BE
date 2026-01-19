@@ -7,11 +7,11 @@ import lombok.Data;
 @Data
 public class TransferTransactionDto {
 
-    private TransferDto transferDto;
+    private TransferDto transfer;
 
     private Long TransferTransactionId;
 
-    private TransactionDto sourceTransactionDto;
+    private TransactionDto sourceTransaction;
 
-    private TransactionDto receiverTransactionDto;
+    private TransactionDto receiverTransaction;
 }

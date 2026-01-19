@@ -52,8 +52,7 @@ public interface TransactionService {
 
     BigDecimal getPrepaymentPaidAmount(Long prepaymentId);
 
-    void createTransferTransactions(
-            CreateTransferTransactionDto transferTransactionDto,
+    void createTransferTransactions(CreateTransferTransactionDto transferTransactionDto,
             Long transferTransactionId, Transfer transfer);
 
     TransferTransactionPair getTransferTransactionPair(Long transferTransactionId);
