@@ -1,6 +1,6 @@
 package com.momo.savanger.api.analytics.dto;
 
-import java.math.BigDecimal;
+import com.momo.savanger.api.transaction.dto.TransactionSumAndCount;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +11,6 @@ public class TimeSeriesMetricDto {
 
     private final LocalDate date;
 
-    private final BigDecimal totalIncomes;
-    private final BigDecimal totalExpenses;
-    private final Long totalTransactions;
+    private final TransactionSumAndCount incomes;
+    private final TransactionSumAndCount expenses;
 }
