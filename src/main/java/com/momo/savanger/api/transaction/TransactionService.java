@@ -6,10 +6,8 @@ import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.user.User;
-
 import java.math.BigDecimal;
 import java.util.List;
-
 import org.springframework.data.domain.Page;
 
 public interface TransactionService {

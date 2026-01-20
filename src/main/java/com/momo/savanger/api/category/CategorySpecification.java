@@ -4,10 +4,8 @@ import com.momo.savanger.api.util.BetweenQuery;
 import com.momo.savanger.api.util.QuerySpecifications;
 import com.momo.savanger.api.util.ReflectionUtils;
 import com.momo.savanger.api.util.SortQuery;
-
 import java.math.BigDecimal;
 import java.util.List;
-
 import org.springframework.data.jpa.domain.Specification;
 
 public final class CategorySpecification {

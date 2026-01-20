@@ -4,7 +4,6 @@ import com.momo.savanger.api.analytics.dto.CategoryAnalytic;
 import com.momo.savanger.api.analytics.dto.TagAnalytic;
 import com.momo.savanger.api.analytics.dto.TimeSeriesMetricDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
-
 import java.util.List;
 
 public interface AnalyticsService {

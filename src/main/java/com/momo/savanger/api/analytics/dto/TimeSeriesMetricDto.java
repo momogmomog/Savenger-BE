@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class TimeSeriesMetricDto {
+
     private final LocalDate date;
 
     private final BigDecimal totalIncomes;
