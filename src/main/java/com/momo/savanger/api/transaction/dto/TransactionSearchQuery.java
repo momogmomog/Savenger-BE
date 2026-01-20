@@ -7,9 +7,11 @@ import com.momo.savanger.api.util.PageQuery;
 import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.constraints.NotNull;
 import jakarta.validation.Valid;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -36,6 +38,10 @@ public class TransactionSearchQuery {
     private List<Long> categoryIds;
 
     private List<Long> userIds;
+
+    private Long debtId;
+
+    private Boolean noDebtTransactions;
 
     @NotNull
     @CanAccessBudget

@@ -10,14 +10,16 @@ import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -128,14 +130,15 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Page<Transaction> searchTransactions(TransactionSearchQuery query, User user) {
-        final Specification<Transaction> specification = TransactionSpecifications
-                .sort(query.getSort())
+        final Specification<Transaction> specification = this.createCoreSearchSpecifications(query)
+                .and(TransactionSpecifications.sort(query.getSort()))
                 .and(TransactionSpecifications.maybeRevised(query.getRevised()));
 
         return this.transactionRepository.findAll(specification, query.getPage(), null);
     }
 
-    private Specification<Transaction> createCoreSearchSpecifications(TransactionSearchQuery query) {
+    private Specification<Transaction> createCoreSearchSpecifications(
+            TransactionSearchQuery query) {
         return TransactionSpecifications
                 .budgetIdEquals(query.getBudgetId())
                 .and(TransactionSpecifications.betweenAmount(query.getAmount()))
@@ -144,6 +147,8 @@ public class TransactionServiceImpl implements TransactionService {
                 .and(TransactionSpecifications.categoryIdContains(query.getCategoryIds()))
                 .and(TransactionSpecifications.typeEquals(query.getType()))
                 .and(TransactionSpecifications.userIdContains(query.getUserIds()))
+                .and(TransactionSpecifications.debtIdEquals(query.getDebtId()))
+                .and(TransactionSpecifications.noDebtTransactions(query.getNoDebtTransactions()))
                 .and(TransactionSpecifications.tagsContain(query.getTagIds()));
     }
 
@@ -251,5 +256,26 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         return amount;
+    }
+
+    @Override
+    public List<Long> extractCategoryIds(TransactionSearchQuery query) {
+        query.setNoDebtTransactions(true);
+        return this.transactionRepository.getCategoryIds(
+                this.createCoreSearchSpecifications(query));
+    }
+
+    @Override
+    public List<Long> extractTagIds(TransactionSearchQuery query) {
+        query.setNoDebtTransactions(true);
+        return this.transactionRepository.getTagIds(this.createCoreSearchSpecifications(query));
+    }
+
+    @Override
+    public BigDecimal sum(TransactionSearchQuery query) {
+        query.setNoDebtTransactions(true);
+        final Specification<Transaction> specification = this.createCoreSearchSpecifications(query);
+
+        return this.transactionRepository.sum(specification);
     }
 }
