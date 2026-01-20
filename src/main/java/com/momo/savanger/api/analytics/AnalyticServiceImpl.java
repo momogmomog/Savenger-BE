@@ -12,6 +12,7 @@ import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
+import com.momo.savanger.api.transaction.dto.TransactionSearchQueryForAnalytics;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,9 @@ public class AnalyticServiceImpl implements AnalyticsService {
     private final TagMapper tagMapper;
 
     @Override
-    public List<CategoryAnalytic> fetchCategoryAnalytics(TransactionSearchQuery query) {
+    public List<CategoryAnalytic> fetchCategoryAnalytics(TransactionSearchQueryForAnalytics q) {
+        final TransactionSearchQuery query = TransactionSearchQuery.fromAnalyticsQuery(q);
+
         final List<Long> categoryIds;
         if (!CollectionUtils.isEmpty(query.getCategoryIds())) {
             log.info("Using provided category IDs");
@@ -50,8 +53,11 @@ public class AnalyticServiceImpl implements AnalyticsService {
             return List.of();
         }
 
-        final List<Category> categories = this.categoryService.findAll(query.getBudgetId(),
-                categoryIds);
+        final List<Category> categories = this.categoryService.findAll(
+                query.getBudgetId(),
+                categoryIds
+        );
+
         if (categories.isEmpty()) {
             log.info("No categories found, aborting!");
             return List.of();
@@ -79,7 +85,8 @@ public class AnalyticServiceImpl implements AnalyticsService {
     }
 
     @Override
-    public List<TagAnalytic> fetchTagAnalytics(TransactionSearchQuery query) {
+    public List<TagAnalytic> fetchTagAnalytics(TransactionSearchQueryForAnalytics q) {
+        final TransactionSearchQuery query = TransactionSearchQuery.fromAnalyticsQuery(q);
         final List<Long> tagIds;
         if (!CollectionUtils.isEmpty(query.getTagIds())) {
             log.info("Using provided tag IDs");
@@ -93,8 +100,10 @@ public class AnalyticServiceImpl implements AnalyticsService {
             return List.of();
         }
 
-        final List<Tag> tags = this.tagService.findByBudgetAndIdContaining(tagIds,
-                query.getBudgetId());
+        final List<Tag> tags = this.tagService.findByBudgetAndIdContaining(
+                tagIds,
+                query.getBudgetId()
+        );
         if (tags.isEmpty()) {
             log.info("No tags found, aborting!");
             return List.of();

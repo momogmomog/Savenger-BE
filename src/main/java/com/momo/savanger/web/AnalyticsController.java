@@ -3,7 +3,7 @@ package com.momo.savanger.web;
 import com.momo.savanger.api.analytics.AnalyticsService;
 import com.momo.savanger.api.analytics.dto.CategoryAnalytic;
 import com.momo.savanger.api.analytics.dto.TagAnalytic;
-import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
+import com.momo.savanger.api.transaction.dto.TransactionSearchQueryForAnalytics;
 import com.momo.savanger.constants.Endpoints;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -22,13 +22,13 @@ public class AnalyticsController {
 
     @PostMapping(Endpoints.ANALYTICS_CATEGORIES)
     public List<CategoryAnalytic> getCategoriesSpendingBreakdown(
-            @Valid @RequestBody TransactionSearchQuery query) {
+            @Valid @RequestBody TransactionSearchQueryForAnalytics query) {
         return this.analyticsService.fetchCategoryAnalytics(query);
     }
 
     @PostMapping(Endpoints.ANALYTICS_TAGS)
     public List<TagAnalytic> getTagsSpendingBreakdown(
-            @Valid @RequestBody TransactionSearchQuery query) {
+            @Valid @RequestBody TransactionSearchQueryForAnalytics query) {
         return this.analyticsService.fetchTagAnalytics(query);
     }
 }
