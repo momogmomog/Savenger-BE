@@ -3,6 +3,7 @@ package com.momo.savanger.api.analytics;
 import com.momo.savanger.api.analytics.dto.CategoryAnalytic;
 import com.momo.savanger.api.analytics.dto.TagAnalytic;
 import com.momo.savanger.api.analytics.dto.TimeSeriesMetricDto;
+import com.momo.savanger.api.analytics.dto.TimeSeriesMetricQuery;
 import com.momo.savanger.api.category.Category;
 import com.momo.savanger.api.category.CategoryMapper;
 import com.momo.savanger.api.category.CategoryService;
@@ -50,6 +51,7 @@ public class AnalyticServiceImpl implements AnalyticsService {
         }
 
         if (categoryIds.isEmpty()) {
+            log.info("No categories found, aborting!");
             return List.of();
         }
 
@@ -96,6 +98,7 @@ public class AnalyticServiceImpl implements AnalyticsService {
         }
 
         if (tagIds.isEmpty()) {
+            log.info("No tags found, aborting!");
             return List.of();
         }
 
@@ -129,7 +132,7 @@ public class AnalyticServiceImpl implements AnalyticsService {
     }
 
     @Override
-    public List<TimeSeriesMetricDto> fetchMetricsByTime() {
+    public List<TimeSeriesMetricDto> fetchMetricsByTime(TimeSeriesMetricQuery query) {
         return List.of();
     }
 }
