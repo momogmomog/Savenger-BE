@@ -3,11 +3,14 @@ package com.momo.savanger.api.transfer.transferTransaction;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.dto.TransferTransactionPair;
 import com.momo.savanger.api.transfer.Transfer;
-import com.momo.savanger.api.transfer.dto.TransferDto;
 import com.momo.savanger.api.transfer.TransferMapper;
 import com.momo.savanger.api.transfer.TransferService;
+import com.momo.savanger.api.transfer.dto.TransferDto;
+import com.momo.savanger.error.ApiErrorCode;
+import com.momo.savanger.error.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +51,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
                 .getTransferTransactionPair(transferTransactionId);
 
         final TransferTransactionDto transferTransactionDto = new TransferTransactionDto();
-        
+
         transferTransactionDto.setTransfer(transferDto);
         transferTransactionDto.setTransferTransactionId(transferTransactionId);
         transferTransactionDto.setReceiverTransaction(
@@ -57,5 +60,27 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
                 transferTransactionPair.getSourceTransaction());
 
         return transferTransactionDto;
+    }
+
+    @Override
+    public TransferTransaction getTransferTransaction(Long transferTransactionId) {
+        return this.transferTransactionRepository.findById(transferTransactionId)
+                .orElseThrow(
+                        () -> ApiException.with(ApiErrorCode.ERR_0019)
+                );
+    }
+
+    @Override
+    @Transactional
+    public void revertTransferTransaction(Long transferTransactionId) {
+
+        final TransferTransactionPair transferTransactionPair = this.transactionService.getTransferTransactionPair(
+                transferTransactionId);
+
+        this.transactionService.deleteById(
+                transferTransactionPair.getReceiverTransaction().getId());
+        this.transactionService.deleteById(transferTransactionPair.getSourceTransaction().getId());
+
+        this.transferTransactionRepository.deleteById(transferTransactionId);
     }
 }

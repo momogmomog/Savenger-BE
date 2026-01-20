@@ -29,20 +29,29 @@ public class ValidCreateTransferTransactionDtoValidation implements
     @Override
     public boolean isValid(CreateTransferTransactionDto dto,
             ConstraintValidatorContext constraintValidatorContext) {
+
         final Transfer transfer = this.transferService.getById(dto.getTransferId());
 
-        if (!this.categoryService.isCategoryValid(dto.getSourceCategoryId(),
-                transfer.getSourceBudgetId())) {
-            return ValidationUtil.fail(constraintValidatorContext, "sourceCategoryId",
-                    String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
-                            dto.getSourceCategoryId()));
+        if (dto.getSourceCategoryId() != null) {
+            if (!this.categoryService.isCategoryValid(dto.getSourceCategoryId(),
+                    transfer.getSourceBudgetId())) {
+                return ValidationUtil.fail(constraintValidatorContext, "sourceCategoryId",
+                        String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
+                                dto.getSourceCategoryId()));
+            }
+        } else {
+            return true;
         }
 
-        if (!this.categoryService.isCategoryValid(dto.getReceiverCategoryId(),
-                transfer.getReceiverBudgetId())) {
-           return ValidationUtil.fail(constraintValidatorContext, "receiverCategoryId",
-                    String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
-                            dto.getSourceCategoryId()));
+        if (dto.getReceiverCategoryId() != null) {
+            if (!this.categoryService.isCategoryValid(dto.getReceiverCategoryId(),
+                    transfer.getReceiverBudgetId())) {
+                return ValidationUtil.fail(constraintValidatorContext, "receiverCategoryId",
+                        String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
+                                dto.getSourceCategoryId()));
+            }
+        } else {
+            return true;
         }
 
         return true;

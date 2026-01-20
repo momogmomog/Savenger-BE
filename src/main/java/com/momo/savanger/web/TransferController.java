@@ -1,20 +1,22 @@
 package com.momo.savanger.web;
 
-import com.momo.savanger.api.transfer.dto.CreateTransferDto;
-import com.momo.savanger.api.transfer.dto.TransferDto;
 import com.momo.savanger.api.transfer.TransferMapper;
-import com.momo.savanger.api.transfer.dto.TransferSearchQuery;
 import com.momo.savanger.api.transfer.TransferService;
 import com.momo.savanger.api.transfer.constraints.CanAccessTransfer;
+import com.momo.savanger.api.transfer.dto.CreateTransferDto;
+import com.momo.savanger.api.transfer.dto.TransferDto;
+import com.momo.savanger.api.transfer.dto.TransferSearchQuery;
 import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
 import com.momo.savanger.api.transfer.transferTransaction.TransferTransaction;
 import com.momo.savanger.api.transfer.transferTransaction.TransferTransactionDto;
 import com.momo.savanger.api.transfer.transferTransaction.TransferTransactionService;
+import com.momo.savanger.api.transfer.transferTransaction.constraints.CanAccessTransferTransaction;
 import com.momo.savanger.constants.Endpoints;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedModel;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @PreAuthorize("isFullyAuthenticated()")
@@ -66,5 +69,12 @@ public class TransferController {
 
         return this.transferTransactionService.getTransferTransactionDto(
                 transferTransactionDto.getTransferId(), transferTransaction.getId());
+    }
+
+    @DeleteMapping(Endpoints.REVERT_TRANSFER_TRANSACTION)
+    public void transferTransaction(
+            @PathVariable("id") @CanAccessTransferTransaction Long transferTransactionId) {
+
+        this.transferTransactionService.revertTransferTransaction(transferTransactionId);
     }
 }

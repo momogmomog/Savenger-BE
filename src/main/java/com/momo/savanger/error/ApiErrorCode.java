@@ -25,7 +25,8 @@ public enum ApiErrorCode {
     ERR_0015(HttpStatus.NOT_FOUND, "Prepayment not found"),
     ERR_0016(HttpStatus.NOT_FOUND, "Recurring transaction not found"),
     ERR_0017(HttpStatus.BAD_REQUEST, "Recurring rule is not valid"),
-    ERR_0018(HttpStatus.NOT_FOUND, "Transfer not found");
+    ERR_0018(HttpStatus.NOT_FOUND, "Transfer not found"),
+    ERR_0019(HttpStatus.NOT_FOUND, "TransferTransaction not found");
 
     public final HttpStatus status;
     public final String message;
