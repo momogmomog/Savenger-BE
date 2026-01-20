@@ -69,7 +69,7 @@ public final class TransactionSpecifications {
 
     public static Specification<Transaction> noDebtTransactions(Boolean noDebtTransactions) {
         if (BooleanUtils.isTrue(noDebtTransactions)) {
-            return QuerySpecifications.equal(Transaction_.debtId, null);
+            return (root, query, criteriaBuilder) -> root.get(Transaction_.debtId).isNull();
         }
 
         return Specification.where(null);
