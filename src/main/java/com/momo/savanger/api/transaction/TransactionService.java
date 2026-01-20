@@ -4,6 +4,7 @@ import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
+import com.momo.savanger.api.transaction.dto.TransactionSumAndCount;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.user.User;
 import java.math.BigDecimal;
@@ -54,6 +55,6 @@ public interface TransactionService {
 
     List<Long> extractTagIds(TransactionSearchQuery query);
 
-    BigDecimal sum(TransactionSearchQuery query);
+    TransactionSumAndCount sumAndCount(TransactionSearchQuery query);
 }
 

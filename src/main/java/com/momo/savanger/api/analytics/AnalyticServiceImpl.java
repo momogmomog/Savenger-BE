@@ -13,7 +13,7 @@ import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQueryForAnalytics;
-import java.math.BigDecimal;
+import com.momo.savanger.api.transaction.dto.TransactionSumAndCount;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -68,16 +68,15 @@ public class AnalyticServiceImpl implements AnalyticsService {
         for (Category category : categories) {
             query.setCategoryIds(List.of(category.getId()));
             query.setType(TransactionType.EXPENSE);
-            final BigDecimal expenses = this.transactionService.sum(query);
+            final TransactionSumAndCount expenses = this.transactionService.sumAndCount(query);
 
             query.setType(TransactionType.INCOME);
-            final BigDecimal incomes = this.transactionService.sum(query);
+            final TransactionSumAndCount incomes = this.transactionService.sumAndCount(query);
 
             result.add(new CategoryAnalytic(
                     this.categoryMapper.toCategoryDto(category),
                     incomes,
-                    expenses,
-                    0L // TODO: think of a way to add this value without making a third query
+                    expenses
             ));
         }
 
@@ -114,16 +113,15 @@ public class AnalyticServiceImpl implements AnalyticsService {
             query.setTagIds(List.of(tag.getId()));
 
             query.setType(TransactionType.EXPENSE);
-            final BigDecimal expenses = this.transactionService.sum(query);
+            final TransactionSumAndCount expenses = this.transactionService.sumAndCount(query);
 
             query.setType(TransactionType.INCOME);
-            final BigDecimal incomes = this.transactionService.sum(query);
+            final TransactionSumAndCount incomes = this.transactionService.sumAndCount(query);
 
             result.add(new TagAnalytic(
                     this.tagMapper.toTagDto(tag),
                     incomes,
-                    expenses,
-                    0L // TODO: think of a way to add this value without making a third query
+                    expenses
             ));
         }
 

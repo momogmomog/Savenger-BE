@@ -5,6 +5,7 @@ import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
+import com.momo.savanger.api.transaction.dto.TransactionSumAndCount;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
@@ -271,10 +272,10 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public BigDecimal sum(TransactionSearchQuery query) {
+    public TransactionSumAndCount sumAndCount(TransactionSearchQuery query) {
         query.setNoDebtTransactions(true);
         final Specification<Transaction> specification = this.createCoreSearchSpecifications(query);
 
-        return this.transactionRepository.sum(specification);
+        return this.transactionRepository.sumAndCount(specification);
     }
 }

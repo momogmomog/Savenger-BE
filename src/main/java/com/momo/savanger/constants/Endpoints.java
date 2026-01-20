@@ -23,5 +23,5 @@ public class Endpoints {
     public static final String PREPAYMENTS = "/prepayments";
     public static final String PAY_R_TRANSACTION = "/recurring-transaction/{rTransactionId}/pay";
     public static final String ANALYTICS_CATEGORIES = "/analytics/categories";
-    public static final String ANALYTICS_TAGS = "/analytics/taags";
+    public static final String ANALYTICS_TAGS = "/analytics/tags";
 }

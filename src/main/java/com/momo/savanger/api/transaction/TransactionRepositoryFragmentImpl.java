@@ -2,12 +2,15 @@ package com.momo.savanger.api.transaction;
 
 import static com.momo.savanger.api.util.QuerySpecificationUtils.getOrCreateJoin;
 
+import com.momo.savanger.api.tag.Tag_;
+import com.momo.savanger.api.transaction.dto.TransactionSumAndCount;
 import com.momo.savanger.api.util.SpecificationExecutorImpl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
@@ -38,8 +41,7 @@ public class TransactionRepositoryFragmentImpl extends
         final Root<Transaction> root = query.from(this.entityType);
         final var join = getOrCreateJoin(root, Transaction_.tags);
 
-        // TODO: use the constant class.
-        query.select(join.get("tagId"));
+        query.select(join.get(Tag_.id));
         query.where(specification.toPredicate(root, query, criteriaBuilder));
 
         query.distinct(true);
@@ -50,17 +52,28 @@ public class TransactionRepositoryFragmentImpl extends
     }
 
     @Override
-    public BigDecimal sum(Specification<Transaction> specification) {
-        final CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+    @Transactional
+    public TransactionSumAndCount sumAndCount(Specification<Transaction> specification) {
+        final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        final CriteriaQuery<TransactionSumAndCount> query = cb.createQuery(
+                TransactionSumAndCount.class);
+        final Root<Transaction> root = query.from(Transaction.class);
 
-        final CriteriaQuery<BigDecimal> query = criteriaBuilder.createQuery(BigDecimal.class);
-        final Root<Transaction> root = query.from(this.entityType);
+        final Subquery<Long> subquery = query.subquery(Long.class);
+        final Root<Transaction> subRoot = subquery.from(Transaction.class);
+        subquery.select(subRoot.get(Transaction_.id));
+        // No need to distinct as the "in" operator on the outer query would do that anyways!
+//        subquery.distinct(true);
+        subquery.where(specification.toPredicate(subRoot, query, cb));
 
-        query.select(criteriaBuilder.sum(root.get(Transaction_.amount)));
-        query.where(specification.toPredicate(root, query, criteriaBuilder));
+        query.where(root.get(Transaction_.id).in(subquery));
 
-        final TypedQuery<BigDecimal> typedQuery = this.entityManager.createQuery(query);
+        query.select(cb.construct(
+                TransactionSumAndCount.class,
+                cb.coalesce(cb.sum(root.get(Transaction_.amount)), BigDecimal.ZERO),
+                cb.count(root)
+        ));
 
-        return typedQuery.getSingleResult();
+        return entityManager.createQuery(query).getSingleResult();
     }
 }

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.UniqueElements;
 
 @Data
 @ValidTransactionDto
@@ -39,6 +40,7 @@ public class CreateTransactionDto implements IModifyTransactionDto {
     @CanAccessBudget
     private Long budgetId;
 
+    @UniqueElements(message = ValidationMessages.VALUES_MUST_BE_UNIQUE)
     private List<Long> tagIds;
 
     public List<Long> getTagIds() {
