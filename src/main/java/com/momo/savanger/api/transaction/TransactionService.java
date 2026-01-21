@@ -8,6 +8,7 @@ import com.momo.savanger.api.transaction.dto.TransferTransactionPair;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transfer.Transfer;
 import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
+import com.momo.savanger.api.transfer.transferTransaction.TransferTransaction;
 import com.momo.savanger.api.user.User;
 import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
@@ -55,6 +56,6 @@ public interface TransactionService {
     void createTransferTransactions(CreateTransferTransactionDto transferTransactionDto,
             Long transferTransactionId, Transfer transfer);
 
-    TransferTransactionPair getTransferTransactionPair(Long transferTransactionId);
+    TransferTransactionPair getTransferTransactionPair(TransferTransaction transferTransaction);
 }
 

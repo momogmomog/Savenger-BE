@@ -9,7 +9,9 @@ import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.transaction.dto.TransferTransactionPair;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transfer.Transfer;
+import com.momo.savanger.api.transfer.TransferService;
 import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
+import com.momo.savanger.api.transfer.transferTransaction.TransferTransaction;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
 import com.momo.savanger.error.ApiErrorCode;
@@ -32,6 +34,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper transactionMapper;
 
     private final TagService tagService;
+
+    private final TransferService transferService;
 
     @Override
     public Transaction findById(Long id) {
@@ -120,7 +124,7 @@ public class TransactionServiceImpl implements TransactionService {
             TransactionType transactionType, Long budgetId, String comment, Long categoryId,
             Long transferTransactionId) {
 
-        CreateTransactionServiceDto dto = null;
+       final CreateTransactionServiceDto dto;
 
         if (debtId != null) {
             dto = CreateTransactionServiceDto.debtDto(amount,
@@ -136,6 +140,8 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionType,
                     budgetId
             );
+        } else {
+            throw ApiException.with(ApiErrorCode.ERR_0020);
         }
 
         return dto;
@@ -175,20 +181,23 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public TransferTransactionPair getTransferTransactionPair(Long transferTransactionId) {
+    public TransferTransactionPair getTransferTransactionPair(
+            TransferTransaction transferTransaction) {
 
         final TransferTransactionPair transferTransactionPair = new TransferTransactionPair();
 
-        TransactionDto sourceTransaction = this.transactionMapper.toTransactionDto(
+        final Transfer transfer = this.transferService.getById(transferTransaction.getTransferId());
+
+       final TransactionDto sourceTransaction = this.transactionMapper.toTransactionDto(
                 this.transactionRepository
-                        .getByTransferTransactionIdAndType(transferTransactionId,
-                                TransactionType.EXPENSE)
+                        .getByTransferTransactionIdAndBudgetId(transferTransaction.getId(),
+                                transfer.getSourceBudgetId())
         );
 
-        TransactionDto receiverTransaction = this.transactionMapper.toTransactionDto(
+        final TransactionDto receiverTransaction = this.transactionMapper.toTransactionDto(
                 this.transactionRepository
-                        .getByTransferTransactionIdAndType(transferTransactionId,
-                                TransactionType.INCOME)
+                        .getByTransferTransactionIdAndBudgetId(transferTransaction.getId(),
+                                transfer.getReceiverBudgetId())
         );
 
         transferTransactionPair.setSourceTransaction(sourceTransaction);

@@ -15,7 +15,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
 
     boolean existsByIdAndRevisedFalse(Long id);
 
-    Transaction getByTransferTransactionIdAndType(Long id, TransactionType type);
+    Transaction getByTransferTransactionIdAndBudgetId(Long transferTransactionId, Long budgetId);
 
     @EntityGraph(EntityGraphs.TRANSACTION_DETAILED)
     Optional<Transaction> findTransactionById(Long id);
