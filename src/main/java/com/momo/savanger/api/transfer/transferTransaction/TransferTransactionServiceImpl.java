@@ -25,7 +25,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
     private final TransferMapper transferMapper;
 
     @Override
-    public TransferTransaction create(CreateTransferTransactionDto dto) {
+    public TransferTransactionDto create(CreateTransferTransactionDto dto) {
         final TransferTransaction transferTransaction = new TransferTransaction();
         transferTransaction.setTransferId(dto.getTransferId());
 
@@ -36,7 +36,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
         this.transactionService.createTransferTransactions(dto, transferTransaction.getId(),
                 transfer);
 
-        return transferTransaction;
+        return this.getTransferTransactionDto(transfer.getId(), transferTransaction.getId());
     }
 
     @Override

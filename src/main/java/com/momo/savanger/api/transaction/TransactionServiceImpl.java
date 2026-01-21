@@ -89,16 +89,18 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public void createDebtTransactions(Debt debt, BigDecimal amount) {
 
+        final User user = SecurityUtils.getCurrentUser();
+
         this.create(
-                this.createTransactionDto(amount, debt.getId(), TransactionType.EXPENSE,
-                        debt.getLenderBudgetId(), null, null, null)
-                , null
+                this.createTransactionDtoForDebt(amount, debt.getId(), TransactionType.EXPENSE,
+                        debt.getLenderBudgetId())
+                , user.getId()
         );
 
         this.create(
-                this.createTransactionDto(amount, debt.getId(), TransactionType.INCOME,
-                        debt.getReceiverBudgetId(), null, null, null)
-                , null
+                this.createTransactionDtoForDebt(amount, debt.getId(), TransactionType.INCOME,
+                        debt.getReceiverBudgetId())
+                , user.getId()
         );
     }
 
@@ -108,43 +110,39 @@ public class TransactionServiceImpl implements TransactionService {
         final Long userId = SecurityUtils.getCurrentUser().getId();
 
         this.create(
-                this.createTransactionDto(amount, debt.getId(), TransactionType.EXPENSE,
-                        debt.getReceiverBudgetId(), null, null, null)
+                this.createTransactionDtoForDebt(amount, debt.getId(), TransactionType.EXPENSE,
+                        debt.getReceiverBudgetId())
                 , userId
         );
 
         this.create(
-                this.createTransactionDto(amount, debt.getId(), TransactionType.INCOME,
-                        debt.getLenderBudgetId(), null, null, null)
+                this.createTransactionDtoForDebt(amount, debt.getId(), TransactionType.INCOME,
+                        debt.getLenderBudgetId())
                 , userId
         );
     }
 
-    private CreateTransactionServiceDto createTransactionDto(BigDecimal amount, Long debtId,
+    private CreateTransactionServiceDto createTransactionDtoForDebt(BigDecimal amount, Long debtId,
+            TransactionType transactionType, Long budgetId) {
+
+        return CreateTransactionServiceDto.debtDto(amount,
+                debtId,
+                transactionType,
+                budgetId
+        );
+    }
+
+    private CreateTransactionServiceDto createTransactionDtoForTransfer(BigDecimal amount,
             TransactionType transactionType, Long budgetId, String comment, Long categoryId,
             Long transferTransactionId) {
 
-       final CreateTransactionServiceDto dto;
-
-        if (debtId != null) {
-            dto = CreateTransactionServiceDto.debtDto(amount,
-                    debtId,
-                    transactionType,
-                    budgetId
-            );
-        } else if (transferTransactionId != null) {
-            dto = CreateTransactionServiceDto.transferDto(transferTransactionId,
-                    amount,
-                    comment,
-                    categoryId,
-                    transactionType,
-                    budgetId
-            );
-        } else {
-            throw ApiException.with(ApiErrorCode.ERR_0020);
-        }
-
-        return dto;
+        return CreateTransactionServiceDto.transferDto(transferTransactionId,
+                amount,
+                comment,
+                categoryId,
+                transactionType,
+                budgetId
+        );
     }
 
     @Override
@@ -155,9 +153,8 @@ public class TransactionServiceImpl implements TransactionService {
         final Long userId = SecurityUtils.getCurrentUser().getId();
 
         this.create(
-                this.createTransactionDto(
+                this.createTransactionDtoForTransfer(
                         dto.getAmount(),
-                        null,
                         TransactionType.EXPENSE,
                         transfer.getSourceBudgetId(),
                         dto.getSourceComment(),
@@ -168,8 +165,7 @@ public class TransactionServiceImpl implements TransactionService {
         );
 
         this.create(
-                this.createTransactionDto(dto.getAmount(),
-                        null,
+                this.createTransactionDtoForTransfer(dto.getAmount(),
                         TransactionType.INCOME,
                         transfer.getReceiverBudgetId(),
                         dto.getReceiverComment(),
@@ -188,7 +184,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         final Transfer transfer = this.transferService.getById(transferTransaction.getTransferId());
 
-       final TransactionDto sourceTransaction = this.transactionMapper.toTransactionDto(
+        final TransactionDto sourceTransaction = this.transactionMapper.toTransactionDto(
                 this.transactionRepository
                         .getByTransferTransactionIdAndBudgetId(transferTransaction.getId(),
                                 transfer.getSourceBudgetId())
@@ -270,7 +266,9 @@ public class TransactionServiceImpl implements TransactionService {
         final Specification<Transaction> specification = TransactionSpecifications
                 .idEquals(transactionId)
                 .and(TransactionSpecifications.userIdEquals(user.getId()))
-                .and(TransactionSpecifications.maybeRevised(false));
+                .and(TransactionSpecifications.maybeRevised(false))
+                .and(TransactionSpecifications.debtIdIsNull())
+                .and(TransactionSpecifications.transferTransactionIdIsNull());
 
         return this.transactionRepository.exists(specification);
     }

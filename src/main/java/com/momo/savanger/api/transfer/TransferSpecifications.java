@@ -50,9 +50,11 @@ public class TransferSpecifications {
 
             return criteriaBuilder.or(
                     criteriaBuilder.equal(budgetJoin.get(Budget_.ownerId), userId),
+                    criteriaBuilder.equal(budgetJoin.get(Budget_.active), true),
                     criteriaBuilder.equal(participantsJoin.get(BudgetParticipantFields.USER_ID),
                             userId)
             );
         };
     }
+
 }

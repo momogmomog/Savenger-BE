@@ -1,5 +1,6 @@
 package com.momo.savanger.api.transfer.dto;
 
+import com.momo.savanger.api.budget.constraints.CanAccessBudget;
 import com.momo.savanger.api.util.PageQuery;
 import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.constraints.NotNull;
@@ -18,6 +19,7 @@ public class TransferSearchQuery {
     @NotNull
     private SortQuery sort;
 
+    @CanAccessBudget
     @NotNull
     private Long sourceBudgetId;
 

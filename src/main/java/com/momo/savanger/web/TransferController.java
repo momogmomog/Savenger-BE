@@ -18,6 +18,7 @@ import org.springframework.data.web.PagedModel;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -60,19 +61,26 @@ public class TransferController {
         return pagedModel;
     }
 
-    @PostMapping(Endpoints.TRANSFER_TRANSACTION)
+    @PostMapping(Endpoints.TRANSFER_TRANSACTIONS)
     public TransferTransactionDto transferTransaction(
             @Valid @RequestBody CreateTransferTransactionDto transferTransactionDto) {
 
-        final TransferTransaction transferTransaction = this.transferTransactionService.create(
-                transferTransactionDto);
-
-        return this.transferTransactionService.getTransferTransactionDto(
-                transferTransactionDto.getTransferId(), transferTransaction.getId());
+        return this.transferTransactionService.create(transferTransactionDto);
     }
 
-    @DeleteMapping(Endpoints.REVERT_TRANSFER_TRANSACTION)
-    public void transferTransaction(
+    @GetMapping(Endpoints.TRANSFER_TRANSACTION)
+    public TransferTransactionDto getTransferTransaction(
+            @PathVariable("id") @CanAccessTransferTransaction Long transferTransactionId) {
+
+        final TransferTransaction transferTransaction = this.transferTransactionService.getTransferTransaction(
+                transferTransactionId);
+
+        return this.transferTransactionService.getTransferTransactionDto(
+                transferTransaction.getTransferId(), transferTransactionId);
+    }
+
+    @DeleteMapping(Endpoints.TRANSFER_TRANSACTION)
+    public void delete(
             @PathVariable("id") @CanAccessTransferTransaction Long transferTransactionId) {
 
         this.transferTransactionService.revertTransferTransaction(transferTransactionId);

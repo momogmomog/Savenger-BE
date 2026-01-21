@@ -28,6 +28,14 @@ public final class TransactionSpecifications {
         return QuerySpecifications.equal(Transaction_.budgetId, budgetId);
     }
 
+    public static Specification<Transaction> debtIdIsNull() {
+        return QuerySpecifications.equal(Transaction_.debtId, null);
+    }
+
+    public static Specification<Transaction> transferTransactionIdIsNull() {
+        return QuerySpecifications.equal(Transaction_.transferTransactionId, null);
+    }
+
     public static Specification<Transaction> betweenAmount(final BetweenQuery<BigDecimal> query) {
         return QuerySpecifications.between(Transaction_.amount, query);
     }

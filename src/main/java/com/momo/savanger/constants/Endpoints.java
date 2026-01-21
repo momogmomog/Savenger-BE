@@ -25,6 +25,6 @@ public class Endpoints {
     public static final String TRANSFERS = "/transfers";
     public static final String TRANSFER = "/transfers/{id}";
     public static final String TRANSFERS_SEARCH = "/transfers/search";
-    public static final String TRANSFER_TRANSACTION = "/transfer-transactions";
-    public static final String REVERT_TRANSFER_TRANSACTION = "/transfer-transactions/{id}";
+    public static final String TRANSFER_TRANSACTIONS = "/transfer-transactions";
+    public static final String TRANSFER_TRANSACTION = "/transfer-transactions/{id}";
 }

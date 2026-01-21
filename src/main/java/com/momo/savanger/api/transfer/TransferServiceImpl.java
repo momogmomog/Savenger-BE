@@ -78,8 +78,8 @@ public class TransferServiceImpl implements TransferService {
     public Page<Transfer> searchTransfer(TransferSearchQuery query) {
 
         final Long userId = SecurityUtils.getCurrentUser().getId();
-        final Specification<Transfer> specification = TransferSpecifications.sourceBudgetIdEquals(
-                        query.getSourceBudgetId())
+        final Specification<Transfer> specification = TransferSpecifications
+                .sourceBudgetIdEquals(query.getSourceBudgetId())
                 .and(TransferSpecifications.receivedBudgetIdIn(query.getReceiverBudgetIds()))
                 .and(TransferSpecifications.isActive(query.getActive()))
                 .and(TransferSpecifications.canAccessReceiverBudget(userId));
