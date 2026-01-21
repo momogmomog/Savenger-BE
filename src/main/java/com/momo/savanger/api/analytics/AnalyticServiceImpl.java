@@ -51,7 +51,7 @@ public class AnalyticServiceImpl implements AnalyticsService {
         }
 
         if (categoryIds.isEmpty()) {
-            log.info("No categories found, aborting!");
+            log.info("No category IDs found, aborting!");
             return List.of();
         }
 
@@ -98,7 +98,7 @@ public class AnalyticServiceImpl implements AnalyticsService {
         }
 
         if (tagIds.isEmpty()) {
-            log.info("No tags found, aborting!");
+            log.info("No tag IDs found, aborting!");
             return List.of();
         }
 
