@@ -1,5 +1,6 @@
 package com.momo.savanger.api.category;
 
+import java.util.List;
 import org.springframework.data.domain.Page;
 
 public interface CategoryService {
@@ -11,4 +12,6 @@ public interface CategoryService {
     boolean isCategoryValid(Long categoryId, Long budgetId);
 
     Page<Category> searchCategories(CategoryQuery query);
+
+    List<Category> findAll(Long budgetId, List<Long> categoryIds);
 }
