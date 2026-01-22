@@ -48,7 +48,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
         );
 
         final TransferTransactionPair transferTransactionPair = this.transactionService
-                .getTransferTransactionPair(this.getTransferTransaction(transferTransactionId));
+                .getTransferTransactionPair(transferTransactionId);
 
         final TransferTransactionDto transferTransactionDto = new TransferTransactionDto();
 
@@ -74,8 +74,8 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
     @Transactional
     public void revertTransferTransaction(Long transferTransactionId) {
 
-        final TransferTransactionPair transferTransactionPair = this.transactionService.getTransferTransactionPair(
-                this.getTransferTransaction(transferTransactionId));
+        final TransferTransactionPair transferTransactionPair = this.transactionService
+                .getTransferTransactionPair(transferTransactionId);
 
         this.transactionService.deleteById(
                 transferTransactionPair.getReceiverTransaction().getId());

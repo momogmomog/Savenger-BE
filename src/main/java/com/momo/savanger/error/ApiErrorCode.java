@@ -27,7 +27,7 @@ public enum ApiErrorCode {
     ERR_0017(HttpStatus.BAD_REQUEST, "Recurring rule is not valid"),
     ERR_0018(HttpStatus.NOT_FOUND, "Transfer not found"),
     ERR_0019(HttpStatus.NOT_FOUND, "TransferTransaction not found"),
-    ERR_0020(HttpStatus.BAD_REQUEST, "TransactionDto is null");
+    ERR_0020(HttpStatus.BAD_REQUEST, "Error fetching transfer transaction data");
 
     public final HttpStatus status;
     public final String message;

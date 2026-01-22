@@ -4,15 +4,12 @@ import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
-import com.momo.savanger.api.transaction.dto.TransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.transaction.dto.TransactionSumAndCount;
 import com.momo.savanger.api.transaction.dto.TransferTransactionPair;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transfer.Transfer;
-import com.momo.savanger.api.transfer.TransferService;
 import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
-import com.momo.savanger.api.transfer.transferTransaction.TransferTransaction;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
 import com.momo.savanger.error.ApiErrorCode;
@@ -22,11 +19,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
@@ -36,8 +35,6 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper transactionMapper;
 
     private final TagService tagService;
-
-    private final TransferService transferService;
 
     @Override
     public Transaction findById(Long id) {
@@ -180,28 +177,37 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransferTransactionPair getTransferTransactionPair(
-            TransferTransaction transferTransaction) {
+            Long transferTransactionId) {
 
-        final TransferTransactionPair transferTransactionPair = new TransferTransactionPair();
+        final TransferTransactionPair pair = new TransferTransactionPair();
 
-        final Transfer transfer = this.transferService.getById(transferTransaction.getTransferId());
+        final List<Transaction> transactions = this.transactionRepository
+                .findByTransferTransactionId(transferTransactionId);
 
-        final TransactionDto sourceTransaction = this.transactionMapper.toTransactionDto(
-                this.transactionRepository
-                        .getByTransferTransactionIdAndBudgetId(transferTransaction.getId(),
-                                transfer.getSourceBudgetId())
+        if (transactions.size() != 2) {
+            log.warn(
+                    "Found {} transactions for transfer transaction {} where exactly two are expected!",
+                    transactions.size(),
+                    transferTransactionId
+            );
+            throw ApiException.with(ApiErrorCode.ERR_0020);
+        }
+
+        pair.setSourceTransaction(transactions.stream()
+                .filter(t -> t.getType() == TransactionType.EXPENSE)
+                .findFirst()
+                .map(this.transactionMapper::toTransactionDto)
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0020))
         );
 
-        final TransactionDto receiverTransaction = this.transactionMapper.toTransactionDto(
-                this.transactionRepository
-                        .getByTransferTransactionIdAndBudgetId(transferTransaction.getId(),
-                                transfer.getReceiverBudgetId())
+        pair.setReceiverTransaction(transactions.stream()
+                .filter(t -> t.getType() == TransactionType.INCOME)
+                .findFirst()
+                .map(this.transactionMapper::toTransactionDto)
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0020))
         );
 
-        transferTransactionPair.setSourceTransaction(sourceTransaction);
-        transferTransactionPair.setReceiverTransaction(receiverTransaction);
-
-        return transferTransactionPair;
+        return pair;
     }
 
     @Override

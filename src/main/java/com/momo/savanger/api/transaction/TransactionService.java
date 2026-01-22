@@ -64,6 +64,6 @@ public interface TransactionService {
     void createTransferTransactions(CreateTransferTransactionDto transferTransactionDto,
             Long transferTransactionId, Transfer transfer);
 
-    TransferTransactionPair getTransferTransactionPair(TransferTransaction transferTransaction);
+    TransferTransactionPair getTransferTransactionPair(Long transferTransactionId);
 }
 
