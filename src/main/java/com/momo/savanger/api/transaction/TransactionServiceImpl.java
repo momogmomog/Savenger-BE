@@ -6,6 +6,7 @@ import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
+import com.momo.savanger.api.transaction.dto.TransactionSumAndCount;
 import com.momo.savanger.api.transaction.dto.TransferTransactionPair;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transfer.Transfer;
@@ -18,6 +19,7 @@ import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -210,22 +212,28 @@ public class TransactionServiceImpl implements TransactionService {
 
     }
 
-
     @Override
     public Page<Transaction> searchTransactions(TransactionSearchQuery query, User user) {
-        final Specification<Transaction> specification = TransactionSpecifications
+        final Specification<Transaction> specification = this.createCoreSearchSpecifications(query)
+                .and(TransactionSpecifications.sort(query.getSort()));
+
+        return this.transactionRepository.findAll(specification, query.getPage(), null);
+    }
+
+    private Specification<Transaction> createCoreSearchSpecifications(
+            TransactionSearchQuery query) {
+        return TransactionSpecifications
                 .budgetIdEquals(query.getBudgetId())
-                .and(TransactionSpecifications.sort(query.getSort()))
                 .and(TransactionSpecifications.betweenAmount(query.getAmount()))
-                .and(TransactionSpecifications.maybeRevised(query.getRevised()))
                 .and(TransactionSpecifications.maybeContainsComment(query.getComment()))
                 .and(TransactionSpecifications.betweenDate(query.getDateCreated()))
                 .and(TransactionSpecifications.categoryIdContains(query.getCategoryIds()))
                 .and(TransactionSpecifications.typeEquals(query.getType()))
+                .and(TransactionSpecifications.maybeRevised(query.getRevised()))
                 .and(TransactionSpecifications.userIdContains(query.getUserIds()))
+                .and(TransactionSpecifications.debtIdEquals(query.getDebtId()))
+                .and(TransactionSpecifications.noDebtTransactions(query.getNoDebtTransactions()))
                 .and(TransactionSpecifications.tagsContain(query.getTagIds()));
-
-        return this.transactionRepository.findAll(specification, query.getPage(), null);
     }
 
     @Override
@@ -334,5 +342,26 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         return amount;
+    }
+
+    @Override
+    public List<Long> extractCategoryIds(TransactionSearchQuery query) {
+        query.setNoDebtTransactions(true);
+        return this.transactionRepository.getCategoryIds(
+                this.createCoreSearchSpecifications(query));
+    }
+
+    @Override
+    public List<Long> extractTagIds(TransactionSearchQuery query) {
+        query.setNoDebtTransactions(true);
+        return this.transactionRepository.getTagIds(this.createCoreSearchSpecifications(query));
+    }
+
+    @Override
+    public TransactionSumAndCount sumAndCount(TransactionSearchQuery query) {
+        query.setNoDebtTransactions(true);
+        final Specification<Transaction> specification = this.createCoreSearchSpecifications(query);
+
+        return this.transactionRepository.sumAndCount(specification);
     }
 }

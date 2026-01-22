@@ -24,7 +24,9 @@ public class Endpoints {
     public static final String PAY_R_TRANSACTION = "/recurring-transaction/{rTransactionId}/pay";
     public static final String TRANSFERS = "/transfers";
     public static final String TRANSFER = "/transfers/{id}";
-    public static final String TRANSFERS_SEARCH = "/transfers/search";
-    public static final String TRANSFER_TRANSACTIONS = "/transfer-transactions";
-    public static final String TRANSFER_TRANSACTION = "/transfer-transactions/{id}";
+    public static final String TRANSFERS_SEARCH = "/transferss/search";
+    public static final String TRANSFER_TRANSACTIONS = "/transfers/transactions";
+    public static final String TRANSFER_TRANSACTION = "/transfers/transactions/{id}";
+    public static final String ANALYTICS_CATEGORIES = "/analytics/categories";
+    public static final String ANALYTICS_TAGS = "/analytics/tags";
 }

@@ -4,6 +4,7 @@ import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
+import com.momo.savanger.api.transaction.dto.TransactionSumAndCount;
 import com.momo.savanger.api.transaction.dto.TransferTransactionPair;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transfer.Transfer;
@@ -11,6 +12,7 @@ import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransact
 import com.momo.savanger.api.transfer.transferTransaction.TransferTransaction;
 import com.momo.savanger.api.user.User;
 import java.math.BigDecimal;
+import java.util.List;
 import org.springframework.data.domain.Page;
 
 public interface TransactionService {
@@ -52,6 +54,12 @@ public interface TransactionService {
     Transaction createCompensationTransaction(Long budgetId, BigDecimal amount);
 
     BigDecimal getPrepaymentPaidAmount(Long prepaymentId);
+
+    List<Long> extractCategoryIds(TransactionSearchQuery query);
+
+    List<Long> extractTagIds(TransactionSearchQuery query);
+
+    TransactionSumAndCount sumAndCount(TransactionSearchQuery query);
 
     void createTransferTransactions(CreateTransferTransactionDto transferTransactionDto,
             Long transferTransactionId, Transfer transfer);

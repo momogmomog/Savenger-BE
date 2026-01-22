@@ -124,6 +124,25 @@ public class SpecificationExecutorImpl<T, ID> implements SpecificationExecutor<T
         return this.entityManager.createQuery(query).getSingleResult();
     }
 
+    protected <F> List<F> selectXFindAllDistinct(
+            Specification<T> specification,
+            SingularAttribute<T, F> field
+    ) {
+        final CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+
+        final CriteriaQuery<F> query = criteriaBuilder.createQuery(field.getJavaType());
+        final Root<T> root = query.from(this.entityType);
+
+        query.select(root.get(field));
+        query.where(specification.toPredicate(root, query, criteriaBuilder));
+
+        query.distinct(true);
+
+        final TypedQuery<F> typedQuery = this.entityManager.createQuery(query);
+
+        return typedQuery.getResultList();
+    }
+
     @Override
     @Transactional
     public List<T> findAll(Specification<T> specification, @Nullable String entityGraph) {

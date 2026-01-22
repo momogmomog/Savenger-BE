@@ -5,6 +5,7 @@ import static com.momo.savanger.api.util.QuerySpecificationUtils.getOrCreateJoin
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.tag.Tag_;
 import com.momo.savanger.api.util.BetweenQuery;
+import com.momo.savanger.api.util.BooleanUtils;
 import com.momo.savanger.api.util.QuerySpecifications;
 import com.momo.savanger.api.util.ReflectionUtils;
 import com.momo.savanger.api.util.SortQuery;
@@ -72,6 +73,18 @@ public final class TransactionSpecifications {
     public static Specification<Transaction> userIdContains(
             final Collection<Long> userIds) {
         return QuerySpecifications.inIfPresent(Transaction_.userId, userIds);
+    }
+
+    public static Specification<Transaction> noDebtTransactions(Boolean noDebtTransactions) {
+        if (BooleanUtils.isTrue(noDebtTransactions)) {
+            return (root, query, criteriaBuilder) -> root.get(Transaction_.debtId).isNull();
+        }
+
+        return Specification.where(null);
+    }
+
+    public static Specification<Transaction> debtIdEquals(Long debtId) {
+        return QuerySpecifications.equalIfPresent(Transaction_.debtId, debtId);
     }
 
     public static Specification<Transaction> isLinkedToTag(final Long tagId) {
