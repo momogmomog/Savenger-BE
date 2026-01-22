@@ -269,6 +269,18 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    public boolean deleteTransferTransactions(Long transferTransactionId) {
+        final TransferTransactionPair pair = this.getTransferTransactionPair(transferTransactionId);
+
+        if (pair.getSourceTransaction().getRevised()
+                || pair.getReceiverTransaction().getRevised()) {
+            throw ApiException.with(ApiErrorCode.ERR_0021);
+        }
+
+        return this.transactionRepository.deleteByTransferTransactionId(transferTransactionId);
+    }
+
+    @Override
     public void deleteById(Long id) {
 
         this.transactionRepository.deleteById(id);
@@ -281,8 +293,9 @@ public class TransactionServiceImpl implements TransactionService {
                 .idEquals(transactionId)
                 .and(TransactionSpecifications.userIdEquals(user.getId()))
                 .and(TransactionSpecifications.maybeRevised(false))
-                .and(TransactionSpecifications.debtIdIsNull())
-                .and(TransactionSpecifications.transferTransactionIdIsNull());
+                .and(TransactionSpecifications.noDebtTransactions(true))
+                .and(TransactionSpecifications.noPrepaymentTransaction())
+                .and(TransactionSpecifications.noTransferTransaction());
 
         return this.transactionRepository.exists(specification);
     }

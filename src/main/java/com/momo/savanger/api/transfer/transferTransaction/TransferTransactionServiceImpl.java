@@ -73,14 +73,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
     @Override
     @Transactional
     public void revertTransferTransaction(Long transferTransactionId) {
-
-        final TransferTransactionPair transferTransactionPair = this.transactionService
-                .getTransferTransactionPair(transferTransactionId);
-
-        this.transactionService.deleteById(
-                transferTransactionPair.getReceiverTransaction().getId());
-        this.transactionService.deleteById(transferTransactionPair.getSourceTransaction().getId());
-
+        this.transactionService.deleteTransferTransactions(transferTransactionId);
         this.transferTransactionRepository.deleteById(transferTransactionId);
     }
 }
