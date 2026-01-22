@@ -3,9 +3,9 @@ package com.momo.savanger.api.transfer;
 import static com.momo.savanger.api.util.QuerySpecificationUtils.getOrCreateJoin;
 
 import com.momo.savanger.api.budget.Budget;
-import com.momo.savanger.api.budget.BudgetParticipantFields;
 import com.momo.savanger.api.budget.Budget_;
 import com.momo.savanger.api.user.User;
+import com.momo.savanger.api.user.User_;
 import com.momo.savanger.api.util.QuerySpecifications;
 import jakarta.persistence.criteria.Join;
 import java.util.Collection;
@@ -51,8 +51,7 @@ public class TransferSpecifications {
             return criteriaBuilder.or(
                     criteriaBuilder.equal(budgetJoin.get(Budget_.ownerId), userId),
                     criteriaBuilder.equal(budgetJoin.get(Budget_.active), true),
-                    criteriaBuilder.equal(participantsJoin.get(BudgetParticipantFields.USER_ID),
-                            userId)
+                    criteriaBuilder.equal(participantsJoin.get(User_.id), userId)
             );
         };
     }
