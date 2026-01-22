@@ -30,7 +30,8 @@ public final class TransactionSpecifications {
     }
 
     public static Specification<Transaction> noTransferTransaction() {
-        return (root, query, criteriaBuilder) -> root.get(Transaction_.transferTransactionId).isNull();
+        return (root, query, criteriaBuilder) -> root.get(Transaction_.transferTransactionId)
+                .isNull();
     }
 
     public static Specification<Transaction> betweenAmount(final BetweenQuery<BigDecimal> query) {

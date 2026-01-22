@@ -28,7 +28,8 @@ public enum ApiErrorCode {
     ERR_0018(HttpStatus.NOT_FOUND, "Transfer not found"),
     ERR_0019(HttpStatus.NOT_FOUND, "TransferTransaction not found"),
     ERR_0020(HttpStatus.BAD_REQUEST, "Error fetching transfer transaction data"),
-    ERR_0021(HttpStatus.BAD_REQUEST, "Cannot revert transfer transaction"),;
+    ERR_0021(HttpStatus.BAD_REQUEST, "Cannot revert transfer transaction"),
+    ;
 
     public final HttpStatus status;
     public final String message;

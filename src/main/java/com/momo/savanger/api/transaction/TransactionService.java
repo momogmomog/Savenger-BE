@@ -9,7 +9,6 @@ import com.momo.savanger.api.transaction.dto.TransferTransactionPair;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transfer.Transfer;
 import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
-import com.momo.savanger.api.transfer.transferTransaction.TransferTransaction;
 import com.momo.savanger.api.user.User;
 import java.math.BigDecimal;
 import java.util.List;

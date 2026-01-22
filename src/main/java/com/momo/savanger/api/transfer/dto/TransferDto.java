@@ -1,6 +1,6 @@
 package com.momo.savanger.api.transfer.dto;
 
-import com.momo.savanger.api.budget.dto.BudgetDto;
+import com.momo.savanger.api.budget.dto.BudgetSimpleDto;
 import lombok.Data;
 
 @Data
@@ -14,8 +14,8 @@ public class TransferDto {
 
     private Boolean active;
 
-    private BudgetDto receiverBudget;
+    private BudgetSimpleDto receiverBudget;
 
-    private BudgetDto sourceBudget;
+    private BudgetSimpleDto sourceBudget;
 
 }
