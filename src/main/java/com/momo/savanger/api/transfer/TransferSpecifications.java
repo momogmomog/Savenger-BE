@@ -48,12 +48,15 @@ public class TransferSpecifications {
             final Join<Budget, User> participantsJoin = getOrCreateJoin(budgetJoin,
                     Budget_.participants);
 
-            return criteriaBuilder.or(
-                    criteriaBuilder.equal(budgetJoin.get(Budget_.ownerId), userId),
+            return criteriaBuilder.and(
                     criteriaBuilder.equal(budgetJoin.get(Budget_.active), true),
-                    criteriaBuilder.equal(participantsJoin.get(User_.id), userId)
+                    criteriaBuilder.or(
+                            criteriaBuilder.equal(budgetJoin.get(Budget_.ownerId), userId),
+                            criteriaBuilder.equal(participantsJoin.get(User_.id), userId)
+                    )
             );
         };
     }
+
 
 }
