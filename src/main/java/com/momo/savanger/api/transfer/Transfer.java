@@ -24,6 +24,9 @@ import lombok.Setter;
         @NamedAttributeNode("receiverBudget"),
         @NamedAttributeNode("sourceBudget"),
 })
+@NamedEntityGraph(name = EntityGraphs.TRANSFER_RECEIVER_BUDGET, attributeNodes = {
+        @NamedAttributeNode("receiverBudget")
+})
 public class Transfer {
 
     @Id

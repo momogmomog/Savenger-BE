@@ -4,10 +4,10 @@ import com.momo.savanger.api.transfer.TransferMapper;
 import com.momo.savanger.api.transfer.TransferService;
 import com.momo.savanger.api.transfer.constraints.CanAccessTransfer;
 import com.momo.savanger.api.transfer.dto.CreateTransferDto;
-import com.momo.savanger.api.transfer.dto.TransferDto;
+import com.momo.savanger.api.transfer.dto.TransferFullDto;
 import com.momo.savanger.api.transfer.dto.TransferSearchQuery;
+import com.momo.savanger.api.transfer.dto.TransferSimpleDto;
 import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
-import com.momo.savanger.api.transfer.transferTransaction.TransferTransaction;
 import com.momo.savanger.api.transfer.transferTransaction.TransferTransactionDto;
 import com.momo.savanger.api.transfer.transferTransaction.TransferTransactionService;
 import com.momo.savanger.api.transfer.transferTransaction.constraints.CanAccessTransferTransaction;
@@ -39,30 +39,30 @@ public class TransferController {
 
 
     @PutMapping(Endpoints.TRANSFERS)
-    public TransferDto transfer(@Valid @RequestBody CreateTransferDto transferDto) {
+    public TransferFullDto createTransfer(@Valid @RequestBody CreateTransferDto transferDto) {
 
-        return this.transferMapper.toTransferDto(this.transferService.upsert(transferDto));
+        return this.transferMapper.toTransferFullDto(this.transferService.upsert(transferDto));
     }
 
     @DeleteMapping(Endpoints.TRANSFER)
-    public void transfer(@PathVariable("id") @CanAccessTransfer Long transferId) {
+    public void deleteTransfer(@PathVariable("id") @CanAccessTransfer Long transferId) {
 
         this.transferService.disable(transferId);
     }
 
     @PostMapping(Endpoints.TRANSFERS_SEARCH)
-    public PagedModel<TransferDto> searchTransfer(
+    public PagedModel<TransferSimpleDto> searchTransfer(
             @Valid @RequestBody TransferSearchQuery query) {
 
-        final PagedModel<TransferDto> pagedModel = new PagedModel<>(this.transferService
-                .searchTransfer(query)
-                .map(this.transferMapper::toTransferDto));
+        final PagedModel<TransferSimpleDto> pagedModel = new PagedModel<>(this.transferService
+                .searchTransfers(query)
+                .map(this.transferMapper::toTransferSimpleDto));
 
         return pagedModel;
     }
 
     @PostMapping(Endpoints.TRANSFER_TRANSACTIONS)
-    public TransferTransactionDto transferTransaction(
+    public TransferTransactionDto createTransferTransaction(
             @Valid @RequestBody CreateTransferTransactionDto transferTransactionDto) {
 
         return this.transferTransactionService.create(transferTransactionDto);
@@ -72,15 +72,11 @@ public class TransferController {
     public TransferTransactionDto getTransferTransaction(
             @PathVariable("id") @CanAccessTransferTransaction Long transferTransactionId) {
 
-        final TransferTransaction transferTransaction = this.transferTransactionService.getTransferTransaction(
-                transferTransactionId);
-
-        return this.transferTransactionService.getTransferTransactionDto(
-                transferTransaction.getTransferId(), transferTransactionId);
+        return this.transferTransactionService.getTransferTransactionDto(transferTransactionId);
     }
 
     @DeleteMapping(Endpoints.TRANSFER_TRANSACTION)
-    public void delete(
+    public void deleteTransferTransaction(
             @PathVariable("id") @CanAccessTransferTransaction Long transferTransactionId) {
 
         this.transferTransactionService.revertTransferTransaction(transferTransactionId);

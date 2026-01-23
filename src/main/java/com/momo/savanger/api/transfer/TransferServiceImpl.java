@@ -3,6 +3,7 @@ package com.momo.savanger.api.transfer;
 import com.momo.savanger.api.transfer.dto.CreateTransferDto;
 import com.momo.savanger.api.transfer.dto.TransferSearchQuery;
 import com.momo.savanger.api.util.SecurityUtils;
+import com.momo.savanger.constants.EntityGraphs;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.util.Optional;
@@ -40,8 +41,7 @@ public class TransferServiceImpl implements TransferService {
     @Override
     @Transactional
     public Transfer upsert(CreateTransferDto dto) {
-        final Transfer transfer = this
-                .findTransfer(
+        final Transfer transfer = this.findTransfer(
                         dto.getReceiverBudgetId(),
                         dto.getSourceBudgetId()
                 )
@@ -67,15 +67,15 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public Optional<Transfer> findTransfer(Long receiverBudgetId, Long sourceBudgetId) {
-        final Specification<Transfer> specification = TransferSpecifications.sourceBudgetIdEquals(
-                        sourceBudgetId)
+        final Specification<Transfer> specification = TransferSpecifications
+                .sourceBudgetIdEquals(sourceBudgetId)
                 .and(TransferSpecifications.receiverBudgetIdEquals(receiverBudgetId));
 
         return this.transferRepository.findAll(specification, null).stream().findFirst();
     }
 
     @Override
-    public Page<Transfer> searchTransfer(TransferSearchQuery query) {
+    public Page<Transfer> searchTransfers(TransferSearchQuery query) {
 
         final Long userId = SecurityUtils.getCurrentUser().getId();
         final Specification<Transfer> specification = TransferSpecifications
@@ -86,7 +86,7 @@ public class TransferServiceImpl implements TransferService {
 
         final Page<Transfer> transfers = this.transferRepository.findAll(specification,
                 query.getPage(),
-                null
+                EntityGraphs.TRANSFER_RECEIVER_BUDGET
         );
 
         return transfers;

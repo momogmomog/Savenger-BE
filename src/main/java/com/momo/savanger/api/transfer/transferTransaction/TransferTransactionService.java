@@ -4,7 +4,7 @@ public interface TransferTransactionService {
 
     TransferTransactionDto create(CreateTransferTransactionDto dto);
 
-    TransferTransactionDto getTransferTransactionDto(Long transferId, Long transferTransactionId);
+    TransferTransactionDto getTransferTransactionDto(Long transferTransactionId);
 
     TransferTransaction getTransferTransaction(Long transferTransactionId);
 

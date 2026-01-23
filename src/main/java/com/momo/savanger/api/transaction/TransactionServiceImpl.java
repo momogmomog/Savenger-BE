@@ -78,7 +78,8 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public Transaction createPrepaymentTransaction(RecurringTransaction recurringTransaction) {
         final CreateTransactionServiceDto transactionDto = this.transactionMapper.toCreateServiceDto(
-                recurringTransaction);
+                recurringTransaction
+        );
         transactionDto.setDateCreated(null);
 
         return this.create(transactionDto, null);
@@ -91,13 +92,17 @@ public class TransactionServiceImpl implements TransactionService {
         final User user = SecurityUtils.getCurrentUser();
 
         this.create(
-                this.createTransactionDtoForDebt(amount, debt.getId(), TransactionType.EXPENSE,
+                this.createTransactionDtoForDebt(amount,
+                        debt.getId(),
+                        TransactionType.EXPENSE,
                         debt.getLenderBudgetId())
                 , user.getId()
         );
 
         this.create(
-                this.createTransactionDtoForDebt(amount, debt.getId(), TransactionType.INCOME,
+                this.createTransactionDtoForDebt(amount,
+                        debt.getId(),
+                        TransactionType.INCOME,
                         debt.getReceiverBudgetId())
                 , user.getId()
         );
@@ -109,13 +114,17 @@ public class TransactionServiceImpl implements TransactionService {
         final Long userId = SecurityUtils.getCurrentUser().getId();
 
         this.create(
-                this.createTransactionDtoForDebt(amount, debt.getId(), TransactionType.EXPENSE,
+                this.createTransactionDtoForDebt(amount,
+                        debt.getId(),
+                        TransactionType.EXPENSE,
                         debt.getReceiverBudgetId())
                 , userId
         );
 
         this.create(
-                this.createTransactionDtoForDebt(amount, debt.getId(), TransactionType.INCOME,
+                this.createTransactionDtoForDebt(amount,
+                        debt.getId(),
+                        TransactionType.INCOME,
                         debt.getLenderBudgetId())
                 , userId
         );
@@ -164,7 +173,8 @@ public class TransactionServiceImpl implements TransactionService {
         );
 
         this.create(
-                this.createTransactionDtoForTransfer(dto.getAmount(),
+                this.createTransactionDtoForTransfer(
+                        dto.getAmount(),
                         TransactionType.INCOME,
                         transfer.getReceiverBudgetId(),
                         dto.getReceiverComment(),
@@ -269,7 +279,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public boolean deleteTransferTransactions(Long transferTransactionId) {
+    public void deleteTransferTransactions(Long transferTransactionId) {
+
         final TransferTransactionPair pair = this.getTransferTransactionPair(transferTransactionId);
 
         if (pair.getSourceTransaction().getRevised()
@@ -277,7 +288,7 @@ public class TransactionServiceImpl implements TransactionService {
             throw ApiException.with(ApiErrorCode.ERR_0021);
         }
 
-        return this.transactionRepository.deleteByTransferTransactionId(transferTransactionId);
+        this.transactionRepository.deleteByTransferTransactionId(transferTransactionId);
     }
 
     @Override

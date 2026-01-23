@@ -30,7 +30,7 @@ public interface TransactionService {
 
     Boolean existsByIdAndRevisedFalse(Long id);
 
-    boolean deleteTransferTransactions(Long transferTransactionId);
+    void deleteTransferTransactions(Long transferTransactionId);
 
     void deleteById(Long id);
 

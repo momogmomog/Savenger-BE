@@ -18,5 +18,5 @@ public interface TransferService {
 
     Optional<Transfer> findTransfer(Long receiverBudgetId, Long sourceBudgetId);
 
-    Page<Transfer> searchTransfer(TransferSearchQuery query);
+    Page<Transfer> searchTransfers(TransferSearchQuery query);
 }

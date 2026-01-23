@@ -22,8 +22,10 @@ public class ValidTransferDtoValidator implements
         }
 
         if (transferDto.getSourceBudgetId().equals(transferDto.getReceiverBudgetId())) {
-            return ValidationUtil.fail(constraintValidatorContext, "sourceBudgetId",
-                    "Source budget id and receiver budget id should be different.");
+            return ValidationUtil.fail(constraintValidatorContext,
+                    "sourceBudgetId",
+                    "Source budget id and receiver budget id should be different."
+            );
         }
 
         return true;

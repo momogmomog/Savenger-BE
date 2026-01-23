@@ -5,7 +5,7 @@ import com.momo.savanger.api.transaction.dto.TransferTransactionPair;
 import com.momo.savanger.api.transfer.Transfer;
 import com.momo.savanger.api.transfer.TransferMapper;
 import com.momo.savanger.api.transfer.TransferService;
-import com.momo.savanger.api.transfer.dto.TransferDto;
+import com.momo.savanger.api.transfer.dto.TransferFullDto;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +25,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
     private final TransferMapper transferMapper;
 
     @Override
+    @Transactional
     public TransferTransactionDto create(CreateTransferTransactionDto dto) {
         final TransferTransaction transferTransaction = new TransferTransaction();
         transferTransaction.setTransferId(dto.getTransferId());
@@ -33,18 +34,24 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
 
         final Transfer transfer = this.transferService.getById(dto.getTransferId());
 
-        this.transactionService.createTransferTransactions(dto, transferTransaction.getId(),
-                transfer);
+        this.transactionService.createTransferTransactions(
+                dto,
+                transferTransaction.getId(),
+                transfer
+        );
 
-        return this.getTransferTransactionDto(transfer.getId(), transferTransaction.getId());
+        return this.getTransferTransactionDto(transferTransaction.getId());
     }
 
     @Override
-    public TransferTransactionDto getTransferTransactionDto(Long transferId,
-            Long transferTransactionId) {
+    public TransferTransactionDto getTransferTransactionDto(Long transferTransactionId) {
 
-        final TransferDto transferDto = this.transferMapper.toTransferDto(
-                this.transferService.findAndFetchDetails(transferId)
+        final TransferTransaction transferTransaction = this.getTransferTransaction(
+                transferTransactionId
+        );
+
+        final TransferFullDto transferFullDto = this.transferMapper.toTransferFullDto(
+                this.transferService.findAndFetchDetails(transferTransaction.getTransferId())
         );
 
         final TransferTransactionPair transferTransactionPair = this.transactionService
@@ -52,12 +59,14 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
 
         final TransferTransactionDto transferTransactionDto = new TransferTransactionDto();
 
-        transferTransactionDto.setTransfer(transferDto);
+        transferTransactionDto.setTransfer(transferFullDto);
         transferTransactionDto.setTransferTransactionId(transferTransactionId);
         transferTransactionDto.setReceiverTransaction(
-                transferTransactionPair.getReceiverTransaction());
+                transferTransactionPair.getReceiverTransaction()
+        );
         transferTransactionDto.setSourceTransaction(
-                transferTransactionPair.getSourceTransaction());
+                transferTransactionPair.getSourceTransaction()
+        );
 
         return transferTransactionDto;
     }
@@ -73,6 +82,7 @@ public class TransferTransactionServiceImpl implements TransferTransactionServic
     @Override
     @Transactional
     public void revertTransferTransaction(Long transferTransactionId) {
+
         this.transactionService.deleteTransferTransactions(transferTransactionId);
         this.transferTransactionRepository.deleteById(transferTransactionId);
     }

@@ -26,6 +26,6 @@ public class ValidationMessages {
     public static final String ACCESS_DENIED = "Access denied";
     public static final String VALUES_MUST_BE_UNIQUE = "Values must be unique";
     public static final String R_TRANSACTION_IS_COMPLETED = "Recurring transaction is already completed.";
-    public static final String CATEGORY_IS_NOT_VALID = "Category with id %s don't belong to this budget or doesn't exist";
+    public static final String CATEGORY_IS_NOT_VALID = "Category with id %s doesn't belong to this budget or doesn't exist";
 
 }

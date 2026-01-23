@@ -4,7 +4,7 @@ import com.momo.savanger.api.budget.dto.BudgetSimpleDto;
 import lombok.Data;
 
 @Data
-public class TransferDto {
+public class TransferFullDto {
 
     private int id;
 
