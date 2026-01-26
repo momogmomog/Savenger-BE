@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class TransferTransactionPair {
 
-    TransactionDto sourceTransaction;
+    TransactionDtoSimple sourceTransaction;
 
-    TransactionDto receiverTransaction;
+    TransactionDtoSimple receiverTransaction;
 }

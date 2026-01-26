@@ -207,14 +207,14 @@ public class TransactionServiceImpl implements TransactionService {
         pair.setSourceTransaction(transactions.stream()
                 .filter(t -> t.getType() == TransactionType.EXPENSE)
                 .findFirst()
-                .map(this.transactionMapper::toTransactionDto)
+                .map(this.transactionMapper::toSimpleTransactionDto)
                 .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0020))
         );
 
         pair.setReceiverTransaction(transactions.stream()
                 .filter(t -> t.getType() == TransactionType.INCOME)
                 .findFirst()
-                .map(this.transactionMapper::toTransactionDto)
+                .map(this.transactionMapper::toSimpleTransactionDto)
                 .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0020))
         );
 
