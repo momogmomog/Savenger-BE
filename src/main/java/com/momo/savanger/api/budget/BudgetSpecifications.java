@@ -9,6 +9,7 @@ import com.momo.savanger.api.util.ReflectionUtils;
 import com.momo.savanger.api.util.SortQuery;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 public final class BudgetSpecifications {
@@ -41,7 +42,7 @@ public final class BudgetSpecifications {
     }
 
     public static Specification<Budget> budgetNameContains(final String name) {
-        return QuerySpecifications.equalIfPresent(Budget_.budgetName, name);
+        return QuerySpecifications.containsIfPresent(Budget_.budgetName, name);
     }
 
     public static Specification<Budget> betweenDateStarted(final BetweenQuery<LocalDateTime> date) {
@@ -58,6 +59,14 @@ public final class BudgetSpecifications {
 
     public static Specification<Budget> betweenBudgetCap(final BetweenQuery<BigDecimal> budgetCap) {
         return QuerySpecifications.between(Budget_.budgetCap, budgetCap);
+    }
+
+    public static Specification<Budget> idNotIn(List<Long> budgetIds) {
+        if (budgetIds == null || budgetIds.isEmpty()) {
+            return Specification.where(null);
+        }
+
+        return (root, query, cb) -> cb.not(root.get(Budget_.id).in(budgetIds));
     }
 
     public static Specification<Budget> sort(SortQuery sortQuery) {

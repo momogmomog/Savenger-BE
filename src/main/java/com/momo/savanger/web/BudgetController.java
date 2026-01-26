@@ -5,9 +5,9 @@ import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.constraints.CanAccessBudget;
 import com.momo.savanger.api.budget.constraints.ValidBudget;
 import com.momo.savanger.api.budget.dto.AssignParticipantDto;
-import com.momo.savanger.api.budget.dto.BudgetDto;
+import com.momo.savanger.api.budget.dto.BudgetFullDto;
 import com.momo.savanger.api.budget.dto.BudgetSearchQuery;
-import com.momo.savanger.api.budget.dto.BudgetSearchResponseDto;
+import com.momo.savanger.api.budget.dto.BudgetSimpleDto;
 import com.momo.savanger.api.budget.dto.BudgetStatisticsDto;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
@@ -41,7 +41,7 @@ public class BudgetController {
     private final BudgetMapper budgetMapper;
 
     @PostMapping(Endpoints.BUDGETS)
-    public BudgetDto create(@Valid @RequestBody CreateBudgetDto createBudgetDto,
+    public BudgetFullDto create(@Valid @RequestBody CreateBudgetDto createBudgetDto,
             @AuthenticationPrincipal User user) {
 
         return this.budgetMapper.toBudgetDto(
@@ -50,7 +50,7 @@ public class BudgetController {
     }
 
     @PutMapping(Endpoints.BUDGET)
-    public BudgetDto edit(
+    public BudgetFullDto edit(
             @PathVariable("id") @CanAccessBudget(onlyEnabled = false) Long budgetId,
             @Valid @RequestBody UpdateBudgetDto updateBudgetDto) {
 
@@ -58,7 +58,7 @@ public class BudgetController {
     }
 
     @GetMapping(Endpoints.BUDGET)
-    public BudgetDto getBudget(
+    public BudgetFullDto getBudget(
             @PathVariable("id") @CanAccessBudget(onlyEnabled = false) Long budgetId) {
         return this.budgetMapper.toBudgetDto(this.budgetService.findByIdFetchAll(budgetId));
     }
@@ -72,7 +72,7 @@ public class BudgetController {
     }
 
     @PostMapping(Endpoints.PARTICIPANTS)
-    public BudgetDto assignParticipants(@PathVariable @ValidBudget Long id,
+    public BudgetFullDto assignParticipants(@PathVariable @ValidBudget Long id,
             @Valid @RequestBody AssignParticipantDto dto) {
 
         if (!id.equals(dto.getBudgetRef().getId())) {
@@ -83,7 +83,7 @@ public class BudgetController {
     }
 
     @DeleteMapping(Endpoints.PARTICIPANTS)
-    public BudgetDto unassignParticipants(@PathVariable @ValidBudget Long id,
+    public BudgetFullDto unassignParticipants(@PathVariable @ValidBudget Long id,
             @Valid @RequestBody UnassignParticipantDto dto) {
 
         if (!id.equals(dto.getBudgetRef().getId())) {
@@ -94,7 +94,7 @@ public class BudgetController {
     }
 
     @PostMapping(Endpoints.BUDGET_SEARCH)
-    public PagedModel<BudgetSearchResponseDto> searchBudget(
+    public PagedModel<BudgetSimpleDto> searchBudget(
             @Valid @RequestBody BudgetSearchQuery query
             , @AuthenticationPrincipal User user) {
 

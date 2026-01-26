@@ -24,7 +24,12 @@ public enum ApiErrorCode {
     ERR_0014(HttpStatus.BAD_REQUEST, "Budget does not have enough money"),
     ERR_0015(HttpStatus.NOT_FOUND, "Prepayment not found"),
     ERR_0016(HttpStatus.NOT_FOUND, "Recurring transaction not found"),
-    ERR_0017(HttpStatus.BAD_REQUEST, "Recurring rule is not valid");
+    ERR_0017(HttpStatus.BAD_REQUEST, "Recurring rule is not valid"),
+    ERR_0018(HttpStatus.NOT_FOUND, "Transfer not found"),
+    ERR_0019(HttpStatus.NOT_FOUND, "TransferTransaction not found"),
+    ERR_0020(HttpStatus.BAD_REQUEST, "Error fetching transfer transaction data"),
+    ERR_0021(HttpStatus.BAD_REQUEST, "Cannot revert transfer transaction"),
+    ;
 
     public final HttpStatus status;
     public final String message;

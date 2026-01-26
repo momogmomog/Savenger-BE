@@ -29,6 +29,11 @@ public final class TransactionSpecifications {
         return QuerySpecifications.equal(Transaction_.budgetId, budgetId);
     }
 
+    public static Specification<Transaction> noTransferTransaction() {
+        return (root, query, criteriaBuilder) -> root.get(Transaction_.transferTransactionId)
+                .isNull();
+    }
+
     public static Specification<Transaction> betweenAmount(final BetweenQuery<BigDecimal> query) {
         return QuerySpecifications.between(Transaction_.amount, query);
     }
@@ -73,6 +78,10 @@ public final class TransactionSpecifications {
         }
 
         return Specification.where(null);
+    }
+
+    public static Specification<Transaction> noPrepaymentTransaction() {
+        return (root, query, criteriaBuilder) -> root.get(Transaction_.prepaymentId).isNull();
     }
 
     public static Specification<Transaction> debtIdEquals(Long debtId) {
