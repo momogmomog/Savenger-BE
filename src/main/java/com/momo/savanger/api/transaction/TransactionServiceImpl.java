@@ -134,8 +134,11 @@ public class TransactionServiceImpl implements TransactionService {
         final Specification<Transaction> specification = this.createCoreSearchSpecifications(query)
                 .and(TransactionSpecifications.sort(query.getSort()));
 
-        return this.transactionRepository.findAll(specification, query.getPage(),
-                EntityGraphs.TRANSACTION_TAGS);
+        return this.transactionRepository.findAll(
+                specification,
+                query.getPage(),
+                EntityGraphs.TRANSACTION_TAGS
+        );
     }
 
     private Specification<Transaction> createCoreSearchSpecifications(
