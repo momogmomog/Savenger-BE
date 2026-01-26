@@ -11,4 +11,6 @@ public final class EntityGraphs {
     public static final String RECURRING_TRANSACTION_ALL = "recurringTransactionAll";
 
     public static final String TRANSACTION_DETAILED = "transactionDetailed";
+
+    public static final String TRANSACTION_TAGS = "transactionTags";
 }
