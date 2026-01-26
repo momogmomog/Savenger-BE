@@ -7,9 +7,9 @@ import com.momo.savanger.api.transaction.constraints.CanViewTransaction;
 import com.momo.savanger.api.transaction.constraints.TransactionNotRevised;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
-import com.momo.savanger.api.transaction.dto.TransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionDtoDetailed;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
+import com.momo.savanger.api.transaction.dto.TransactionSearchResponseDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.constants.Endpoints;
 import jakarta.validation.Valid;
@@ -38,7 +38,8 @@ public class TransactionController {
     private final TransactionMapper transactionMapper;
 
     @PostMapping(value = Endpoints.TRANSACTIONS, produces = MediaType.APPLICATION_JSON_VALUE)
-    public TransactionDto create(@Valid @RequestBody CreateTransactionDto transactionDto,
+    public TransactionSearchResponseDto create(
+            @Valid @RequestBody CreateTransactionDto transactionDto,
             @AuthenticationPrincipal User user) {
 
         return this.transactionMapper.toTransactionDto(
@@ -50,7 +51,7 @@ public class TransactionController {
     }
 
     @PostMapping(Endpoints.TRANSACTIONS_SEARCH)
-    public PagedModel<TransactionDto> searchTransactions(
+    public PagedModel<TransactionSearchResponseDto> searchTransactions(
             @Valid @RequestBody TransactionSearchQuery query,
             @AuthenticationPrincipal User user) {
         return new PagedModel<>(this.transactionService

@@ -1,16 +1,14 @@
 package com.momo.savanger.api.transaction.dto;
 
-import com.momo.savanger.api.category.CategoryDto;
 import com.momo.savanger.api.tag.TagDto;
 import com.momo.savanger.api.transaction.TransactionType;
-import com.momo.savanger.api.user.OtherUserDto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;
 
 @Data
-public class TransactionDtoDetailed {
+public class TransactionSearchResponseDto {
 
     private Long id;
 
@@ -31,8 +29,4 @@ public class TransactionDtoDetailed {
     private Long budgetId;
 
     private List<TagDto> tags;
-
-    private CategoryDto category;
-
-    private OtherUserDto user;
 }
