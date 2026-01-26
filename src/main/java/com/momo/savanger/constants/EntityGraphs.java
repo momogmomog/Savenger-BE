@@ -15,4 +15,6 @@ public final class EntityGraphs {
     public static final String TRANSFER_ALL = "transferAll";
 
     public static final String TRANSFER_RECEIVER_BUDGET = "transferReceiverBudget";
+
+    public static final String TRANSACTION_TAGS = "transactionTags";
 }

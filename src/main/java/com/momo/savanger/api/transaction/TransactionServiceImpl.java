@@ -12,6 +12,7 @@ import com.momo.savanger.api.transfer.Transfer;
 import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
+import com.momo.savanger.constants.EntityGraphs;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
@@ -233,7 +234,11 @@ public class TransactionServiceImpl implements TransactionService {
         final Specification<Transaction> specification = this.createCoreSearchSpecifications(query)
                 .and(TransactionSpecifications.sort(query.getSort()));
 
-        return this.transactionRepository.findAll(specification, query.getPage(), null);
+        return this.transactionRepository.findAll(
+                specification,
+                query.getPage(),
+                EntityGraphs.TRANSACTION_TAGS
+        );
     }
 
     private Specification<Transaction> createCoreSearchSpecifications(

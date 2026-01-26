@@ -38,6 +38,9 @@ import lombok.ToString.Exclude;
         @NamedAttributeNode("user"),
         @NamedAttributeNode("category"),
 })
+@NamedEntityGraph(name = EntityGraphs.TRANSACTION_TAGS, attributeNodes = {
+        @NamedAttributeNode("tags"),
+})
 public class Transaction {
 
     @Id
