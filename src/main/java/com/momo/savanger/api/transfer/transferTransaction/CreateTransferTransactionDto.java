@@ -23,7 +23,9 @@ public class CreateTransferTransactionDto {
 
     private String receiverComment;
 
+    @NotNull
     private Long sourceCategoryId;
 
+    @NotNull
     private Long receiverCategoryId;
 }

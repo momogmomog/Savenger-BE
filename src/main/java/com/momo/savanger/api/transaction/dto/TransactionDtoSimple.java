@@ -7,6 +7,7 @@ import lombok.Data;
 
 @Data
 public class TransactionDtoSimple {
+
     private Long id;
 
     private TransactionType type;

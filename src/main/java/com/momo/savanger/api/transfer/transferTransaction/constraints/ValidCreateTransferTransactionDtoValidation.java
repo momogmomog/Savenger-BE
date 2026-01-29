@@ -30,34 +30,43 @@ public class ValidCreateTransferTransactionDtoValidation implements
     public boolean isValid(CreateTransferTransactionDto dto,
             ConstraintValidatorContext constraintValidatorContext) {
 
+        if (dto.getTransferId() == null) {
+            return true;
+        }
+
         final Transfer transfer = this.transferService.getById(dto.getTransferId());
 
-        if (dto.getReceiverCategoryId() == null || dto.getSourceCategoryId() == null) {
-            return false;
+        //TODO:Think how to return two fails when both category are not valid.
+        if (!this.isNull(dto.getSourceCategoryId())) {
+            if (!this.categoryService.isCategoryValid(dto.getSourceCategoryId(),
+                    transfer.getSourceBudgetId())
+            ) {
+                return ValidationUtil.fail(constraintValidatorContext,
+                        "sourceCategoryId",
+                        String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
+                                dto.getSourceCategoryId()
+                        )
+                );
+            }
         }
 
-        if (!this.categoryService.isCategoryValid(dto.getSourceCategoryId(),
-                transfer.getSourceBudgetId())
-        ) {
-            return ValidationUtil.fail(constraintValidatorContext,
-                    "sourceCategoryId",
-                    String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
-                            dto.getSourceCategoryId()
-                    )
-            );
-        }
-
-        if (!this.categoryService.isCategoryValid(dto.getReceiverCategoryId(),
-                transfer.getReceiverBudgetId())
-        ) {
-            return ValidationUtil.fail(constraintValidatorContext,
-                    "receiverCategoryId",
-                    String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
-                            dto.getSourceCategoryId()
-                    )
-            );
+        if (!this.isNull(dto.getReceiverCategoryId())) {
+            if (!this.categoryService.isCategoryValid(dto.getReceiverCategoryId(),
+                    transfer.getReceiverBudgetId())
+            ) {
+                return ValidationUtil.fail(constraintValidatorContext,
+                        "receiverCategoryId",
+                        String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
+                                dto.getSourceCategoryId()
+                        )
+                );
+            }
         }
 
         return true;
+    }
+
+    private boolean isNull(Long categoryId) {
+        return categoryId == null;
     }
 }

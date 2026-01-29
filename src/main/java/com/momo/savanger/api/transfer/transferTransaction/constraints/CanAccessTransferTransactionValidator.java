@@ -32,6 +32,10 @@ public class CanAccessTransferTransactionValidator implements
     public boolean isValid(Long transferTransactionId,
             ConstraintValidatorContext constraintValidatorContext) {
 
+        if (transferTransactionId == null) {
+            return false;
+        }
+
         final TransferTransaction transferTransaction = this.transferTransactionService.getTransferTransaction(
                 transferTransactionId);
 

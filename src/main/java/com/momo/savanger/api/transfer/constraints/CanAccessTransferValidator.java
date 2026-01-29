@@ -26,6 +26,10 @@ public class CanAccessTransferValidator implements ConstraintValidator<CanAccess
     @Override
     public boolean isValid(Long transferId, ConstraintValidatorContext constraintValidatorContext) {
 
+        if (transferId == null) {
+            return true;
+        }
+
         final Transfer transfer = this.transferService.getById(transferId);
 
         final User user = SecurityUtils.getCurrentUser();
