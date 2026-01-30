@@ -67,7 +67,7 @@ public class TransferControllerIt extends BaseControllerIt {
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testCreate_validDto_shouldCreateTransfer() throws Exception {
-        assertEquals(1, this.transferRepository.findAll().size());
+        assertEquals(2, this.transferRepository.findAll().size());
 
         final CreateTransferDto dto = new CreateTransferDto();
         dto.setReceiverBudgetId(1001L);
@@ -75,7 +75,7 @@ public class TransferControllerIt extends BaseControllerIt {
 
         super.putOK(Endpoints.TRANSFERS, dto);
 
-        assertEquals(2, this.transferRepository.findAll().size());
+        assertEquals(3, this.transferRepository.findAll().size());
 
         //If try to create transfer with same budgets as receiver and source
 
@@ -83,7 +83,7 @@ public class TransferControllerIt extends BaseControllerIt {
                 dto
         );
 
-        assertEquals(2, this.transferRepository.findAll().size());
+        assertEquals(3, this.transferRepository.findAll().size());
 
         // If transfer is not active
 
@@ -289,7 +289,7 @@ public class TransferControllerIt extends BaseControllerIt {
         dto.setReceiverComment("fcsd");
         dto.setSourceComment("fddfg");
         dto.setSourceCategoryId(302L);
-        dto.setReceiverCategoryId(303L);
+        dto.setReceiverCategoryId(304L);
 
         super.postOK(Endpoints.TRANSFER_TRANSACTIONS, dto);
 

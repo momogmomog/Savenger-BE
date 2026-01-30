@@ -36,37 +36,32 @@ public class ValidCreateTransferTransactionDtoValidation implements
 
         final Transfer transfer = this.transferService.getById(dto.getTransferId());
 
-        //TODO:Think how to return two fails when both category are not valid.
-        if (!this.isNull(dto.getSourceCategoryId())) {
-            if (!this.categoryService.isCategoryValid(dto.getSourceCategoryId(),
-                    transfer.getSourceBudgetId())
-            ) {
-                return ValidationUtil.fail(constraintValidatorContext,
-                        "sourceCategoryId",
-                        String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
-                                dto.getSourceCategoryId()
-                        )
-                );
-            }
+        if (dto.getReceiverCategoryId() == null || dto.getSourceCategoryId() == null){
+            return true;
         }
 
-        if (!this.isNull(dto.getReceiverCategoryId())) {
-            if (!this.categoryService.isCategoryValid(dto.getReceiverCategoryId(),
-                    transfer.getReceiverBudgetId())
-            ) {
-                return ValidationUtil.fail(constraintValidatorContext,
-                        "receiverCategoryId",
-                        String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
-                                dto.getSourceCategoryId()
-                        )
-                );
-            }
+        if (!this.categoryService.isCategoryValid(dto.getSourceCategoryId(),
+                transfer.getSourceBudgetId())
+        ) {
+            return ValidationUtil.fail(constraintValidatorContext,
+                    "sourceCategoryId",
+                    String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
+                            dto.getSourceCategoryId()
+                    )
+            );
+        }
+
+        if (!this.categoryService.isCategoryValid(dto.getReceiverCategoryId(),
+                transfer.getReceiverBudgetId())
+        ) {
+            return ValidationUtil.fail(constraintValidatorContext,
+                    "receiverCategoryId",
+                    String.format(ValidationMessages.CATEGORY_IS_NOT_VALID,
+                            dto.getReceiverCategoryId()
+                    )
+            );
         }
 
         return true;
-    }
-
-    private boolean isNull(Long categoryId) {
-        return categoryId == null;
     }
 }

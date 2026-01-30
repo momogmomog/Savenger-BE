@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class TransferFullDto {
 
-    private int id;
+    private Long id;
 
     private Long sourceBudgetId;
 
