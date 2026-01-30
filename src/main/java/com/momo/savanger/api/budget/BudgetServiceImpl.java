@@ -18,6 +18,7 @@ import com.momo.savanger.constants.EntityGraphs;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -202,6 +203,11 @@ public class BudgetServiceImpl implements BudgetService {
     public BudgetStatistics getStatisticsFetchAll(Long budgetId) {
         final Budget budget = this.findByIdFetchAll(budgetId);
         return this.getStatistics(budget);
+    }
+
+    @Override
+    public boolean isBudgetDateBefore(Long budgetId, LocalDateTime localDate) {
+        return this.budgetRepository.existsByIdAndDateStartedLessThanEqual(budgetId, localDate);
     }
 
     private BudgetStatistics getStatistics(Budget budget) {

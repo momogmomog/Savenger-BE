@@ -2,6 +2,7 @@ package com.momo.savanger.api.transaction.dto;
 
 import com.momo.savanger.api.budget.constraints.CanAccessBudget;
 import com.momo.savanger.api.transaction.TransactionType;
+import com.momo.savanger.api.transaction.constraints.DateAfterBudgetDate;
 import com.momo.savanger.api.transaction.constraints.ValidTransactionDto;
 import com.momo.savanger.constants.Lengths;
 import com.momo.savanger.constants.ValidationMessages;
@@ -18,6 +19,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 
 @Data
 @ValidTransactionDto
+@DateAfterBudgetDate
 public class CreateTransactionDto implements IModifyTransactionDto {
 
     @NotNull

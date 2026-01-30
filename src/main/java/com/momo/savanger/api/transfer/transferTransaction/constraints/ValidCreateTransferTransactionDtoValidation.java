@@ -36,7 +36,7 @@ public class ValidCreateTransferTransactionDtoValidation implements
 
         final Transfer transfer = this.transferService.getById(dto.getTransferId());
 
-        if (dto.getReceiverCategoryId() == null || dto.getSourceCategoryId() == null){
+        if (dto.getReceiverCategoryId() == null || dto.getSourceCategoryId() == null) {
             return true;
         }
 

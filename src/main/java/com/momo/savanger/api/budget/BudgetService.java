@@ -8,6 +8,7 @@ import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.budget.dto.UpdateBudgetDto;
 import com.momo.savanger.api.revision.Revision;
 import com.momo.savanger.api.user.User;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 
@@ -40,4 +41,6 @@ public interface BudgetService {
     BudgetStatistics getStatistics(Long budgetId);
 
     BudgetStatistics getStatisticsFetchAll(Long budgetId);
+
+    boolean isBudgetDateBefore(Long budgetId, LocalDateTime localDate);
 }
