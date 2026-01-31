@@ -8,7 +8,13 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
+@Component
+@RequiredArgsConstructor
+@Slf4j
 public class NoneEqualValidator implements ConstraintValidator<NoneEqual, Object> {
 
     private String[] fields;
@@ -41,6 +47,7 @@ public class NoneEqualValidator implements ConstraintValidator<NoneEqual, Object
                 }
             }
         } catch (Exception e) {
+            log.error("Error during NoneEqualValidator", e);
             throw ApiException.with(ApiErrorCode.ERR_0001);
         }
 
