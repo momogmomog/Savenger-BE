@@ -5,6 +5,7 @@ import com.momo.savanger.api.transfer.Transfer;
 import com.momo.savanger.api.transfer.TransferService;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
+import com.momo.savanger.api.util.ValidationUtil;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import jakarta.validation.ConstraintValidator;
@@ -39,7 +40,10 @@ public class CanAccessTransferValidator implements ConstraintValidator<CanAccess
         );
 
         if (exception.isPresent()) {
-            throw exception.get();
+            return ValidationUtil.fail(constraintValidatorContext,
+                    "transferId",
+                    exception.get().getMessage()
+            );
         }
 
         final Transfer transfer = this.transferService.getById(transferId);

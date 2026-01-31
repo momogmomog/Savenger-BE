@@ -43,7 +43,10 @@ public class ValidCreateTransferTransactionDtoValidation implements
         );
 
         if (exception.isPresent()) {
-            throw exception.get();
+            return ValidationUtil.fail(constraintValidatorContext,
+                    "transferId",
+                    exception.get().getMessage()
+            );
         }
 
         final Transfer transfer = this.transferService.getById(dto.getTransferId());

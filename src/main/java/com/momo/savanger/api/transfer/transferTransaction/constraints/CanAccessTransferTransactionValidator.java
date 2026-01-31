@@ -7,6 +7,7 @@ import com.momo.savanger.api.transfer.transferTransaction.TransferTransaction;
 import com.momo.savanger.api.transfer.transferTransaction.TransferTransactionService;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
+import com.momo.savanger.api.util.ValidationUtil;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import jakarta.validation.ConstraintValidator;
@@ -45,7 +46,10 @@ public class CanAccessTransferTransactionValidator implements
         );
 
         if (exception.isPresent()) {
-           throw exception.get();
+            return ValidationUtil.fail(constraintValidatorContext,
+                    "transferTransactionId",
+                    exception.get().getMessage()
+            );
         }
 
         final TransferTransaction transferTransaction = this.transferTransactionService.getTransferTransaction(
