@@ -339,21 +339,6 @@ public class TransactionServiceImpl implements TransactionService {
         return this.getSumAmount(budgetId, TransactionType.INCOME);
     }
 
-
-    @Override
-    public BigDecimal getDebtLendedAmount(Long budgetId) {
-        return Objects.requireNonNullElse(
-                this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId,
-                        TransactionType.EXPENSE), BigDecimal.ZERO);
-    }
-
-    @Override
-    public BigDecimal getDebtReceivedAmount(Long budgetId) {
-        return Objects.requireNonNullElse(
-                this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(budgetId,
-                        TransactionType.INCOME), BigDecimal.ZERO);
-    }
-
     private BigDecimal getSumAmount(Long budgetId, TransactionType type) {
         return Objects.requireNonNullElse(
                 this.transactionRepository.sumAmountByBudgetIdAndTypeOfNonRevisedNonDebt(

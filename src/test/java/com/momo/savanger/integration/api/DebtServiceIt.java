@@ -12,6 +12,7 @@ import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.debt.DebtRepository;
 import com.momo.savanger.api.debt.DebtService;
 import com.momo.savanger.api.debt.PayDebtDto;
+import com.momo.savanger.api.transaction.TransactionRepository;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
@@ -63,6 +64,9 @@ public class DebtServiceIt {
 
     @Autowired
     TransactionService transactionService;
+
+    @Autowired
+    TransactionRepository transactionRepository;
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
@@ -293,8 +297,8 @@ public class DebtServiceIt {
 
         this.debtService.create(dto);
 
-        BigDecimal lendedAmount = this.transactionService.getDebtLendedAmount(1001L);
-        BigDecimal receivedAmount = this.transactionService.getDebtReceivedAmount(1002L);
+        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1001L, TransactionType.EXPENSE);
+        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1002L, TransactionType.INCOME);
 
         assertEquals(BigDecimal.valueOf(20.00).setScale(2, RoundingMode.HALF_DOWN),
                 lendedAmount.setScale(2, RoundingMode.HALF_DOWN));
@@ -400,8 +404,9 @@ public class DebtServiceIt {
 
         this.debtService.pay(101L, dto);
 
-        BigDecimal lendedAmount = this.transactionService.getDebtLendedAmount(1001L);
-        BigDecimal receivedAmount = this.transactionService.getDebtReceivedAmount(1002L);
+
+        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1001L, TransactionType.EXPENSE);
+        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1002L, TransactionType.INCOME);
 
         assertEquals(BigDecimal.valueOf(302.09), lendedAmount.setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.valueOf(302.09),

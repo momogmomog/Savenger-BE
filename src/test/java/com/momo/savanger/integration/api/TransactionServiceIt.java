@@ -450,7 +450,7 @@ public class TransactionServiceIt {
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(32.32));
 
-        BigDecimal lendedAmount = this.transactionService.getDebtLendedAmount(1002L);
+        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1002L, TransactionType.EXPENSE);
 
         assertEquals(BigDecimal.valueOf(232.32), lendedAmount.setScale(2, RoundingMode.HALF_DOWN));
     }
@@ -463,7 +463,7 @@ public class TransactionServiceIt {
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(32.32));
 
-        BigDecimal receivedAmount = this.transactionService.getDebtReceivedAmount(1001L);
+        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1001L, TransactionType.INCOME);
 
         assertEquals(BigDecimal.valueOf(232.32),
                 receivedAmount.setScale(2, RoundingMode.HALF_DOWN));
@@ -477,7 +477,7 @@ public class TransactionServiceIt {
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(32.32));
 
-        BigDecimal lendedAmount = this.transactionService.getDebtLendedAmount(1004L);
+        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1004L, TransactionType.EXPENSE);
 
         assertEquals(BigDecimal.ZERO, lendedAmount);
     }
@@ -490,7 +490,7 @@ public class TransactionServiceIt {
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(32.32));
 
-        BigDecimal receivedAmount = this.transactionService.getDebtReceivedAmount(1004L);
+        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1004L, TransactionType.INCOME);
 
         assertEquals(BigDecimal.ZERO, receivedAmount);
     }
