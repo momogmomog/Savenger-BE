@@ -78,8 +78,8 @@ public class DebtServiceIt {
         CreateDebtDto dto = new CreateDebtDto();
 
         dto.setDebtAmount(BigDecimal.valueOf(200));
-        dto.setLenderBudgetId(1001L);
-        dto.setReceiverBudgetId(1002L);
+        dto.setLenderBudgetId(100111L);
+        dto.setReceiverBudgetId(100112L);
 
         BudgetStatistics lenderBudget = this.budgetService.getStatistics(dto.getLenderBudgetId());
         BudgetStatistics receiverBudget = this.budgetService.getStatistics(
@@ -190,8 +190,8 @@ public class DebtServiceIt {
 
         CreateDebtDto dto = new CreateDebtDto();
         dto.setDebtAmount(BigDecimal.valueOf(200));
-        dto.setLenderBudgetId(1001L);
-        dto.setReceiverBudgetId(1002L);
+        dto.setLenderBudgetId(100111L);
+        dto.setReceiverBudgetId(100112L);
 
         this.debtService.create(dto);
 
@@ -256,8 +256,8 @@ public class DebtServiceIt {
 
         CreateDebtDto dto = new CreateDebtDto();
         dto.setDebtAmount(BigDecimal.valueOf(20));
-        dto.setLenderBudgetId(1001L);
-        dto.setReceiverBudgetId(1002L);
+        dto.setLenderBudgetId(100111L);
+        dto.setReceiverBudgetId(100112L);
         this.debtService.create(dto);
 
         assertEquals(2, debtRepository.findAll().size());
@@ -292,13 +292,13 @@ public class DebtServiceIt {
     public void testCreate_validPayload_shouldCreateDebtTransactions() {
         CreateDebtDto dto = new CreateDebtDto();
         dto.setDebtAmount(BigDecimal.valueOf(20));
-        dto.setLenderBudgetId(1001L);
-        dto.setReceiverBudgetId(1002L);
+        dto.setLenderBudgetId(100111L);
+        dto.setReceiverBudgetId(100112L);
 
         this.debtService.create(dto);
 
-        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1001L, TransactionType.EXPENSE);
-        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1002L, TransactionType.INCOME);
+        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(100111L, TransactionType.EXPENSE);
+        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(100112L, TransactionType.INCOME);
 
         assertEquals(BigDecimal.valueOf(20.00).setScale(2, RoundingMode.HALF_DOWN),
                 lendedAmount.setScale(2, RoundingMode.HALF_DOWN));
@@ -311,8 +311,8 @@ public class DebtServiceIt {
         CreateDebtDto dto = new CreateDebtDto();
 
         dto.setDebtAmount(BigDecimal.valueOf(500));
-        dto.setLenderBudgetId(1001L);
-        dto.setReceiverBudgetId(1002L);
+        dto.setLenderBudgetId(100111L);
+        dto.setReceiverBudgetId(100112L);
 
         AssertUtil.assertApiException(ApiErrorCode.ERR_0014, () -> this.debtService.create(dto));
     }
