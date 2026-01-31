@@ -1,6 +1,7 @@
 package com.momo.savanger.api.transaction.recurring;
 
 import com.momo.savanger.api.recurringRule.RecurringRuleService;
+import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.constants.EntityGraphs;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
@@ -22,6 +23,8 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
 
     private final RecurringRuleService recurringRuleService;
 
+    private final TagService tagService;
+
     @Override
     @Transactional
     public RecurringTransaction create(CreateRecurringTransactionDto dto) {
@@ -35,6 +38,13 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
                         LocalDateTime.now()
                 )
         );
+
+        if (!dto.getTagIds().isEmpty()) {
+            recurringTransaction.setTags(this.tagService.findByBudgetAndIdContaining(
+                    dto.getTagIds(),
+                    dto.getBudgetId()
+            ));
+        }
 
         this.recurringTransactionRepository.saveAndFlush(recurringTransaction);
 
