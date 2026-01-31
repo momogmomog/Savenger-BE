@@ -43,7 +43,7 @@ public class ValidCreateTransferTransactionDtoValidation implements
         );
 
         if (exception.isPresent()) {
-            return false;
+            throw exception.get();
         }
 
         final Transfer transfer = this.transferService.getById(dto.getTransferId());

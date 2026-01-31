@@ -39,7 +39,7 @@ public class CanAccessTransferValidator implements ConstraintValidator<CanAccess
         );
 
         if (exception.isPresent()) {
-            return false;
+            throw exception.get();
         }
 
         final Transfer transfer = this.transferService.getById(transferId);

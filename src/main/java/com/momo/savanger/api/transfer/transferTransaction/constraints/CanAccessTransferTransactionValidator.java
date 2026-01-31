@@ -45,7 +45,7 @@ public class CanAccessTransferTransactionValidator implements
         );
 
         if (exception.isPresent()) {
-            return false;
+           throw exception.get();
         }
 
         final TransferTransaction transferTransaction = this.transferTransactionService.getTransferTransaction(

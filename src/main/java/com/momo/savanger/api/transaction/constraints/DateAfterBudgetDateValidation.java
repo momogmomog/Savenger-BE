@@ -29,7 +29,7 @@ public class DateAfterBudgetDateValidation implements
             return true;
         }
 
-        if (this.budgetService.isBudgetDateBefore(
+        if (!this.budgetService.isBudgetDateBefore(
                 dto.getBudgetId(),
                 dto.getDateCreated())
         ) {
