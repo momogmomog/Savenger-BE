@@ -8,6 +8,7 @@ import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.budget.dto.CreateBudgetDto;
 import com.momo.savanger.api.budget.dto.UnassignParticipantDto;
 import com.momo.savanger.api.budget.dto.UpdateBudgetDto;
+import com.momo.savanger.api.debt.DebtRepository;
 import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.recurringRule.RecurringRuleService;
 import com.momo.savanger.api.revision.Revision;
@@ -42,6 +43,9 @@ public class BudgetServiceImpl implements BudgetService {
     private final PrepaymentService prepaymentService;
 
     private final RecurringRuleService recurringRuleService;
+
+    // Inject debt repo to avoid circular dependency
+    private final DebtRepository debtRepository;
 
     @Override
     public Budget findById(Long id) {
@@ -217,8 +221,8 @@ public class BudgetServiceImpl implements BudgetService {
         final BigDecimal earnings = this.transactionService.getEarningsAmount(budgetId);
         final BigDecimal expenses = this.transactionService.getExpensesAmount(budgetId);
 
-        final BigDecimal debtLendedSum = this.transactionService.getDebtLendedAmount(budgetId);
-        final BigDecimal debtReceivedSum = this.transactionService.getDebtReceivedAmount(budgetId);
+        final BigDecimal debtLendedSum = this.debtRepository.sumDebtsLended(budgetId);
+        final BigDecimal debtReceivedSum = this.debtRepository.sumDebtsReceived(budgetId);
 
         final BigDecimal prepaymentsAmount = this.prepaymentService
                 .getRemainingPrepaymentAmountSumByBudgetId(budgetId);

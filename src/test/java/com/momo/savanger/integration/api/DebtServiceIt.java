@@ -12,6 +12,7 @@ import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.debt.DebtRepository;
 import com.momo.savanger.api.debt.DebtService;
 import com.momo.savanger.api.debt.PayDebtDto;
+import com.momo.savanger.api.transaction.TransactionRepository;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
@@ -64,6 +65,9 @@ public class DebtServiceIt {
     @Autowired
     TransactionService transactionService;
 
+    @Autowired
+    TransactionRepository transactionRepository;
+
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testCreate_newDebtReceiverAndLender_shouldCreateDebt() {
@@ -74,8 +78,8 @@ public class DebtServiceIt {
         CreateDebtDto dto = new CreateDebtDto();
 
         dto.setDebtAmount(BigDecimal.valueOf(200));
-        dto.setLenderBudgetId(1001L);
-        dto.setReceiverBudgetId(1002L);
+        dto.setLenderBudgetId(100111L);
+        dto.setReceiverBudgetId(100112L);
 
         BudgetStatistics lenderBudget = this.budgetService.getStatistics(dto.getLenderBudgetId());
         BudgetStatistics receiverBudget = this.budgetService.getStatistics(
@@ -186,8 +190,8 @@ public class DebtServiceIt {
 
         CreateDebtDto dto = new CreateDebtDto();
         dto.setDebtAmount(BigDecimal.valueOf(200));
-        dto.setLenderBudgetId(1001L);
-        dto.setReceiverBudgetId(1002L);
+        dto.setLenderBudgetId(100111L);
+        dto.setReceiverBudgetId(100112L);
 
         this.debtService.create(dto);
 
@@ -252,8 +256,8 @@ public class DebtServiceIt {
 
         CreateDebtDto dto = new CreateDebtDto();
         dto.setDebtAmount(BigDecimal.valueOf(20));
-        dto.setLenderBudgetId(1001L);
-        dto.setReceiverBudgetId(1002L);
+        dto.setLenderBudgetId(100111L);
+        dto.setReceiverBudgetId(100112L);
         this.debtService.create(dto);
 
         assertEquals(2, debtRepository.findAll().size());
@@ -288,13 +292,13 @@ public class DebtServiceIt {
     public void testCreate_validPayload_shouldCreateDebtTransactions() {
         CreateDebtDto dto = new CreateDebtDto();
         dto.setDebtAmount(BigDecimal.valueOf(20));
-        dto.setLenderBudgetId(1001L);
-        dto.setReceiverBudgetId(1002L);
+        dto.setLenderBudgetId(100111L);
+        dto.setReceiverBudgetId(100112L);
 
         this.debtService.create(dto);
 
-        BigDecimal lendedAmount = this.transactionService.getDebtLendedAmount(1001L);
-        BigDecimal receivedAmount = this.transactionService.getDebtReceivedAmount(1002L);
+        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(100111L, TransactionType.EXPENSE);
+        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(100112L, TransactionType.INCOME);
 
         assertEquals(BigDecimal.valueOf(20.00).setScale(2, RoundingMode.HALF_DOWN),
                 lendedAmount.setScale(2, RoundingMode.HALF_DOWN));
@@ -307,8 +311,8 @@ public class DebtServiceIt {
         CreateDebtDto dto = new CreateDebtDto();
 
         dto.setDebtAmount(BigDecimal.valueOf(500));
-        dto.setLenderBudgetId(1001L);
-        dto.setReceiverBudgetId(1002L);
+        dto.setLenderBudgetId(100111L);
+        dto.setReceiverBudgetId(100112L);
 
         AssertUtil.assertApiException(ApiErrorCode.ERR_0014, () -> this.debtService.create(dto));
     }
@@ -400,8 +404,9 @@ public class DebtServiceIt {
 
         this.debtService.pay(101L, dto);
 
-        BigDecimal lendedAmount = this.transactionService.getDebtLendedAmount(1001L);
-        BigDecimal receivedAmount = this.transactionService.getDebtReceivedAmount(1002L);
+
+        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1001L, TransactionType.EXPENSE);
+        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1002L, TransactionType.INCOME);
 
         assertEquals(BigDecimal.valueOf(302.09), lendedAmount.setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.valueOf(302.09),

@@ -8,6 +8,7 @@ import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetRepository;
 import com.momo.savanger.api.budget.BudgetServiceImpl;
 import com.momo.savanger.api.budget.dto.BudgetStatistics;
+import com.momo.savanger.api.debt.DebtRepository;
 import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.transaction.TransactionService;
 import java.math.BigDecimal;
@@ -31,6 +32,9 @@ public class BudgetStatisticsTest {
 
     @Mock
     private BudgetRepository budgetRepository;
+
+    @Mock
+    private DebtRepository debtRepository;
 
     @InjectMocks
     private BudgetServiceImpl budgetService;
@@ -57,8 +61,8 @@ public class BudgetStatisticsTest {
 
         when(transactionService.getEarningsAmount(budgetId)).thenReturn(BigDecimal.ZERO);
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsLended(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsReceived(budgetId)).thenReturn(BigDecimal.ZERO);
         when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.ZERO);
 
@@ -79,8 +83,8 @@ public class BudgetStatisticsTest {
 
         when(transactionService.getEarningsAmount(budgetId)).thenReturn(BigDecimal.ZERO);
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
-        when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsLended(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsReceived(budgetId)).thenReturn(BigDecimal.ZERO);
         when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.ZERO);
 
@@ -102,8 +106,8 @@ public class BudgetStatisticsTest {
 
         when(transactionService.getEarningsAmount(budgetId)).thenReturn(BigDecimal.valueOf(1000));
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsLended(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsReceived(budgetId)).thenReturn(BigDecimal.ZERO);
         when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.ZERO);
 
@@ -124,8 +128,8 @@ public class BudgetStatisticsTest {
 
         when(transactionService.getEarningsAmount(budgetId)).thenReturn(BigDecimal.valueOf(1000));
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
-        when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsLended(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsReceived(budgetId)).thenReturn(BigDecimal.ZERO);
         when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.ZERO);
 
@@ -146,8 +150,8 @@ public class BudgetStatisticsTest {
 
         when(transactionService.getEarningsAmount(budgetId)).thenReturn(BigDecimal.valueOf(1000));
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
-        when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsLended(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsReceived(budgetId)).thenReturn(BigDecimal.ZERO);
         when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.valueOf(230));
 
@@ -169,8 +173,8 @@ public class BudgetStatisticsTest {
         testBudget.setBalance(BigDecimal.valueOf(1000));
         when(transactionService.getEarningsAmount(budgetId)).thenReturn(BigDecimal.valueOf(1000));
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
-        when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsLended(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsReceived(budgetId)).thenReturn(BigDecimal.ZERO);
         when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.valueOf(230));
 
@@ -191,8 +195,8 @@ public class BudgetStatisticsTest {
 
         when(transactionService.getEarningsAmount(budgetId)).thenReturn(BigDecimal.valueOf(1000));
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
-        when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
-        when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.valueOf(50));
+        when(debtRepository.sumDebtsLended(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsReceived(budgetId)).thenReturn(BigDecimal.valueOf(50));
         when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.valueOf(230));
 
@@ -213,8 +217,8 @@ public class BudgetStatisticsTest {
 
         when(transactionService.getEarningsAmount(budgetId)).thenReturn(BigDecimal.valueOf(1000));
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
-        when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.valueOf(100));
-        when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.ZERO);
+        when(debtRepository.sumDebtsLended(budgetId)).thenReturn(BigDecimal.valueOf(100));
+        when(debtRepository.sumDebtsReceived(budgetId)).thenReturn(BigDecimal.ZERO);
         when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
                 BigDecimal.valueOf(230));
 
@@ -240,10 +244,10 @@ public class BudgetStatisticsTest {
         when(transactionService.getExpensesAmount(budgetId)).thenReturn(BigDecimal.valueOf(200));
 
         // Balance 800, Real Balance 700
-        when(transactionService.getDebtLendedAmount(budgetId)).thenReturn(BigDecimal.valueOf(100));
+        when(debtRepository.sumDebtsLended(budgetId)).thenReturn(BigDecimal.valueOf(100));
 
         // Balance 800, Real Balance 750
-        when(transactionService.getDebtReceivedAmount(budgetId)).thenReturn(BigDecimal.valueOf(50));
+        when(debtRepository.sumDebtsReceived(budgetId)).thenReturn(BigDecimal.valueOf(50));
 
         // Balance 800, Real Balance 520
         when(prepaymentService.getRemainingPrepaymentAmountSumByBudgetId(budgetId)).thenReturn(
