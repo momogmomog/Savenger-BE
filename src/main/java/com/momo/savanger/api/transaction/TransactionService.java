@@ -5,7 +5,10 @@ import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.transaction.dto.TransactionSumAndCount;
+import com.momo.savanger.api.transaction.dto.TransferTransactionPair;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
+import com.momo.savanger.api.transfer.Transfer;
+import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
 import com.momo.savanger.api.user.User;
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,6 +29,8 @@ public interface TransactionService {
     Transaction edit(Long id, EditTransactionDto dto);
 
     Boolean existsByIdAndRevisedFalse(Long id);
+
+    void deleteTransferTransactions(Long transferTransactionId);
 
     void deleteById(Long id);
 
@@ -56,5 +61,10 @@ public interface TransactionService {
     List<Long> extractTagIds(TransactionSearchQuery query);
 
     TransactionSumAndCount sumAndCount(TransactionSearchQuery query);
+
+    void createTransferTransactions(CreateTransferTransactionDto transferTransactionDto,
+            Long transferTransactionId, Transfer transfer);
+
+    TransferTransactionPair getTransferTransactionPair(Long transferTransactionId);
 }
 

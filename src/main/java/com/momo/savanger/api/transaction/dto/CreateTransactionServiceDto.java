@@ -26,6 +26,8 @@ public class CreateTransactionServiceDto {
 
     private Long prepaymentId;
 
+    private Long transferTransactionId;
+
     private List<Long> tagIds;
 
     public List<Long> getTagIds() {
@@ -50,6 +52,22 @@ public class CreateTransactionServiceDto {
         createDto.setBudgetId(budgetId);
         createDto.setType(type);
         createDto.setDebtId(debtId);
+
+        return createDto;
+    }
+
+    public static CreateTransactionServiceDto transferDto(
+            Long transferTransactionId, BigDecimal amount, String comment, Long categoryId,
+            TransactionType type, Long budgetId) {
+
+        final CreateTransactionServiceDto createDto = new CreateTransactionServiceDto();
+
+        createDto.setAmount(amount);
+        createDto.setTransferTransactionId(transferTransactionId);
+        createDto.setComment(comment);
+        createDto.setCategoryId(categoryId);
+        createDto.setType(type);
+        createDto.setBudgetId(budgetId);
 
         return createDto;
     }

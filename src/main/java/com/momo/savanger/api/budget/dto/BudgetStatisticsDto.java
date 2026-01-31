@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class BudgetStatisticsDto {
 
-    private BudgetDto budget;
+    private BudgetFullDto budget;
 
     private BigDecimal balance;
 

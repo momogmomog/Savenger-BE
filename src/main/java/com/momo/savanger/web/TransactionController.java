@@ -71,7 +71,6 @@ public class TransactionController {
 
     @DeleteMapping(Endpoints.TRANSACTION)
     public void delete(@PathVariable @CanDeleteTransaction Long id) {
-
         this.transactionService.deleteById(id);
 
     }

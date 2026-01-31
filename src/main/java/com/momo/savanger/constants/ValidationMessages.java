@@ -15,6 +15,7 @@ public class ValidationMessages {
     public static final String TRANSACTION_IS_REVISED = "Transaction is already revised and cannot be edit.";
     public static final String INVALID_TRANSACTION = "Invalid transaction or you don't have access to it.";
     public static final String TRANSACTION_DOES_NOT_EXIST = "Transaction does not exist.";
+    public static final String TRANSACTION_DATE_IS_INVALID = "Transaction date should be after budget create date.";
     public static final String DEBT_ALREADY_EXIST = "Debt with these budgets already exist.";
     public static final String DEBT_IS_NOT_VALID = "Debt is not valid.";
     public static final String BUDGETS_SHOULD_BE_DIFFERENT = "Lender and receiver budget ids should be different.";
@@ -25,6 +26,6 @@ public class ValidationMessages {
     public static final String R_TRANSACTION_ID_NOT_EXIST = "Recurring transaction with this id and budget id does not exist.";
     public static final String ACCESS_DENIED = "Access denied";
     public static final String VALUES_MUST_BE_UNIQUE = "Values must be unique";
-    public static final String R_TRANSACTION_IS_COMPLETED = "Recurring transaction is already completed.";
+    public static final String CATEGORY_IS_NOT_VALID = "Category with id %s doesn't belong to this budget or doesn't exist";
 
 }

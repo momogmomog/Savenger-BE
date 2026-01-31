@@ -2,6 +2,7 @@ package com.momo.savanger.api.transaction;
 
 import com.momo.savanger.constants.EntityGraphs;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +15,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
         TransactionRepositoryFragment {
 
     boolean existsByIdAndRevisedFalse(Long id);
+
+    List<Transaction> findByTransferTransactionId(Long transferTransactionId);
+
+    void deleteByTransferTransactionId(Long transferTransactionId);
 
     @EntityGraph(EntityGraphs.TRANSACTION_DETAILED)
     Optional<Transaction> findTransactionById(Long id);

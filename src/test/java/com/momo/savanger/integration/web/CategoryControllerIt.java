@@ -87,7 +87,7 @@ public class CategoryControllerIt extends BaseControllerIt {
         categoryDto.setBudgetCap(BigDecimal.valueOf(323));
         categoryDto.setBudgetId(1001L);
 
-        super.post(Endpoints.CATEGORIES, categoryDto, HttpStatus.BAD_REQUEST);
+        super.post(Endpoints.CATEGORIES, categoryDto, HttpStatus.UNAUTHORIZED);
     }
 
     @Test

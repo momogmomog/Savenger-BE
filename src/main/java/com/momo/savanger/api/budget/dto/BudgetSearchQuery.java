@@ -7,6 +7,7 @@ import com.momo.savanger.constraints.NotNull;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -33,5 +34,7 @@ public class BudgetSearchQuery {
     private BetweenQuery<BigDecimal> budgetCap;
 
     private Boolean autoRevise;
+
+    private List<Long> excludedBudgetIds;
 
 }

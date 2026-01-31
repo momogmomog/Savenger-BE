@@ -53,7 +53,7 @@ public final class QuerySpecifications {
 
     public static <T> Specification<T> containsIfPresent(SingularAttribute<T, String> attribute,
             String text) {
-        if (text == null) {
+        if (text == null || text.isEmpty()) {
             return Specification.where(null);
         }
 

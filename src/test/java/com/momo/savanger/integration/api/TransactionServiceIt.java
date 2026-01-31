@@ -21,17 +21,25 @@ import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
+import com.momo.savanger.api.transaction.dto.TransactionDtoSimple;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
+import com.momo.savanger.api.transaction.dto.TransferTransactionPair;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
+import com.momo.savanger.api.transfer.TransferService;
+import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
+import com.momo.savanger.api.transfer.transferTransaction.TransferTransactionDto;
+import com.momo.savanger.api.transfer.transferTransaction.TransferTransactionService;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.user.UserService;
 import com.momo.savanger.api.util.BetweenQuery;
 import com.momo.savanger.api.util.PageQuery;
 import com.momo.savanger.api.util.SortDirection;
 import com.momo.savanger.api.util.SortQuery;
+import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import com.momo.savanger.integration.web.Constants;
 import com.momo.savanger.integration.web.WithLocalMockedUser;
+import com.momo.savanger.util.AssertUtil;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -60,6 +68,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Sql("classpath:/sql/transaction-it-data.sql")
 @Sql("classpath:/sql/transactions_tags-it-data.sql")
 @Sql("classpath:/sql/debt/debt-it-data.sql")
+@Sql("classpath:/sql/transfer/transfer-it-data.sql")
+@Sql("classpath:/sql/transfer/transfer_transactions-it-data.sql")
+@Sql(value = "classpath:/sql/transfer/del-transfer-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/transfer/del-transfer_transactions-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/prepayment/del-recurring_transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/prepayment/del-prepayment-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-transactions_tags-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -87,6 +99,12 @@ public class TransactionServiceIt {
 
     @Autowired
     private DebtService debtService;
+
+    @Autowired
+    private TransferTransactionService transferTransactionService;
+
+    @Autowired
+    private TransferService transferService;
 
     @Autowired
     private PrepaymentService prepaymentService;
@@ -514,6 +532,56 @@ public class TransactionServiceIt {
         BigDecimal amount = this.transactionService.getPrepaymentPaidAmount(10013L);
 
         assertEquals(BigDecimal.ZERO, amount);
+    }
+
+    @Test
+    @WithLocalMockedUser
+    @Transactional
+    @Sql("classpath:/sql/transfer/category-it-data.sql")
+    @Sql("classpath:/sql/transaction_transfer-it-data.sql")
+    public void testCreateTransferTransactions_valid_shouldCreateTwoTransactions() {
+        final CreateTransferTransactionDto dto = new CreateTransferTransactionDto();
+        dto.setTransferId(234L);
+        dto.setAmount(BigDecimal.valueOf(320));
+        dto.setSourceComment("This is a test");
+        dto.setReceiverComment("Simcho");
+        dto.setSourceCategoryId(302L);
+        dto.setReceiverCategoryId(303L);
+
+        TransferTransactionDto transferTransaction = this.transferTransactionService.create(dto);
+        TransactionDtoSimple receiverTransaction = transferTransaction.getReceiverTransaction();
+        TransactionDtoSimple sourceTransaction = transferTransaction.getSourceTransaction();
+
+        //Repository return transactions from main transaction sql and transfer transaction sql together
+        assertEquals(8, this.transactionRepository.findAll().size());
+        assertEquals(2L, receiverTransaction.getId());
+        assertEquals(1L, sourceTransaction.getId());
+
+    }
+
+    @Test
+    @WithLocalMockedUser
+    @Sql("classpath:/sql/transfer/category-it-data.sql")
+    @Sql("classpath:/sql/transaction_transfer-it-data.sql")
+    public void testGetTransferTransactionPair() {
+
+        TransferTransactionPair pair = this.transactionService.getTransferTransactionPair(594L);
+
+        assertNotNull(pair);
+        assertEquals(206L, pair.getSourceTransaction().getId());
+        assertEquals(205L, pair.getReceiverTransaction().getId());
+    }
+
+    @Test
+    @WithLocalMockedUser
+    @Sql("classpath:/sql/transfer/category-it-data.sql")
+    @Sql("classpath:/sql/transaction_transfer-it-data.sql")
+    public void testGetTransferTransactionPair_invalidId() {
+
+        AssertUtil.assertApiException(ApiErrorCode.ERR_0020,
+                () -> this.transactionService.getTransferTransactionPair(574L));
+
+
     }
 
 }
