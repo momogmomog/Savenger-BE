@@ -7,8 +7,12 @@ import com.momo.savanger.api.transfer.transferTransaction.TransferTransaction;
 import com.momo.savanger.api.transfer.transferTransaction.TransferTransactionService;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
+import com.momo.savanger.api.util.ValidationUtil;
+import com.momo.savanger.error.ApiErrorCode;
+import com.momo.savanger.error.ApiException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +38,18 @@ public class CanAccessTransferTransactionValidator implements
 
         if (transferTransactionId == null) {
             return false;
+        }
+
+        Optional<ApiException> exception = ApiException.tryCatch(
+                ApiErrorCode.ERR_0019,
+                () -> this.transferTransactionService.getTransferTransaction(transferTransactionId)
+        );
+
+        if (exception.isPresent()) {
+            return ValidationUtil.fail(constraintValidatorContext,
+                    "transferTransactionId",
+                    exception.get().getMessage()
+            );
         }
 
         final TransferTransaction transferTransaction = this.transferTransactionService.getTransferTransaction(
