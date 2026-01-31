@@ -376,7 +376,9 @@ public class TransferControllerIt extends BaseControllerIt {
     @WithLocalMockedUser
     public void testGetTransferTransaction_validId_shouldReturnTransfer() throws Exception {
 
-        super.getOK("/transfers/transactions/594");
+        super.getOK("/transfers/transactions/594",
+                jsonPath("$.transferTransactionId", is(594)),
+                jsonPath("$.transfer.id", is(234)));
     }
 
     @Test
@@ -396,22 +398,31 @@ public class TransferControllerIt extends BaseControllerIt {
     public void testGetTransferTransaction_invalidId() throws Exception {
 
         super.get("/transfers/transactions/94",
-                HttpStatus.NOT_FOUND);
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"transferTransactionId\" && @.constraintName == \"CanAccessTransferTransaction\")]").exists()
+        );
     }
 
 
     @Test
     @WithLocalMockedUser
-    public void testDeleteTransferTransaction_validId_shouldReturnTransfer() throws Exception {
+    public void testDeleteTransferTransaction_validId_shouldDeleteTransfer() throws Exception {
 
-        super.getOK("/transfers/transactions/594");
+        super.deleteOK(
+                "/transfers/transactions/594",
+                null
+        );
     }
 
     @Test
     @WithLocalMockedUser(username = Constants.THIRD_USER_USERNAME)
     public void testDeleteTransferTransaction_invalidOwner() throws Exception {
 
-        super.get("/transfers/transactions/594",
+        super.delete(
+                "/transfers/transactions/594",
+                null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath(
@@ -423,8 +434,14 @@ public class TransferControllerIt extends BaseControllerIt {
     @WithLocalMockedUser
     public void testDeleteTransferTransaction_invalidId() throws Exception {
 
-        super.get("/transfers/transactions/94",
-                HttpStatus.NOT_FOUND);
+        super.delete(
+                "/transfers/transactions/94",
+                null,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"transferTransactionId\" && @.constraintName == \"CanAccessTransferTransaction\")]").exists()
+        );
     }
 
 

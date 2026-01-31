@@ -6,8 +6,11 @@ import com.momo.savanger.api.transfer.TransferService;
 import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
 import com.momo.savanger.api.util.ValidationUtil;
 import com.momo.savanger.constants.ValidationMessages;
+import com.momo.savanger.error.ApiErrorCode;
+import com.momo.savanger.error.ApiException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +35,15 @@ public class ValidCreateTransferTransactionDtoValidation implements
 
         if (dto.getTransferId() == null) {
             return true;
+        }
+
+        Optional<ApiException> exception = ApiException.tryCatch(
+                ApiErrorCode.ERR_0018,
+                () -> this.transferService.getById(dto.getTransferId())
+        );
+
+        if (exception.isPresent()) {
+            return false;
         }
 
         final Transfer transfer = this.transferService.getById(dto.getTransferId());

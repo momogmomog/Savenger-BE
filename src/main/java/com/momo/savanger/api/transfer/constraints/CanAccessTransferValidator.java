@@ -5,8 +5,11 @@ import com.momo.savanger.api.transfer.Transfer;
 import com.momo.savanger.api.transfer.TransferService;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
+import com.momo.savanger.error.ApiErrorCode;
+import com.momo.savanger.error.ApiException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +31,15 @@ public class CanAccessTransferValidator implements ConstraintValidator<CanAccess
 
         if (transferId == null) {
             return true;
+        }
+
+        Optional<ApiException> exception = ApiException.tryCatch(
+                ApiErrorCode.ERR_0018,
+                () -> this.transferService.getById(transferId)
+        );
+
+        if (exception.isPresent()) {
+            return false;
         }
 
         final Transfer transfer = this.transferService.getById(transferId);
