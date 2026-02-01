@@ -28,6 +28,7 @@ public class Endpoints {
     public static final String TRANSFER_TRANSACTIONS = "/transfers/transactions";
     public static final String TRANSFER_TRANSACTION = "/transfers/transactions/{id}";
     public static final String RECURRING_TRANSACTIONS = "/recurring-transactions";
+    public static final String RECURRING_TRANSACTIONS_SEARCH = "/recurring-transactions/search";
     public static final String ANALYTICS_CATEGORIES = "/analytics/categories";
     public static final String ANALYTICS_TAGS = "/analytics/tags";
 }

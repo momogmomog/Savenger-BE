@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
@@ -33,6 +34,7 @@ import lombok.ToString.Exclude;
 @Setter
 @ToString
 @NamedEntityGraph(name = EntityGraphs.RECURRING_TRANSACTION_ALL, includeAllAttributes = true)
+@NamedEntityGraph(name = EntityGraphs.RECURRING_TRANSACTION_TAGS, attributeNodes = @NamedAttributeNode("tags"))
 public class RecurringTransaction extends Audit {
 
     @Id

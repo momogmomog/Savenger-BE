@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,13 +69,6 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     }
 
     @Override
-    @Transactional
-    public void updateRecurringTransaction(RecurringTransaction recurringTransaction) {
-        recurringTransaction.setUpdateDate(LocalDateTime.now());
-        this.recurringTransactionRepository.save(recurringTransaction);
-    }
-
-    @Override
     public boolean recurringTransactionExists(Long recurringTransactionId, Long budgetId) {
         return this.recurringTransactionRepository.existsByIdAndBudgetId(recurringTransactionId,
                 budgetId);
@@ -82,13 +76,42 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
 
     @Override
     public Optional<RecurringTransaction> findByIdIfExists(Long id) {
-        final Specification<RecurringTransaction> specification = RecurringTransactionSpecifications.idEquals(
-                        id)
+        final Specification<RecurringTransaction> specification = RecurringTransactionSpecifications
+                .idEquals(id)
                 .and(RecurringTransactionSpecifications.isCompleted(false));
 
         final List<RecurringTransaction> recurringTransactions = this.recurringTransactionRepository.findAll(
                 specification, EntityGraphs.RECURRING_TRANSACTION_ALL
         );
         return recurringTransactions.stream().findFirst();
+    }
+
+    @Override
+    @Transactional
+    public void updateRecurringTransaction(RecurringTransaction recurringTransaction) {
+        recurringTransaction.setUpdateDate(LocalDateTime.now());
+        this.recurringTransactionRepository.save(recurringTransaction);
+    }
+
+    @Override
+    public Page<RecurringTransaction> search(RecurringTransactionQuery query) {
+        final Specification<RecurringTransaction> spec = RecurringTransactionSpecifications
+                .sort(query.getSort())
+                .and(RecurringTransactionSpecifications.budgetIdEquals(query.getBudgetId()))
+                .and(RecurringTransactionSpecifications.typeEquals(query.getType()))
+                .and(RecurringTransactionSpecifications.betweenNextDate(query.getNextDate()))
+                .and(RecurringTransactionSpecifications.isAutoExecuted(query.getAutoExecute()))
+                .and(RecurringTransactionSpecifications.betweenAmount(query.getAmount()))
+                .and(RecurringTransactionSpecifications.prepaymentIdEquals(query.getPrepaymentId()))
+                .and(RecurringTransactionSpecifications.isCompleted(query.getCompleted()))
+                .and(RecurringTransactionSpecifications.categoryIdsIn(query.getCategoryIds()))
+                .and(RecurringTransactionSpecifications.debtIdEquals(query.getDebtId()))
+                .and(RecurringTransactionSpecifications.tagsContain(query.getTagIds()));
+
+        return this.recurringTransactionRepository.findAll(
+                spec,
+                query.getPage(),
+                EntityGraphs.RECURRING_TRANSACTION_TAGS
+        );
     }
 }
