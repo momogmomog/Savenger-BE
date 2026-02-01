@@ -1,6 +1,7 @@
 package com.momo.savanger.api.transaction.recurring;
 
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 
 public interface RecurringTransactionService {
 
@@ -16,4 +17,5 @@ public interface RecurringTransactionService {
 
     void updateRecurringTransaction(RecurringTransaction recurringTransaction);
 
+    Page<RecurringTransaction> search(RecurringTransactionQuery query);
 }
