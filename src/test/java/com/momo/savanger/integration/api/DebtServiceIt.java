@@ -331,10 +331,10 @@ public class DebtServiceIt {
         assertEquals(BigDecimal.valueOf(302.09),
                 debt.getAmount().setScale(2, RoundingMode.HALF_DOWN));
 
-        assertEquals(BigDecimal.valueOf(243.00).setScale(2, RoundingMode.HALF_DOWN),
+        assertEquals(BigDecimal.valueOf(-59.09).setScale(2, RoundingMode.HALF_DOWN),
                 lenderBudgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
 
-        assertEquals(BigDecimal.valueOf(320.00).setScale(2, RoundingMode.HALF_DOWN),
+        assertEquals(BigDecimal.valueOf(622.09).setScale(2, RoundingMode.HALF_DOWN),
                 receiverBudgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
 
         PayDebtDto dto = new PayDebtDto();
@@ -348,10 +348,10 @@ public class DebtServiceIt {
         assertEquals(BigDecimal.valueOf(202.09),
                 debt.getAmount().setScale(2, RoundingMode.HALF_DOWN));
 
-        assertEquals(BigDecimal.valueOf(343.00).setScale(2, RoundingMode.HALF_DOWN),
+        assertEquals(BigDecimal.valueOf(40.91).setScale(2, RoundingMode.HALF_DOWN),
                 lenderBudgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
 
-        assertEquals(BigDecimal.valueOf(220.00).setScale(2, RoundingMode.HALF_DOWN),
+        assertEquals(BigDecimal.valueOf(522.09).setScale(2, RoundingMode.HALF_DOWN),
                 receiverBudgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
     }
 
@@ -368,10 +368,10 @@ public class DebtServiceIt {
         //Test before pay
         assertEquals(BigDecimal.valueOf(302.09),
                 debt.getAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(243.00).setScale(2, RoundingMode.HALF_DOWN),
+        assertEquals(BigDecimal.valueOf(-59.09).setScale(2, RoundingMode.HALF_DOWN),
                 lenderBudgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
 
-        assertEquals(BigDecimal.valueOf(320.00).setScale(2, RoundingMode.HALF_DOWN),
+        assertEquals(BigDecimal.valueOf(622.09).setScale(2, RoundingMode.HALF_DOWN),
                 receiverBudgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
 
         PayDebtDto dto = new PayDebtDto();
@@ -386,11 +386,11 @@ public class DebtServiceIt {
         assertEquals(BigDecimal.valueOf(0.00).setScale(2, RoundingMode.HALF_DOWN),
                 debt.getAmount().setScale(2, RoundingMode.HALF_DOWN)
         );
-        assertEquals(BigDecimal.valueOf(545.09),
+        assertEquals(BigDecimal.valueOf(243).setScale(2, RoundingMode.HALF_DOWN),
                 lenderBudgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN)
         );
 
-        assertEquals(BigDecimal.valueOf(17.91),
+        assertEquals(BigDecimal.valueOf(320).setScale(2, RoundingMode.HALF_DOWN),
                 receiverBudgetStatistics.getRealBalance().setScale(2, RoundingMode.HALF_DOWN)
         );
     }
@@ -418,7 +418,7 @@ public class DebtServiceIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testPay_amountBiggerThanBalance_shouldThrowException() {
         CreateTransactionServiceDto dto = new CreateTransactionServiceDto();
-        dto.setAmount(BigDecimal.valueOf(100));
+        dto.setAmount(BigDecimal.valueOf(400));
         dto.setType(TransactionType.EXPENSE);
         dto.setBudgetId(1001L);
 

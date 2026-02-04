@@ -553,9 +553,12 @@ public class TransactionServiceIt {
         TransactionDtoSimple sourceTransaction = transferTransaction.getSourceTransaction();
 
         //Repository return transactions from main transaction sql and transfer transaction sql together
+        //Test with budget id because when run all test transactions, id is 23 for example
         assertEquals(8, this.transactionRepository.findAll().size());
-        assertEquals(2L, receiverTransaction.getId());
-        assertEquals(1L, sourceTransaction.getId());
+        assertEquals(1002L, receiverTransaction.getBudgetId());
+        assertEquals(1001L, sourceTransaction.getBudgetId());
+        assertEquals("This is a test", sourceTransaction.getComment());
+        assertEquals("Simcho", receiverTransaction.getComment());
 
     }
 
