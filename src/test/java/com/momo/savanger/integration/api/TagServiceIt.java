@@ -16,6 +16,7 @@ import com.momo.savanger.api.util.SortDirection;
 import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,7 +56,7 @@ public class TagServiceIt {
 
         List<Tag> tags = this.tagRepository.findAll();
 
-        assertThat(List.of("DM", "Tok", "Voda"))
+        assertThat(List.of("DM", "Tok", "Kotki", "Voda"))
                 .hasSameElementsAs(
                         tags.stream().map(Tag::getTagName).toList()
                 );
@@ -107,10 +108,10 @@ public class TagServiceIt {
 
         Page<Tag> tags = this.tagService.searchTags(query);
 
-        assertEquals(2, tags.getTotalElements());
+        assertEquals(3, tags.getTotalElements());
 
         assertEquals(tag.getId(), tags.getContent().getFirst().getId());
-        assertEquals(1001L, tags.getContent().getLast().getId());
+        assertEquals(1003L, tags.getContent().getLast().getId());
 
         //Test by name
 
@@ -133,10 +134,10 @@ public class TagServiceIt {
         query.setBudgetCap(budgetCap);
         tags = this.tagService.searchTags(query);
 
-        assertEquals(2, tags.getTotalElements());
+        assertEquals(3, tags.getTotalElements());
 
         assertEquals("Smetki", tags.getContent().getFirst().getTagName());
-        assertEquals("DM", tags.getContent().getLast().getTagName());
+        assertEquals("Kotki", tags.getContent().getLast().getTagName());
 
         //Test budget cap 2
         budgetCap = new BetweenQuery<>(BigDecimal.valueOf(20), BigDecimal.valueOf(299));
@@ -147,5 +148,46 @@ public class TagServiceIt {
 
         assertEquals(1, tags.getTotalElements());
         assertEquals("Smetki", tags.getContent().getFirst().getTagName());
+    }
+
+    @Test
+    public void testFindByBudgetIdAndIdContaining_valid() {
+
+        List<Long> tagIds = new ArrayList<>();
+        tagIds.add(1001L);
+
+        List<Tag> foundTagIds = this.tagService.findByBudgetAndIdContaining(tagIds, 1001L);
+
+        assertEquals(1, foundTagIds.size());
+        assertEquals(1001L, foundTagIds.getFirst().getId());
+        assertEquals("DM", foundTagIds.getFirst().getTagName());
+
+        tagIds.add(1003L);
+
+        foundTagIds = this.tagService.findByBudgetAndIdContaining(tagIds, 1001L);
+        assertEquals(2, foundTagIds.size());
+        assertEquals(1001L, foundTagIds.getFirst().getId());
+        assertEquals("DM", foundTagIds.getFirst().getTagName());
+        assertEquals(1003L, foundTagIds.getLast().getId());
+        assertEquals("Kotki", foundTagIds.getLast().getTagName());
+    }
+
+    @Test
+    public void testFindByBudgetIdAndIdContaining_invalid() {
+
+        //With empty tagIds
+        List<Long> tagIds = new ArrayList<>();
+        List<Tag> foundTagIds = this.tagService.findByBudgetAndIdContaining(tagIds, 1001L);
+
+        assertEquals(0, foundTagIds.size());
+
+        //with invalid budget id
+
+        tagIds.add(1001L);
+        foundTagIds = this.tagService.findByBudgetAndIdContaining(tagIds, 100433L);
+
+        assertEquals(0, foundTagIds.size());
+
+
     }
 }

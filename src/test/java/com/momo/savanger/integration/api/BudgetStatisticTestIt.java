@@ -83,7 +83,8 @@ public class BudgetStatisticTestIt {
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testBudgetStatistic_firstBudgetWithBalanceZero() {
-        final Supplier<BudgetStatistics> getB1Stat = () -> this.budgetService.getStatistics(this.budgetOneId);
+        final Supplier<BudgetStatistics> getB1Stat = () -> this.budgetService.getStatistics(
+                this.budgetOneId);
 
         BudgetStatistics b1Stat = getB1Stat.get();
 
@@ -464,7 +465,8 @@ public class BudgetStatisticTestIt {
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testBudgetStatistic_secondBudgetWithBalanceOneHundred() {
-        final Supplier<BudgetStatistics> getB2Stat = () -> this.budgetService.getStatistics(this.budgetTwoId);
+        final Supplier<BudgetStatistics> getB2Stat = () -> this.budgetService.getStatistics(
+                this.budgetTwoId);
 
         BudgetStatistics b2sStat = getB2Stat.get();
 

@@ -450,7 +450,8 @@ public class TransactionServiceIt {
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(32.32));
 
-        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1002L, TransactionType.EXPENSE);
+        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(
+                1002L, TransactionType.EXPENSE);
 
         assertEquals(BigDecimal.valueOf(232.32), lendedAmount.setScale(2, RoundingMode.HALF_DOWN));
     }
@@ -463,7 +464,8 @@ public class TransactionServiceIt {
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(32.32));
 
-        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1001L, TransactionType.INCOME);
+        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(
+                1001L, TransactionType.INCOME);
 
         assertEquals(BigDecimal.valueOf(232.32),
                 receivedAmount.setScale(2, RoundingMode.HALF_DOWN));
@@ -477,7 +479,8 @@ public class TransactionServiceIt {
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(32.32));
 
-        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1004L, TransactionType.EXPENSE);
+        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(
+                1004L, TransactionType.EXPENSE);
 
         assertEquals(BigDecimal.ZERO, lendedAmount);
     }
@@ -490,9 +493,22 @@ public class TransactionServiceIt {
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(200));
         this.transactionService.createDebtTransactions(debt, BigDecimal.valueOf(32.32));
 
-        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1004L, TransactionType.INCOME);
+        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(
+                1004L, TransactionType.INCOME);
 
         assertEquals(BigDecimal.ZERO, receivedAmount);
+    }
+
+    @Test
+    @WithLocalMockedUser
+    public void testPayDebtTransaction_validId_shouldPayDebtTransactions() {
+        Debt debt = this.debtService.findById(101L);
+
+        assertEquals(4, this.transactionRepository.findAll().size());
+
+        this.transactionService.payDebtTransaction(debt, BigDecimal.valueOf(200));
+
+        assertEquals(6, this.transactionRepository.findAll().size());
     }
 
     @Test
@@ -586,5 +602,40 @@ public class TransactionServiceIt {
 
 
     }
+
+    @Test
+    @Transactional
+    public void testFindByIdAndFetchAll_validId() {
+
+        final Transaction transaction = this.transactionService.findAndFetchDetails(
+                1001L);
+
+        assertNotNull(transaction);
+        assertEquals(1001L, transaction.getId());
+        assertNotNull(transaction.getBudget());
+        assertEquals(1001L, transaction.getBudget().getId());
+        assertEquals("Food", transaction.getBudget().getBudgetName());
+    }
+
+    @Test
+    public void testFindByIdAndFetchAll_invalidId() {
+
+        AssertUtil.assertApiException(ApiErrorCode.ERR_0010,
+                () -> this.transactionService.findAndFetchDetails(1234L)
+        );
+    }
+
+    @Test
+    public void testExistByIdAndRevisedFalse_valid() {
+
+        assertTrue(this.transactionService.existsByIdAndRevisedFalse(1001L));
+    }
+
+    @Test
+    public void testExistByIdAndRevisedFalse_invalid() {
+
+        assertFalse(this.transactionService.existsByIdAndRevisedFalse(2001L));
+    }
+
 
 }

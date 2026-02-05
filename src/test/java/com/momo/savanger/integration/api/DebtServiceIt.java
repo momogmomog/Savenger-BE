@@ -297,8 +297,10 @@ public class DebtServiceIt {
 
         this.debtService.create(dto);
 
-        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(100111L, TransactionType.EXPENSE);
-        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(100112L, TransactionType.INCOME);
+        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(
+                100111L, TransactionType.EXPENSE);
+        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(
+                100112L, TransactionType.INCOME);
 
         assertEquals(BigDecimal.valueOf(20.00).setScale(2, RoundingMode.HALF_DOWN),
                 lendedAmount.setScale(2, RoundingMode.HALF_DOWN));
@@ -404,9 +406,10 @@ public class DebtServiceIt {
 
         this.debtService.pay(101L, dto);
 
-
-        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1001L, TransactionType.EXPENSE);
-        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(1002L, TransactionType.INCOME);
+        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(
+                1001L, TransactionType.EXPENSE);
+        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(
+                1002L, TransactionType.INCOME);
 
         assertEquals(BigDecimal.valueOf(302.09), lendedAmount.setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.valueOf(302.09),
