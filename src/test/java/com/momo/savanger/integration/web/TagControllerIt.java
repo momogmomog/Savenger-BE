@@ -54,7 +54,7 @@ public class TagControllerIt extends BaseControllerIt {
 
         List<Tag> tags = this.tagRepository.findAll();
 
-        assertThat(List.of("DM", "Test", "Tok"))
+        assertThat(List.of("DM", "Test", "Tok", "Kotki"))
                 .hasSameElementsAs(
                         tags.stream().map(Tag::getTagName).toList()
                 );
@@ -73,7 +73,7 @@ public class TagControllerIt extends BaseControllerIt {
 
         List<Tag> tags = this.tagRepository.findAll();
 
-        assertThat(List.of("DM", "Test", "Tok"))
+        assertThat(List.of("DM", "Test", "Tok", "Kotki"))
                 .hasSameElementsAs(
                         tags.stream().map(Tag::getTagName).toList()
                 );
