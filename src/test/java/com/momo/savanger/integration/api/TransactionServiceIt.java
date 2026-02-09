@@ -509,6 +509,26 @@ public class TransactionServiceIt {
         this.transactionService.payDebtTransaction(debt, BigDecimal.valueOf(200));
 
         assertEquals(6, this.transactionRepository.findAll().size());
+
+        final Transaction expenseTransaction = this.transactionRepository.findAll().get(0);
+
+        final Transaction incomeTransaction = this.transactionRepository.findAll().get(1);
+
+        assertEquals(TransactionType.EXPENSE, expenseTransaction.getType());
+        assertEquals(TransactionType.INCOME, incomeTransaction.getType());
+
+        assertEquals(debt.getId(), expenseTransaction.getDebtId());
+        assertEquals(debt.getId(), incomeTransaction.getDebtId());
+
+        assertEquals(debt.getLenderBudgetId(), incomeTransaction.getBudgetId());
+        assertEquals(debt.getReceiverBudgetId(), expenseTransaction.getBudgetId());
+
+        assertEquals(BigDecimal.valueOf(200).setScale(2, RoundingMode.HALF_DOWN),
+                incomeTransaction.getAmount()
+        );
+        assertEquals(BigDecimal.valueOf(200).setScale(2, RoundingMode.HALF_DOWN),
+                expenseTransaction.getAmount()
+        );
     }
 
     @Test

@@ -148,7 +148,7 @@ public class BudgetStatisticTestIt {
                 toScale(b1Stat.getExpensesAmount())
         );
 
-        //Test with received and lend debt
+        //Test with received and lent debt
 
         Debt b1ToB2 = this.createDebt(budgetOneId, budgetTwoId, BigDecimal.valueOf(20));
 
@@ -182,7 +182,7 @@ public class BudgetStatisticTestIt {
                 toScale(b1Stat.getExpensesAmount())
         );
 
-        //Test with 2 received and 1 lend debt
+        //Test with 2 received and 1 lent debt
 
         b3ToB1 = this.createDebt(budgetThreeId, budgetOneId, BigDecimal.valueOf(50));
 
@@ -215,7 +215,7 @@ public class BudgetStatisticTestIt {
                 toScale(0),
                 toScale(b1Stat.getExpensesAmount())
         );
-        //Test with 2 received and 1 lend debt and expense and earning transaction
+        //Test with 2 received and 1 lent debt and expense and earning transaction
 
         this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10), budgetOneId);
         this.createTransaction(TransactionType.INCOME, BigDecimal.valueOf(500), budgetOneId);
@@ -528,7 +528,7 @@ public class BudgetStatisticTestIt {
                 toScale(b2sStat.getExpensesAmount())
         );
 
-        //Test with received and lend debt
+        //Test with received and lent debt
 
         Debt b2ToB1 = this.createDebt(budgetTwoId, budgetOneId, BigDecimal.valueOf(20));
 
@@ -590,7 +590,7 @@ public class BudgetStatisticTestIt {
                 toScale(b2sStat.getExpensesAmount())
         );
 
-        //Test with 2 received and 1 lend debt and expense and earning transaction
+        //Test with 2 received and 1 lent debt and expense and earning transaction
 
         this.createTransaction(TransactionType.EXPENSE, BigDecimal.valueOf(10), budgetTwoId);
         this.createTransaction(TransactionType.INCOME, BigDecimal.valueOf(500), budgetTwoId);
@@ -622,7 +622,7 @@ public class BudgetStatisticTestIt {
                 toScale(b2sStat.getExpensesAmount())
         );
 
-        //Test with 2 received and 1 lend debt, 1 expense and 1 earning transaction, 1 prepayment
+        //Test with 2 received and 1 lent debt, 1 expense and 1 earning transaction, 1 prepayment
 
         this.createPrepayment(BigDecimal.valueOf(25), "netinet", budgetTwoId);
 
