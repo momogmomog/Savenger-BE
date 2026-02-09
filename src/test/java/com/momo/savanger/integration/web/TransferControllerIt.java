@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.momo.savanger.api.transfer.Transfer;
 import com.momo.savanger.api.transfer.TransferRepository;
+import com.momo.savanger.api.transfer.TransferService;
 import com.momo.savanger.api.transfer.dto.CreateTransferDto;
 import com.momo.savanger.api.transfer.dto.TransferSearchQuery;
 import com.momo.savanger.api.transfer.transferTransaction.CreateTransferTransactionDto;
@@ -64,6 +65,9 @@ public class TransferControllerIt extends BaseControllerIt {
     @Autowired
     private TransferTransactionRepository transferTransactionRepository;
 
+    @Autowired
+    private TransferService transferService;
+
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testCreate_validDto_shouldCreateTransfer() throws Exception {
@@ -87,17 +91,20 @@ public class TransferControllerIt extends BaseControllerIt {
 
         // If transfer is not active
 
-        super.deleteOK("/transfers/1", null);
-
-        final Transfer transfer = this.transferRepository.findById(1L).orElse(null);
+        Transfer transfer = this.transferService.findTransfer(1001L, 1002L)
+                .orElse(null);
 
         assertNotNull(transfer);
-        assertEquals(1L, transfer.getId());
+
+        super.deleteOK("/transfers/" + transfer.getId(), null);
+
+        transfer = this.transferRepository.findById(transfer.getId()).orElse(null);
+
+        assertNotNull(transfer);
         assertEquals(false, transfer.getActive());
 
         super.putOK(Endpoints.TRANSFERS,
                 dto,
-                jsonPath("$.id", is(1)),
                 jsonPath("$.active", is(true))
         );
     }
@@ -184,7 +191,10 @@ public class TransferControllerIt extends BaseControllerIt {
 
         super.delete("/transfers/24",
                 null,
-                HttpStatus.NOT_FOUND
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"transferId\" && @.constraintName == \"CanAccessTransfer\")]").exists()
         );
     }
 

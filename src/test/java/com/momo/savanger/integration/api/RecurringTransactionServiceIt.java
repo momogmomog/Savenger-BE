@@ -242,4 +242,25 @@ public class RecurringTransactionServiceIt {
 
     }
 
+    @Test
+    public void testFindByIdAndFetchAll_validId() {
+
+        final RecurringTransaction recurringTransaction = this.rTransactionService.findByIdFetchAll(
+                1001L);
+
+        assertNotNull(recurringTransaction);
+        assertEquals(1001L, recurringTransaction.getId());
+        assertNotNull(recurringTransaction.getPrepayment());
+        assertEquals(1001L, recurringTransaction.getPrepayment().getId());
+        assertEquals("netsurf", recurringTransaction.getPrepayment().getName());
+    }
+
+    @Test
+    public void testFindByIdAndFetchAll_invalidId() {
+
+        AssertUtil.assertApiException(ApiErrorCode.ERR_0016,
+                () -> this.rTransactionService.findByIdFetchAll(1234L)
+        );
+    }
+
 }

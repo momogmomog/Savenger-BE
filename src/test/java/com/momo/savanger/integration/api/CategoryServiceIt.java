@@ -2,8 +2,10 @@ package com.momo.savanger.integration.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.momo.savanger.api.category.Category;
 import com.momo.savanger.api.category.CategoryQuery;
@@ -147,5 +149,17 @@ public class CategoryServiceIt {
 
         assertEquals(1, categories.getTotalElements());
         assertEquals("Smetki", categories.getContent().getFirst().getCategoryName());
+    }
+
+    @Test
+    public void testIsCategoryValid_valid() {
+
+        assertTrue(this.categoryService.isCategoryValid(1001L, 1001L));
+    }
+
+    @Test
+    public void testIsCategoryValid_invalid() {
+
+        assertFalse(this.categoryService.isCategoryValid(1002L, 1001L));
     }
 }
