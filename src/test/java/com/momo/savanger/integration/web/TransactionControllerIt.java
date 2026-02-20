@@ -136,7 +136,7 @@ public class TransactionControllerIt extends BaseControllerIt {
 
         List<Long> ids = new ArrayList<>();
         ids.add(1001L);
-        ids.add(1003L);
+        ids.add(10089L);
 
         dto.setTagIds(ids);
 
@@ -146,7 +146,7 @@ public class TransactionControllerIt extends BaseControllerIt {
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath("fieldErrors.[?(@.field == \"tagIds\" "
                         + "&& @.constraintName == \"ValidTransactionDto\" "
-                        + "&& @.message == \"Invalid tags: [1003]\")]").exists()
+                        + "&& @.message == \"Invalid tags: [10089]\")]").exists()
         );
 
     }
@@ -287,7 +287,7 @@ public class TransactionControllerIt extends BaseControllerIt {
 
         List<Long> ids = new ArrayList<>();
         ids.add(1001L);
-        ids.add(1003L);
+        ids.add(10089L);
 
         dto.setTagIds(ids);
 
@@ -297,12 +297,12 @@ public class TransactionControllerIt extends BaseControllerIt {
                 jsonPath("fieldErrors.length()", is(2)),
                 jsonPath("fieldErrors.[?(@.field == \"tagIds\" "
                         + "&& @.constraintName == \"ValidTransactionDto\" "
-                        + "&& @.message == \"Invalid tags: [1003]\")]").exists(),
+                        + "&& @.message == \"Invalid tags: [10089]\")]").exists(),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"dateCreated\" && @.constraintName == \"NotNull\")]").exists()
         );
 
-        ids.remove(1003L);
+        ids.remove(10089L);
         dto.setTagIds(ids);
         dto.setDateCreated(LocalDateTime.now());
 

@@ -25,7 +25,9 @@ import com.momo.savanger.api.util.BetweenQuery;
 import com.momo.savanger.api.util.PageQuery;
 import com.momo.savanger.api.util.SortDirection;
 import com.momo.savanger.api.util.SortQuery;
+import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
+import com.momo.savanger.util.AssertUtil;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -481,6 +483,26 @@ public class BudgetServiceIt {
         updateBudgetDto.setAutoRevise(false);
 
         assertThrows(ApiException.class, () -> this.budgetService.update(updateBudgetDto, 10055L));
+    }
+
+    @Test
+    public void testGetStatisticsFetchAll_validId() {
+        BudgetStatistics statistics = this.budgetService.getStatisticsFetchAll(1001L);
+
+        assertNotNull(statistics);
+        assertNotNull(statistics.getBudget());
+        assertEquals(1001L, statistics.getBudget().getId());
+        assertEquals("Food", statistics.getBudget().getBudgetName());
+
+        assertEquals(BigDecimal.valueOf(101.32), statistics.getRealBalance());
+    }
+
+    @Test
+    public void testGetStatisticsFetchAll_invalidId() {
+
+        AssertUtil.assertApiException(ApiErrorCode.ERR_0004,
+                () -> this.budgetService.getStatisticsFetchAll(1004321L)
+        );
     }
 
 }
