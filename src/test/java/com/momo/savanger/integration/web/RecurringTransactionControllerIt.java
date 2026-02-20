@@ -88,7 +88,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         final CreateRecurringTransactionDto rTransactionDto = new CreateRecurringTransactionDto();
 
         final CreatePrepaymentDto prepaymentDto = new CreatePrepaymentDto();
-        prepaymentDto.setAmount(BigDecimal.valueOf(1));
+        prepaymentDto.setAmount(BigDecimal.valueOf(1000));
         prepaymentDto.setRecurringTransaction(rTransactionDto);
         prepaymentDto.setBudgetId(1002L);
         prepaymentDto.setName("kroki");
