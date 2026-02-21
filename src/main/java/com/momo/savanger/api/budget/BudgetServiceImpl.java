@@ -81,6 +81,8 @@ public class BudgetServiceImpl implements BudgetService {
 
         budget.setOwnerId(ownerId);
 
+        //TODO: TEST scenarios:
+        // This if this exception will be thrown
         budget.setDueDate(
                 this.recurringRuleService.getNextOccurrence(
                         createBudgetDto.getRecurringRule(),
@@ -192,6 +194,9 @@ public class BudgetServiceImpl implements BudgetService {
 
         budget.setBalance(revision.getBalance());
         budget.setDateStarted(revision.getRevisionDate());
+
+        //TODO: TEST scenarios:
+        // This if this exception will be thrown
         budget.setDueDate(this.recurringRuleService.getNextOccurrence(
                         budget.getRecurringRule(),
                         budget.getDateStarted(),

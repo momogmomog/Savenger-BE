@@ -41,6 +41,7 @@ public class CreateRecurringTransactionDto {
 
     private LocalDateTime startFrom;
 
+    @NotNull
     private Boolean includeInBalance;
 
     @NotNull

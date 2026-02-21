@@ -78,8 +78,9 @@ public class RecurringTransaction extends Audit {
 
     private Long debtId;
 
-    //TODO: TEST scenarios:
+    //TODO: TEST scenarios (Not yet implemented, ignore):
     // recurring transactions (1+ with false, 1+ with true) are created and budget statistic is considering the values.
+    // if recurring transaction is outside the lifecycle of the budget, it should not be calculated
     private Boolean includeInBalance;
 
     @ManyToOne(fetch = FetchType.LAZY)

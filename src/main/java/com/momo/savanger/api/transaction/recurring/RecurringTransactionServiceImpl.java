@@ -29,6 +29,10 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     @Override
     @Transactional
     public RecurringTransaction create(CreateRecurringTransactionDto dto) {
+
+        //TODO: TEST scenarios:
+        // Test the next date generation, both successful and failing
+        // Test tags if they are saved
         final RecurringTransaction recurringTransaction = this.recurringTransactionMapper
                 .ToRecurringTransaction(dto);
 
@@ -102,6 +106,9 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
 
     @Override
     public void advanceRecurringTransaction(RecurringTransaction recurringTransaction) {
+
+        //TODO: TEST scenarios:
+        // Write tests to cover all lines here to prevent future modifications from breaking dependent services
         recurringTransaction.setOccurrences(recurringTransaction.getOccurrences() + 1);
         final Optional<LocalDateTime> maybeNextDate = this.recurringRuleService.getNextOccurrence(
                 recurringTransaction.getRecurringRule(),
