@@ -29,21 +29,26 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
     @Override
     @Transactional
     public RecurringTransaction create(CreateRecurringTransactionDto dto) {
-        final RecurringTransaction recurringTransaction = this.recurringTransactionMapper.ToRecurringTransaction(
-                dto);
+        final RecurringTransaction recurringTransaction = this.recurringTransactionMapper
+                .ToRecurringTransaction(dto);
 
+        recurringTransaction.setOccurrences(0);
         recurringTransaction.setCompleted(false);
+        if (recurringTransaction.getStartFrom() == null) {
+            recurringTransaction.setStartFrom(LocalDateTime.now());
+        }
         recurringTransaction.setNextDate(
-                this.recurringRuleService.convertRecurringRuleToDate(
-                        dto.getRecurringRule(),
-                        LocalDateTime.now()
-                )
+                this.recurringRuleService.getNextOccurrence(
+                        recurringTransaction.getRecurringRule(),
+                        recurringTransaction.getStartFrom(),
+                        recurringTransaction.getStartFrom()
+                ).orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0022))
         );
 
         if (!dto.getTagIds().isEmpty()) {
             recurringTransaction.setTags(this.tagService.findByBudgetAndIdContaining(
                     dto.getTagIds(),
-                    dto.getBudgetId()
+                    recurringTransaction.getBudgetId()
             ));
         }
 
@@ -88,9 +93,25 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
 
     @Override
     @Transactional
-    public void updateRecurringTransaction(RecurringTransaction recurringTransaction) {
+    public RecurringTransaction updateRecurringTransaction(RecurringTransaction recurringTransaction) {
         recurringTransaction.setUpdateDate(LocalDateTime.now());
-        this.recurringTransactionRepository.save(recurringTransaction);
+        return this.recurringTransactionRepository.save(recurringTransaction);
+    }
+
+    @Override
+    public void advanceRecurringTransaction(RecurringTransaction recurringTransaction) {
+        recurringTransaction.setOccurrences(recurringTransaction.getOccurrences() + 1);
+        final Optional<LocalDateTime> maybeNextDate = this.recurringRuleService.getNextOccurrence(
+                recurringTransaction.getRecurringRule(),
+                recurringTransaction.getStartFrom(),
+                recurringTransaction.getNextDate()
+        );
+
+        if (maybeNextDate.isEmpty()) {
+            recurringTransaction.setCompleted(true);
+        } else {
+            recurringTransaction.setNextDate(maybeNextDate.get());
+        }
     }
 
     @Override

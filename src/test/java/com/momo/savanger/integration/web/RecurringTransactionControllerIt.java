@@ -165,7 +165,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testPay_validPayload_shouldPayTransaction() throws Exception {
 
-        super.postOK("/recurring-transaction/1001/pay", null);
+        super.postOK("/prepayments/pay/1001", null);
 
         assertEquals(2, this.transactionRepository.findAll().size());
 
@@ -175,7 +175,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.THIRD_USER_USERNAME)
     public void testPay_invalidBudgetOwner_shouldThrowException() throws Exception {
 
-        super.post("/recurring-transaction/1001/pay",
+        super.post("/prepayments/pay/1001",
                 null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
@@ -191,7 +191,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testCreate_invalidPayload() throws Exception {
 
-        super.post("/recurring-transaction/1002/pay",
+        super.post("/prepayments/pay/1002",
                 null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
@@ -202,11 +202,14 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
 
         );
 
-        super.postOK("/recurring-transaction/1001/pay", null);
+        // 1st payment
+        super.postOK("/prepayments/pay/1001", null);
 
-        super.postOK("/recurring-transaction/1001/pay", null);
+        // 2nd payment - remaining amount should be now 0
+        super.postOK("/prepayments/pay/1001", null);
 
-        super.post("/recurring-transaction/1001/pay",
+        // prepayment is already completed
+        super.post("/prepayments/pay/1001",
                 null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),

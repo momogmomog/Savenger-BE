@@ -63,12 +63,24 @@ public class RecurringTransaction extends Audit {
     @Column(nullable = false)
     private Boolean completed;
 
+    private String comment;
+
+    @Column(nullable = false)
+    private Integer occurrences;
+
+    @Column(nullable = false)
+    private LocalDateTime startFrom;
+
     private Long categoryId;
 
     @Column(nullable = false)
     private Long budgetId;
 
     private Long debtId;
+
+    //TODO: TEST scenarios:
+    // recurring transactions (1+ with false, 1+ with true) are created and budget statistic is considering the values.
+    private Boolean includeInBalance;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prepaymentId", insertable = false, updatable = false)

@@ -89,7 +89,8 @@ public final class RecurringTransactionSpecifications {
         }
 
         return (root, query, criteriaBuilder) -> {
-            final Join<RecurringTransaction, Tag> join = getOrCreateJoin(root, RecurringTransaction_.tags);
+            final Join<RecurringTransaction, Tag> join = getOrCreateJoin(root,
+                    RecurringTransaction_.tags);
             return join.get(Tag_.id).in(tagIds);
         };
     }

@@ -11,7 +11,7 @@ import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.transaction.TransactionRepository;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
-import com.momo.savanger.api.transaction.recurring.RTransactionPrepaymentService;
+import com.momo.savanger.api.transaction.recurring.RecurringTransactionExecutionService;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionRepository;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
@@ -69,7 +69,7 @@ public class RecurringTransactionServiceIt {
     private PrepaymentService prepaymentService;
 
     @Autowired
-    private RTransactionPrepaymentService rTransactionPrepaymentService;
+    private RecurringTransactionExecutionService recurringTransactionExecutionService;
 
     @Autowired
     private TransactionRepository transactionRepository;
@@ -201,7 +201,7 @@ public class RecurringTransactionServiceIt {
     @Transactional
     public void testPay_validPayload_shouldCreateTransaction() {
 
-        RecurringTransaction recurringTransaction = this.rTransactionPrepaymentService.pay(1001L);
+        RecurringTransaction recurringTransaction = this.recurringTransactionExecutionService.payPrepayment(1001L);
 
         //Test remaining amount
         assertEquals(
@@ -222,7 +222,7 @@ public class RecurringTransactionServiceIt {
 
         //Test if remaining amount is smaller than transaction amount
 
-        recurringTransaction = this.rTransactionPrepaymentService.pay(1001L);
+        recurringTransaction = this.recurringTransactionExecutionService.payPrepayment(1001L);
 
         assertEquals(BigDecimal.valueOf(0).setScale(2, RoundingMode.HALF_DOWN),
                 recurringTransaction.getPrepayment().getRemainingAmount());
@@ -232,13 +232,13 @@ public class RecurringTransactionServiceIt {
 
         //Test if prepayment is completed already
 
-        assertThrows(ApiException.class, () -> this.rTransactionPrepaymentService.pay(1001L));
+        assertThrows(ApiException.class, () -> this.recurringTransactionExecutionService.payPrepayment(1001L));
     }
 
     @Test
     public void testPay_invalidId_shouldThrowException() {
 
-        assertThrows(ApiException.class, () -> this.rTransactionPrepaymentService.pay(10001L));
+        assertThrows(ApiException.class, () -> this.recurringTransactionExecutionService.payPrepayment(10001L));
 
     }
 

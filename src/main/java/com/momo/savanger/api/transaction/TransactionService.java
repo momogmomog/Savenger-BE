@@ -22,7 +22,7 @@ public interface TransactionService {
 
     Transaction create(CreateTransactionServiceDto dto, Long userId);
 
-    Transaction createPrepaymentTransaction(RecurringTransaction recurringTransaction);
+    Transaction createFromRecurringTransaction(RecurringTransaction recurringTransaction);
 
     Page<Transaction> searchTransactions(TransactionSearchQuery query, User user);
 

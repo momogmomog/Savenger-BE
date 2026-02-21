@@ -1,7 +1,7 @@
 package com.momo.savanger.web;
 
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
-import com.momo.savanger.api.transaction.recurring.RTransactionPrepaymentService;
+import com.momo.savanger.api.transaction.recurring.RecurringTransactionExecutionService;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionDto;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionMapper;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionQuery;
@@ -25,15 +25,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class RecurringTransactionController {
 
     private final RecurringTransactionService recurringTransactionService;
-    private final RTransactionPrepaymentService rTransactionPrepaymentService;
+    private final RecurringTransactionExecutionService recurringTransactionExecutionService;
     private final RecurringTransactionMapper recurringTransactionMapper;
 
-    @PostMapping(Endpoints.PAY_R_TRANSACTION)
+    @PostMapping(Endpoints.PREPAYMENT_PAY)
     public RecurringTransactionDto pay(
             @PathVariable("rTransactionId") @ValidRecurringTransaction Long rTransactionId) {
 
         return this.recurringTransactionMapper.toRecurringTransactionDto(
-                this.rTransactionPrepaymentService.pay(rTransactionId)
+                this.recurringTransactionExecutionService.payPrepayment(rTransactionId)
         );
     }
 

@@ -82,9 +82,11 @@ public class BudgetServiceImpl implements BudgetService {
         budget.setOwnerId(ownerId);
 
         budget.setDueDate(
-                this.recurringRuleService.convertRecurringRuleToDate(
+                this.recurringRuleService.getNextOccurrence(
                         createBudgetDto.getRecurringRule(),
-                        createBudgetDto.getDateStarted())
+                        createBudgetDto.getDateStarted(),
+                        createBudgetDto.getDateStarted()
+                ).orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0022))
         );
 
         if (budget.getBudgetCap() == null) {
@@ -190,8 +192,11 @@ public class BudgetServiceImpl implements BudgetService {
 
         budget.setBalance(revision.getBalance());
         budget.setDateStarted(revision.getRevisionDate());
-        budget.setDueDate(this.recurringRuleService.convertRecurringRuleToDate(
-                budget.getRecurringRule(), budget.getDateStarted())
+        budget.setDueDate(this.recurringRuleService.getNextOccurrence(
+                        budget.getRecurringRule(),
+                        budget.getDateStarted(),
+                        budget.getDateStarted()
+                ).orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0022))
         );
 
         this.budgetRepository.save(budget);
