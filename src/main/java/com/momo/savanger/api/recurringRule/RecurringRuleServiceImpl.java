@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class RecurringRuleServiceImpl implements RecurringRuleService {
+
     @Override
     public Optional<LocalDateTime> getNextOccurrence(
             String recurringRule,

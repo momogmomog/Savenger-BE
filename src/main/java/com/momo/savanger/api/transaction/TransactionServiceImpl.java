@@ -2,6 +2,7 @@ package com.momo.savanger.api.transaction;
 
 import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.tag.TagService;
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
@@ -77,10 +78,20 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public Transaction createFromRecurringTransaction(RecurringTransaction recurringTransaction) {
+    public Transaction createFromRecurringTransaction(
+            RecurringTransaction recurringTransaction,
+            CreateTransactionDto transactionOverride
+    ) {
+        //TODO: TEST scenarios:
+        // Test with transaction override
         final CreateTransactionServiceDto transactionDto = this.transactionMapper.toCreateServiceDto(
                 recurringTransaction
         );
+
+        if (transactionOverride != null) {
+            this.transactionMapper.mergeIntoServiceDto(transactionOverride, transactionDto);
+        }
+
         transactionDto.setDateCreated(null);
 
         return this.create(transactionDto, null);

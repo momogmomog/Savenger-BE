@@ -93,7 +93,9 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
 
     @Override
     @Transactional
-    public RecurringTransaction updateRecurringTransaction(RecurringTransaction recurringTransaction) {
+    public RecurringTransaction updateRecurringTransaction(
+            RecurringTransaction recurringTransaction
+    ) {
         recurringTransaction.setUpdateDate(LocalDateTime.now());
         return this.recurringTransactionRepository.save(recurringTransaction);
     }

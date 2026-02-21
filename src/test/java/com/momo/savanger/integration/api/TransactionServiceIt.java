@@ -538,7 +538,7 @@ public class TransactionServiceIt {
     public void testCreateFromRecurringTransaction_shouldSaveTransaction() {
 
         this.transactionService.createFromRecurringTransaction(
-                recurringTransactionService.findById(1001L));
+                recurringTransactionService.findById(1001L), null);
 
         assertEquals(5, this.transactionRepository.findAll().size());
     }
@@ -547,9 +547,11 @@ public class TransactionServiceIt {
     @Transactional
     public void testCreateFromRecurringTransaction_emptyRecurringTransaction_shouldThrowException() {
 
-        assertThrows(ApiException.class, () -> this.transactionService.createFromRecurringTransaction(
-                recurringTransactionService.findById(102L)
-        ));
+        assertThrows(ApiException.class,
+                () -> this.transactionService.createFromRecurringTransaction(
+                        recurringTransactionService.findById(102L),
+                        null
+                ));
     }
 
     @Test

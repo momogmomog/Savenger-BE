@@ -1,8 +1,9 @@
 package com.momo.savanger.web;
 
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
-import com.momo.savanger.api.transaction.recurring.RecurringTransactionExecutionService;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionDto;
+import com.momo.savanger.api.transaction.recurring.RecurringTransactionExecutionService;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionMapper;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionQuery;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
@@ -52,6 +53,19 @@ public class RecurringTransactionController {
                 this.recurringTransactionService
                         .search(query)
                         .map(this.recurringTransactionMapper::toRecurringTransactionDto)
+        );
+    }
+
+    @PostMapping(Endpoints.RECURRING_TRANSACTIONS_EXECUTE)
+    public RecurringTransactionDto execute(
+            @PathVariable @ValidRecurringTransaction Long rTransactionId,
+            @Valid @RequestBody CreateTransactionDto transactionOverridesDto) {
+
+        return this.recurringTransactionMapper.toRecurringTransactionDto(
+                this.recurringTransactionExecutionService.execute(
+                        rTransactionId,
+                        transactionOverridesDto
+                )
         );
     }
 }

@@ -30,7 +30,8 @@ public enum ApiErrorCode {
     ERR_0020(HttpStatus.BAD_REQUEST, "Error fetching transfer transaction data"),
     ERR_0021(HttpStatus.BAD_REQUEST, "Cannot revert transfer transaction"),
     ERR_0022(HttpStatus.BAD_REQUEST, "Cannot generate initial date from RRule"),
-    ERR_0023(HttpStatus.PRECONDITION_FAILED, "Cannot proceed prepayment due to completed recurring transaction"),
+    ERR_0023(HttpStatus.PRECONDITION_FAILED,
+            "Cannot proceed prepayment due to completed recurring transaction"),
     ;
 
     public final HttpStatus status;

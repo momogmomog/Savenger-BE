@@ -3,6 +3,7 @@ package com.momo.savanger.api.transaction.recurring;
 import com.momo.savanger.api.prepayment.Prepayment;
 import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.transaction.TransactionService;
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class RecurringTransactionExecutionServiceImpl implements
             recurringTransaction.setAmount(prepayment.getRemainingAmount());
         }
 
-        final var updatedRecurringTransaction = this.execute(recurringTransaction);
+        final var updatedRecurringTransaction = this.execute(recurringTransaction, null);
 
         this.prepaymentService.updatePrepaymentAfterPay(prepayment);
 
@@ -38,7 +39,8 @@ public class RecurringTransactionExecutionServiceImpl implements
         // Recurring transaction completes before prepayment
         if (prepayment.getCompleted()) {
             recurringTransaction.setCompleted(true);
-            return this.recurringTransactionService.updateRecurringTransaction(recurringTransaction);
+            return this.recurringTransactionService.updateRecurringTransaction(
+                    recurringTransaction);
         } else if (updatedRecurringTransaction.getCompleted()) {
             throw ApiException.with(ApiErrorCode.ERR_0023);
         }
@@ -48,20 +50,27 @@ public class RecurringTransactionExecutionServiceImpl implements
 
     @Override
     @Transactional
-    public RecurringTransaction execute(Long recurringTransactionId) {
+    public RecurringTransaction execute(
+            Long recurringTransactionId,
+            CreateTransactionDto transactionOverride) {
         //TODO: TEST scenarios:
         // Recurring transaction is completed if the rrule has end date
         // Recurring transaction is completed if the rrule has max occurrences
         // The occurrences field is incremented
         // Next Date is generated properly according to rrule
         return this.execute(
-                this.recurringTransactionService.findByIdFetchAll(recurringTransactionId)
+                this.recurringTransactionService.findByIdFetchAll(recurringTransactionId),
+                transactionOverride
         );
     }
 
-    private RecurringTransaction execute(RecurringTransaction recurringTransaction) {
+    private RecurringTransaction execute(
+            RecurringTransaction recurringTransaction,
+            CreateTransactionDto transactionOverride
+    ) {
         this.transactionService.createFromRecurringTransaction(
-                recurringTransaction
+                recurringTransaction,
+                transactionOverride
         );
         this.recurringTransactionService.advanceRecurringTransaction(
                 recurringTransaction
