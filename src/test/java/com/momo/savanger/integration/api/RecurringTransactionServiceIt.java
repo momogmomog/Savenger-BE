@@ -203,7 +203,7 @@ public class RecurringTransactionServiceIt {
 
         RecurringTransaction recurringTransaction = this.recurringTransactionExecutionService.payPrepayment(
                 1001L
-                );
+        );
 
         //Test remaining amount
         assertEquals(
@@ -235,18 +235,18 @@ public class RecurringTransactionServiceIt {
         //Test if prepayment is completed already
 
         assertThrows(
-        ApiException.class,
+                ApiException.class,
                 () -> this.recurringTransactionExecutionService.payPrepayment(1001L)
-                );
+        );
     }
 
     @Test
     public void testPay_invalidId_shouldThrowException() {
 
         assertThrows(
-        ApiException.class,
+                ApiException.class,
                 () -> this.recurringTransactionExecutionService.payPrepayment(10001L)
-                );
+        );
 
     }
 

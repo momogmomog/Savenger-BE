@@ -101,6 +101,7 @@ public class PrepaymentControllerIt extends BaseControllerIt {
         transactionDto.setAutoExecute(false);
         transactionDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
         transactionDto.setBudgetId(1001L);
+        transactionDto.setIncludeInBalance(false);
 
         //Test minus amount
         prepaymentDto.setName("Kola");

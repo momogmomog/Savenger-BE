@@ -65,6 +65,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         rTransactionDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
         rTransactionDto.setAmount(BigDecimal.valueOf(20));
         rTransactionDto.setBudgetId(1001L);
+        rTransactionDto.setIncludeInBalance(false);
         rTransactionDto.setAutoExecute(false);
 
         final CreatePrepaymentDto prepaymentDto = new CreatePrepaymentDto();
@@ -97,7 +98,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         super.post(Endpoints.PREPAYMENTS,
                 prepaymentDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(7)),
+                jsonPath("fieldErrors.length()", is(8)),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.type\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
@@ -111,6 +112,8 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
                 jsonPath(
                         "fieldErrors.[?(@.field == \"amount\" && @.constraintName == \"IsBudgetBalanceBigger\")]").exists(),
                 jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringTransaction.includeInBalance\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"ValidPrepaymentDto\")]").exists()
 
         );
@@ -119,6 +122,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         rTransactionDto.setRecurringRule("FRE=DAILY;INTERVAL=1");
         rTransactionDto.setAmount(BigDecimal.valueOf(-20));
         rTransactionDto.setBudgetId(101L);
+        rTransactionDto.setIncludeInBalance(false);
         rTransactionDto.setAutoExecute(false);
 
         super.post(Endpoints.PREPAYMENTS,
