@@ -1,9 +1,20 @@
 package com.momo.savanger.api.recurringRule;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface RecurringRuleService {
 
-    LocalDateTime convertRecurringRuleToDate(String recurringRule, LocalDateTime startDate);
+    Optional<LocalDateTime> getNextOccurrence(
+            String recurringRule,
+            LocalDateTime originalStartDate,
+            LocalDateTime currentNextDate
+    );
 
+    Optional<LocalDateTime> getNextOccurrence(
+            String recurringRule,
+            LocalDateTime originalStartDate,
+            LocalDateTime currentNextDate,
+            boolean allowCurrentNextDate
+    );
 }

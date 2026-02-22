@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
@@ -33,6 +34,7 @@ import lombok.ToString.Exclude;
 @Setter
 @ToString
 @NamedEntityGraph(name = EntityGraphs.RECURRING_TRANSACTION_ALL, includeAllAttributes = true)
+@NamedEntityGraph(name = EntityGraphs.RECURRING_TRANSACTION_TAGS, attributeNodes = @NamedAttributeNode("tags"))
 public class RecurringTransaction extends Audit {
 
     @Id
@@ -61,12 +63,25 @@ public class RecurringTransaction extends Audit {
     @Column(nullable = false)
     private Boolean completed;
 
+    private String comment;
+
+    @Column(nullable = false)
+    private Integer occurrences;
+
+    @Column(nullable = false)
+    private LocalDateTime startFrom;
+
     private Long categoryId;
 
     @Column(nullable = false)
     private Long budgetId;
 
     private Long debtId;
+
+    //TODO: TEST scenarios (Not yet implemented, ignore):
+    // recurring transactions (1+ with false, 1+ with true) are created and budget statistic is considering the values.
+    // if recurring transaction is outside the lifecycle of the budget, it should not be calculated
+    private Boolean includeInBalance;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prepaymentId", insertable = false, updatable = false)

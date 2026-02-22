@@ -865,7 +865,9 @@ public class BudgetStatisticTestIt {
         recurringTransactionDto.setType(type);
         recurringTransactionDto.setBudgetId(budgetId);
         recurringTransactionDto.setAmount(amount);
+        recurringTransactionDto.setStartFrom(LocalDateTime.now());
         recurringTransactionDto.setAutoExecute(false);
+        recurringTransactionDto.setIncludeInBalance(false);
         recurringTransactionDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
 
         return recurringTransactionDto;

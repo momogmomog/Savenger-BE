@@ -535,21 +535,23 @@ public class TransactionServiceIt {
     @Transactional
     @Sql("classpath:/sql/prepayment/prepayment-it-data.sql")
     @Sql("classpath:/sql/prepayment/recurring_transaction-it-data.sql")
-    public void testCreatePrepaymentTransaction_shouldSaveTransaction() {
+    public void testCreateFromRecurringTransaction_shouldSaveTransaction() {
 
-        this.transactionService.createPrepaymentTransaction(
-                recurringTransactionService.findById(1001L));
+        this.transactionService.createFromRecurringTransaction(
+                recurringTransactionService.findById(1001L), null);
 
         assertEquals(5, this.transactionRepository.findAll().size());
     }
 
     @Test
     @Transactional
-    public void testCreatePrepaymentTransaction_emptyRecurringTransaction_shouldThrowException() {
+    public void testCreateFromRecurringTransaction_emptyRecurringTransaction_shouldThrowException() {
 
-        assertThrows(ApiException.class, () -> this.transactionService.createPrepaymentTransaction(
-                recurringTransactionService.findById(102L)
-        ));
+        assertThrows(ApiException.class,
+                () -> this.transactionService.createFromRecurringTransaction(
+                        recurringTransactionService.findById(102L),
+                        null
+                ));
     }
 
     @Test

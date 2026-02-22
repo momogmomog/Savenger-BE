@@ -27,4 +27,9 @@ public interface TransactionMapper {
 
     Transaction mergeIntoTransaction(EditTransactionDto dto,
             @MappingTarget Transaction transaction);
+
+    void mergeIntoServiceDto(
+            CreateTransactionDto dto,
+            @MappingTarget CreateTransactionServiceDto serviceDto
+    );
 }

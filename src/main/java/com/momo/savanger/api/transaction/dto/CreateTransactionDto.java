@@ -11,6 +11,7 @@ import com.momo.savanger.constraints.NotNull;
 import com.momo.savanger.converter.DateTimeConverter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.Data;
@@ -46,6 +47,6 @@ public class CreateTransactionDto implements IModifyTransactionDto {
     private List<Long> tagIds;
 
     public List<Long> getTagIds() {
-        return Objects.requireNonNullElse(this.tagIds, List.of());
+        return Objects.requireNonNullElse(this.tagIds, new ArrayList<>());
     }
 }

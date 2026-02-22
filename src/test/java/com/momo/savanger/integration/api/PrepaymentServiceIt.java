@@ -83,6 +83,7 @@ public class PrepaymentServiceIt {
         createRecurringTransactionDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
         createRecurringTransactionDto.setType(TransactionType.EXPENSE);
         createRecurringTransactionDto.setBudgetId(1001L);
+        createRecurringTransactionDto.setStartFrom(LocalDateTime.now());
         createRecurringTransactionDto.setCategoryId(1001L);
         createRecurringTransactionDto.setAutoExecute(false);
 

@@ -65,6 +65,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         rTransactionDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
         rTransactionDto.setAmount(BigDecimal.valueOf(20));
         rTransactionDto.setBudgetId(1001L);
+        rTransactionDto.setIncludeInBalance(false);
         rTransactionDto.setAutoExecute(false);
 
         final CreatePrepaymentDto prepaymentDto = new CreatePrepaymentDto();
@@ -97,7 +98,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         super.post(Endpoints.PREPAYMENTS,
                 prepaymentDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(7)),
+                jsonPath("fieldErrors.length()", is(8)),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.type\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
@@ -111,6 +112,8 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
                 jsonPath(
                         "fieldErrors.[?(@.field == \"amount\" && @.constraintName == \"IsBudgetBalanceBigger\")]").exists(),
                 jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringTransaction.includeInBalance\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"ValidPrepaymentDto\")]").exists()
 
         );
@@ -119,6 +122,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         rTransactionDto.setRecurringRule("FRE=DAILY;INTERVAL=1");
         rTransactionDto.setAmount(BigDecimal.valueOf(-20));
         rTransactionDto.setBudgetId(101L);
+        rTransactionDto.setIncludeInBalance(false);
         rTransactionDto.setAutoExecute(false);
 
         super.post(Endpoints.PREPAYMENTS,
@@ -165,7 +169,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testPay_validPayload_shouldPayTransaction() throws Exception {
 
-        super.postOK("/recurring-transaction/1001/pay", null);
+        super.postOK("/prepayments/pay/1001", null);
 
         assertEquals(2, this.transactionRepository.findAll().size());
 
@@ -175,7 +179,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.THIRD_USER_USERNAME)
     public void testPay_invalidBudgetOwner_shouldThrowException() throws Exception {
 
-        super.post("/recurring-transaction/1001/pay",
+        super.post("/prepayments/pay/1001",
                 null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
@@ -191,7 +195,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testCreate_invalidPayload() throws Exception {
 
-        super.post("/recurring-transaction/1002/pay",
+        super.post("/prepayments/pay/1002",
                 null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
@@ -202,11 +206,14 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
 
         );
 
-        super.postOK("/recurring-transaction/1001/pay", null);
+        // 1st payment
+        super.postOK("/prepayments/pay/1001", null);
 
-        super.postOK("/recurring-transaction/1001/pay", null);
+        // 2nd payment - remaining amount should be now 0
+        super.postOK("/prepayments/pay/1001", null);
 
-        super.post("/recurring-transaction/1001/pay",
+        // prepayment is already completed
+        super.post("/prepayments/pay/1001",
                 null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),

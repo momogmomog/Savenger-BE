@@ -26,8 +26,11 @@ public class RecurringRuleServiceIt {
         String recurringRule = "FREQ=DAILY;INTERVAL=1";
         LocalDateTime date = LocalDateTime.of(2025, 11, 6, 13, 27);
 
-        LocalDateTime newDate = this.recurringRuleService.convertRecurringRuleToDate(recurringRule,
-                date);
+        LocalDateTime newDate = this.recurringRuleService.getNextOccurrence(
+                recurringRule,
+                date,
+                date
+        ).get();
 
         assertEquals(date.plusDays(1).toLocalDate(), newDate.toLocalDate());
     }
@@ -39,8 +42,11 @@ public class RecurringRuleServiceIt {
 
         LocalDateTime date = LocalDateTime.of(2025, 11, 6, 13, 27);
 
-        LocalDateTime newDate = this.recurringRuleService.convertRecurringRuleToDate(recurringRule,
-                date);
+        LocalDateTime newDate = this.recurringRuleService.getNextOccurrence(
+                recurringRule,
+                date,
+                date
+        ).get();
 
         LocalDateTime expectedDate = date
                 .with(TemporalAdjusters.next(DayOfWeek.MONDAY));
@@ -55,8 +61,11 @@ public class RecurringRuleServiceIt {
 
         LocalDateTime date = LocalDateTime.of(2025, 11, 6, 13, 27);
 
-        LocalDateTime newDate = this.recurringRuleService.convertRecurringRuleToDate(recurringRule,
-                date);
+        LocalDateTime newDate = this.recurringRuleService.getNextOccurrence(
+                recurringRule,
+                date,
+                date
+        ).get();
 
         LocalDateTime expectedDate = date.plusMonths(1);
 
@@ -70,8 +79,11 @@ public class RecurringRuleServiceIt {
 
         LocalDateTime date = LocalDateTime.of(2025, 11, 6, 13, 27);
 
-        LocalDateTime newDate = this.recurringRuleService.convertRecurringRuleToDate(recurringRule,
-                date);
+        LocalDateTime newDate = this.recurringRuleService.getNextOccurrence(
+                recurringRule,
+                date,
+                date
+        ).get();
 
         LocalDateTime expectedDate = date.plusYears(1);
 
@@ -84,8 +96,11 @@ public class RecurringRuleServiceIt {
         String recurringRule = "FREQ=DAILY;INTERVAL=3";
         LocalDateTime date = LocalDateTime.of(2025, 11, 6, 13, 27);
 
-        LocalDateTime newDate = this.recurringRuleService.convertRecurringRuleToDate(recurringRule,
-                date);
+        LocalDateTime newDate = this.recurringRuleService.getNextOccurrence(
+                recurringRule,
+                date,
+                date
+        ).get();
 
         assertEquals(date.plusDays(3).toLocalDate(), newDate.toLocalDate());
     }
@@ -97,8 +112,11 @@ public class RecurringRuleServiceIt {
 
         LocalDateTime date = LocalDateTime.of(2025, 11, 6, 13, 27);
 
-        LocalDateTime newDate = this.recurringRuleService.convertRecurringRuleToDate(recurringRule,
-                date);
+        LocalDateTime newDate = this.recurringRuleService.getNextOccurrence(
+                recurringRule,
+                date,
+                date
+        ).get();
 
         assertEquals(LocalDateTime.of(2025, 11, 24, 13, 27).toLocalDate(), newDate.toLocalDate());
     }
@@ -110,8 +128,11 @@ public class RecurringRuleServiceIt {
 
         LocalDateTime date = LocalDateTime.of(2025, 11, 6, 13, 27);
 
-        LocalDateTime newDate = this.recurringRuleService.convertRecurringRuleToDate(recurringRule,
-                date);
+        LocalDateTime newDate = this.recurringRuleService.getNextOccurrence(
+                recurringRule,
+                date,
+                date
+        ).get();
 
         assertEquals(LocalDate.of(2026, 2, 6), newDate.toLocalDate());
     }
@@ -123,8 +144,11 @@ public class RecurringRuleServiceIt {
 
         LocalDateTime date = LocalDateTime.of(2025, 11, 6, 13, 27);
 
-        LocalDateTime newDate = this.recurringRuleService.convertRecurringRuleToDate(recurringRule,
-                date);
+        LocalDateTime newDate = this.recurringRuleService.getNextOccurrence(
+                recurringRule,
+                date,
+                date
+        ).get();
 
         LocalDateTime expectedDate = date.plusYears(3);
 

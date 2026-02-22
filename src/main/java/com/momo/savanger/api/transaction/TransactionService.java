@@ -1,6 +1,7 @@
 package com.momo.savanger.api.transaction;
 
 import com.momo.savanger.api.debt.Debt;
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
@@ -22,7 +23,10 @@ public interface TransactionService {
 
     Transaction create(CreateTransactionServiceDto dto, Long userId);
 
-    Transaction createPrepaymentTransaction(RecurringTransaction recurringTransaction);
+    Transaction createFromRecurringTransaction(
+            RecurringTransaction recurringTransaction,
+            CreateTransactionDto transactionOverride
+    );
 
     Page<Transaction> searchTransactions(TransactionSearchQuery query, User user);
 

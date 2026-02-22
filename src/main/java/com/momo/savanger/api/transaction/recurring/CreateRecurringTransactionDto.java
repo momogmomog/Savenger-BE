@@ -9,6 +9,7 @@ import com.momo.savanger.constraints.MinValueZero;
 import com.momo.savanger.constraints.NotNull;
 import com.momo.savanger.constraints.RRule;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import lombok.Data;
@@ -34,6 +35,14 @@ public class CreateRecurringTransactionDto {
     private BigDecimal amount;
 
     private Long categoryId;
+
+    @Length(max = Lengths.MAX_VARCHAR, message = ValidationMessages.TEXT_MUST_BE_BETWEEN)
+    private String comment;
+
+    private LocalDateTime startFrom;
+
+    @NotNull
+    private Boolean includeInBalance;
 
     @NotNull
     @CanAccessBudget

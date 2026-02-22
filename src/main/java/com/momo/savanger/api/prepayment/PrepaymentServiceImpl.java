@@ -64,15 +64,7 @@ public class PrepaymentServiceImpl implements PrepaymentService {
         }
 
         if (rTransaction != null) {
-
             rTransaction.setPrepaymentId(prepayment.getId());
-            rTransaction.setNextDate(this.recurringRuleService
-                    .convertRecurringRuleToDate(
-                            rTransaction.getRecurringRule(),
-                            rTransaction.getCreateDate()
-                    )
-            );
-
             this.recurringTransactionService.updateRecurringTransaction(rTransaction);
         }
 

@@ -12,9 +12,12 @@ import com.momo.savanger.api.util.SortQuery;
 import jakarta.persistence.criteria.Join;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.CollectionUtils;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RecurringTransactionSpecifications {
@@ -32,9 +35,11 @@ public final class RecurringTransactionSpecifications {
         return QuerySpecifications.between(RecurringTransaction_.nextDate, query);
     }
 
-    public static Specification<RecurringTransaction> isAutoExecuted(final boolean isAutoExecuted) {
-        return QuerySpecifications.equalIfPresent(RecurringTransaction_.autoExecute,
-                isAutoExecuted);
+    public static Specification<RecurringTransaction> isAutoExecuted(final Boolean isAutoExecuted) {
+        return QuerySpecifications.equalIfPresent(
+                RecurringTransaction_.autoExecute,
+                isAutoExecuted
+        );
     }
 
     public static Specification<RecurringTransaction> betweenAmount(
@@ -46,7 +51,7 @@ public final class RecurringTransactionSpecifications {
         return QuerySpecifications.equalIfPresent(RecurringTransaction_.prepaymentId, prepaymentId);
     }
 
-    public static Specification<RecurringTransaction> isCompleted(final boolean isCompleted) {
+    public static Specification<RecurringTransaction> isCompleted(final Boolean isCompleted) {
         return QuerySpecifications.equalIfPresent(RecurringTransaction_.completed, isCompleted);
     }
 
@@ -54,8 +59,12 @@ public final class RecurringTransactionSpecifications {
         return QuerySpecifications.equalIfPresent(RecurringTransaction_.categoryId, categoryId);
     }
 
+    public static Specification<RecurringTransaction> categoryIdsIn(final List<Long> categoryIds) {
+        return QuerySpecifications.inIfPresent(RecurringTransaction_.categoryId, categoryIds);
+    }
+
     public static Specification<RecurringTransaction> budgetIdEquals(final Long budgetId) {
-        return QuerySpecifications.equalIfPresent(RecurringTransaction_.budgetId, budgetId);
+        return QuerySpecifications.equal(RecurringTransaction_.budgetId, budgetId);
     }
 
     public static Specification<RecurringTransaction> debtIdEquals(final Long debtId) {
@@ -71,6 +80,18 @@ public final class RecurringTransactionSpecifications {
             final Join<RecurringTransaction, Tag> join = getOrCreateJoin(root,
                     RecurringTransaction_.tags);
             return criteriaBuilder.equal(join.get(Tag_.id), tagId);
+        };
+    }
+
+    public static Specification<RecurringTransaction> tagsContain(final Collection<Long> tagIds) {
+        if (CollectionUtils.isEmpty(tagIds)) {
+            return Specification.where(null);
+        }
+
+        return (root, query, criteriaBuilder) -> {
+            final Join<RecurringTransaction, Tag> join = getOrCreateJoin(root,
+                    RecurringTransaction_.tags);
+            return join.get(Tag_.id).in(tagIds);
         };
     }
 

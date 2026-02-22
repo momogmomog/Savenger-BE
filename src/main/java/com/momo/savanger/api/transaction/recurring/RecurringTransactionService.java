@@ -1,6 +1,7 @@
 package com.momo.savanger.api.transaction.recurring;
 
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 
 public interface RecurringTransactionService {
 
@@ -14,6 +15,9 @@ public interface RecurringTransactionService {
 
     boolean recurringTransactionExists(Long rTransactionId, Long budgetId);
 
-    void updateRecurringTransaction(RecurringTransaction recurringTransaction);
+    RecurringTransaction updateRecurringTransaction(RecurringTransaction recurringTransaction);
 
+    void advanceRecurringTransaction(RecurringTransaction recurringTransaction);
+
+    Page<RecurringTransaction> search(RecurringTransactionQuery query);
 }
