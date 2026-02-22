@@ -42,7 +42,7 @@ public class RecurringTransaction extends Audit {
     @Column(unique = true, nullable = false)
     private Long id;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private TransactionType type;
 
