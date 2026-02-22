@@ -14,8 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PagedModel;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,6 +45,23 @@ public class RecurringTransactionController {
             @Valid @RequestBody CreateRecurringTransactionDto dto) {
         return this.recurringTransactionMapper.toRecurringTransactionDto(
                 this.recurringTransactionService.create(dto)
+        );
+    }
+
+    @GetMapping(Endpoints.RECURRING_TRANSACTION)
+    public RecurringTransactionDto getRecurringTransaction(
+            @PathVariable @ValidRecurringTransaction Long id) {
+        return this.recurringTransactionMapper.toRecurringTransactionDto(
+                this.recurringTransactionService.findByIdFetchAll(id)
+        );
+    }
+
+    @PutMapping(Endpoints.RECURRING_TRANSACTION)
+    public RecurringTransactionDto editRecurringTransaction(
+            @PathVariable @ValidRecurringTransaction Long id,
+            @Valid @RequestBody CreateRecurringTransactionDto dto) {
+        return this.recurringTransactionMapper.toRecurringTransactionDto(
+                this.recurringTransactionService.edit(id, dto)
         );
     }
 

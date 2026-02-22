@@ -32,6 +32,7 @@ public enum ApiErrorCode {
     ERR_0022(HttpStatus.BAD_REQUEST, "Cannot generate initial date from RRule"),
     ERR_0023(HttpStatus.PRECONDITION_FAILED,
             "Cannot proceed prepayment due to completed recurring transaction"),
+    ERR_0024(HttpStatus.BAD_REQUEST, "Budget field is not updatable!"),
     ;
 
     public final HttpStatus status;

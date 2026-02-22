@@ -6,6 +6,7 @@ import com.momo.savanger.constants.EntityGraphs;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +35,35 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
         // Test the next date generation, both successful and failing
         // Test tags if they are saved
         final RecurringTransaction recurringTransaction = this.recurringTransactionMapper
-                .ToRecurringTransaction(dto);
+                .toRecurringTransaction(dto);
 
         recurringTransaction.setOccurrences(0);
         recurringTransaction.setCompleted(false);
+
+        return this.upsert(recurringTransaction, dto);
+    }
+
+    @Override
+    @Transactional
+    public RecurringTransaction edit(
+            Long recurringTransactionId,
+            CreateRecurringTransactionDto dto) {
+        final RecurringTransaction existingRTransaction = this.findByIdFetchAll(
+                recurringTransactionId);
+
+        if (!existingRTransaction.getBudgetId().equals(dto.getBudgetId())) {
+            throw ApiException.with(ApiErrorCode.ERR_0024);
+        }
+
+        this.recurringTransactionMapper.mergeIntoRecurringTransaction(dto, existingRTransaction);
+
+        return this.upsert(existingRTransaction, dto);
+    }
+
+    private RecurringTransaction upsert(
+            RecurringTransaction recurringTransaction,
+            CreateRecurringTransactionDto dto
+    ) {
         if (recurringTransaction.getStartFrom() == null) {
             recurringTransaction.setStartFrom(LocalDateTime.now());
         }
@@ -50,11 +76,19 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
                 ).orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0022))
         );
 
+        if (recurringTransaction.getTags() == null) {
+            recurringTransaction.setTags(new ArrayList<>());
+        }
+
+        recurringTransaction.getTags().clear();
+
         if (!dto.getTagIds().isEmpty()) {
-            recurringTransaction.setTags(this.tagService.findByBudgetAndIdContaining(
-                    dto.getTagIds(),
-                    recurringTransaction.getBudgetId()
-            ));
+            recurringTransaction.getTags().addAll(
+                    this.tagService.findByBudgetAndIdContaining(
+                            dto.getTagIds(),
+                            recurringTransaction.getBudgetId()
+                    )
+            );
         }
 
         this.recurringTransactionRepository.saveAndFlush(recurringTransaction);
