@@ -7,6 +7,8 @@ public interface RecurringTransactionService {
 
     RecurringTransaction create(CreateRecurringTransactionDto dto);
 
+    RecurringTransaction edit(Long recurringTransactionId, CreateRecurringTransactionDto dto);
+
     RecurringTransaction findById(Long id);
 
     RecurringTransaction findByIdFetchAll(Long id);
