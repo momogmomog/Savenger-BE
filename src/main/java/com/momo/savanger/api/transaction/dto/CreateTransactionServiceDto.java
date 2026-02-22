@@ -3,6 +3,7 @@ package com.momo.savanger.api.transaction.dto;
 import com.momo.savanger.api.transaction.TransactionType;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.Data;
@@ -31,7 +32,7 @@ public class CreateTransactionServiceDto {
     private List<Long> tagIds;
 
     public List<Long> getTagIds() {
-        return Objects.requireNonNullElse(this.tagIds, List.of());
+        return Objects.requireNonNullElse(this.tagIds, new ArrayList<>());
     }
 
     public static CreateTransactionServiceDto compensateDto(BigDecimal amount, Long budgetId) {

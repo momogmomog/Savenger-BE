@@ -26,6 +26,21 @@ public class RecurringRuleServiceImpl implements RecurringRuleService {
             LocalDateTime originalStartDate,
             LocalDateTime currentNextDate
     ) {
+       return this.getNextOccurrence(
+               recurringRule,
+               originalStartDate,
+               currentNextDate,
+               false
+       );
+    }
+
+    @Override
+    public Optional<LocalDateTime> getNextOccurrence(
+            String recurringRule,
+            LocalDateTime originalStartDate,
+            LocalDateTime currentNextDate,
+            boolean allowCurrentNextDate
+    ) {
         //TODO: TEST scenarios (skip those that are already tested):
         // Test RRULE with 1 occurrence for a specific date. Happens only once on may 5th 2026 and never repeats. test with few examples.
         // Test RRULE with 3 occurrences max, meaning that passing current next date after the 3rd occurrence will return empty.
@@ -47,7 +62,15 @@ public class RecurringRuleServiceImpl implements RecurringRuleService {
             while (iterator.hasNext()) {
                 final DateTime next = iterator.nextDateTime();
 
-                if (next.getTimestamp() > currentNextMillis) {
+                final boolean acceptable;
+                final long nextTimestamp = next.getTimestamp();
+                if (allowCurrentNextDate) {
+                    acceptable = nextTimestamp >= currentNextMillis;
+                } else {
+                    acceptable = nextTimestamp > currentNextMillis;
+                }
+
+                if (acceptable) {
                     final LocalDateTime newNextDate = LocalDateTime.ofInstant(
                             Instant.ofEpochMilli(next.getTimestamp()),
                             ZoneId.systemDefault()

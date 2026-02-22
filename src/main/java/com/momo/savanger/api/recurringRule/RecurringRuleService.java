@@ -11,4 +11,10 @@ public interface RecurringRuleService {
             LocalDateTime currentNextDate
     );
 
+    Optional<LocalDateTime> getNextOccurrence(
+            String recurringRule,
+            LocalDateTime originalStartDate,
+            LocalDateTime currentNextDate,
+            boolean allowCurrentNextDate
+    );
 }

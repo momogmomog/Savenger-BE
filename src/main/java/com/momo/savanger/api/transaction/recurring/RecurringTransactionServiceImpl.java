@@ -45,7 +45,8 @@ public class RecurringTransactionServiceImpl implements RecurringTransactionServ
                 this.recurringRuleService.getNextOccurrence(
                         recurringTransaction.getRecurringRule(),
                         recurringTransaction.getStartFrom(),
-                        recurringTransaction.getStartFrom()
+                        recurringTransaction.getStartFrom(),
+                        true
                 ).orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0022))
         );
 
