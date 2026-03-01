@@ -3,6 +3,7 @@ package com.momo.savanger.api.recurringRule;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
@@ -26,12 +27,12 @@ public class RecurringRuleServiceImpl implements RecurringRuleService {
             LocalDateTime originalStartDate,
             LocalDateTime currentNextDate
     ) {
-       return this.getNextOccurrence(
-               recurringRule,
-               originalStartDate,
-               currentNextDate,
-               false
-       );
+        return this.getNextOccurrence(
+                recurringRule,
+                originalStartDate,
+                currentNextDate,
+                false
+        );
     }
 
     @Override
@@ -49,25 +50,32 @@ public class RecurringRuleServiceImpl implements RecurringRuleService {
         try {
             final RecurrenceRule rule = new RecurrenceRule(recurringRule);
 
-            final long startMillis = originalStartDate.atZone(ZoneId.systemDefault()).toInstant()
+            final long startMillis = originalStartDate
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant()
                     .toEpochMilli();
             final DateTime startDateTime = new DateTime(TimeZone.getDefault(), startMillis);
 
-            final long currentNextMillis = currentNextDate.atZone(ZoneId.systemDefault())
-                    .toInstant()
-                    .toEpochMilli();
+            final LocalDate targetLocalDate = currentNextDate.toLocalDate();
 
             final RecurrenceRuleIterator iterator = rule.iterator(startDateTime);
 
             while (iterator.hasNext()) {
                 final DateTime next = iterator.nextDateTime();
+                // Will leave here for future debugging in case needed.
+//                System.out.println("Suggesting");
+//                System.out.println(next);
+
+                final LocalDate nextLocalDate = Instant
+                        .ofEpochMilli(next.getTimestamp())
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
 
                 final boolean acceptable;
-                final long nextTimestamp = next.getTimestamp();
                 if (allowCurrentNextDate) {
-                    acceptable = nextTimestamp >= currentNextMillis;
+                    acceptable = !nextLocalDate.isBefore(targetLocalDate);
                 } else {
-                    acceptable = nextTimestamp > currentNextMillis;
+                    acceptable = nextLocalDate.isAfter(targetLocalDate);
                 }
 
                 if (acceptable) {
@@ -80,7 +88,6 @@ public class RecurringRuleServiceImpl implements RecurringRuleService {
             }
 
             return Optional.empty();
-
         } catch (InvalidRecurrenceRuleException exception) {
             log.error("Error during next occurrence retrieval.", exception);
             throw ApiException.with(ApiErrorCode.ERR_0017);
