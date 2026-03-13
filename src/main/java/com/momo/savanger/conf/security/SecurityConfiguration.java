@@ -32,6 +32,9 @@ public class SecurityConfiguration {
 
     private final ObjectMapper objectMapper;
 
+    @Value("${authtoken.clear.on.login}")
+    private final boolean clearOnLogin;
+
     @Bean
     public SecurityFilterChain configureSecurity(HttpSecurity http,
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -52,7 +55,8 @@ public class SecurityConfiguration {
         final TokenBasicAuthenticationFilter basicAuthenticationFilter = new TokenBasicAuthenticationFilter(
                 authenticationManager,
                 this.authTokenService,
-                this.authTokenHeaderName
+                this.authTokenHeaderName,
+                this.clearOnLogin
         );
 
         final TokenAuthenticationFilter tokenFilter = new TokenAuthenticationFilter(

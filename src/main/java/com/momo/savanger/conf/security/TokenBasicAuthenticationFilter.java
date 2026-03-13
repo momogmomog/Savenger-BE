@@ -19,12 +19,16 @@ public class TokenBasicAuthenticationFilter extends BasicAuthenticationFilter {
 
     private final String authTokenHeaderName;
 
+    private final boolean clearOnLogin;
+
     public TokenBasicAuthenticationFilter(AuthenticationManager authenticationManager,
             AuthTokenService authTokenService,
-            String authTokenHeaderName) {
+            String authTokenHeaderName,
+            boolean clearOnLogin) {
         super(authenticationManager);
         this.authTokenService = authTokenService;
         this.authTokenHeaderName = authTokenHeaderName;
+        this.clearOnLogin = clearOnLogin;
     }
 
     @Override
@@ -42,7 +46,9 @@ public class TokenBasicAuthenticationFilter extends BasicAuthenticationFilter {
         final User user = (User) authResult.getPrincipal();
 
         //Remove previous tokens.
-        this.authTokenService.findByUser(user).forEach(this.authTokenService::remove);
+        if (this.clearOnLogin) {
+            this.authTokenService.findByUser(user).forEach(this.authTokenService::remove);
+        }
 
         //Generate new token.
         final AuthToken newToken = this.authTokenService.createToken(user);
