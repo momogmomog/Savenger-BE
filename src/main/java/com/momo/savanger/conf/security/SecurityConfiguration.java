@@ -32,7 +32,7 @@ public class SecurityConfiguration {
 
     private final ObjectMapper objectMapper;
 
-    @Value("${authtoken.clear.on.login}")
+    @Value("${authtoken.clear.on.login:false}")
     private final boolean clearOnLogin;
 
     @Bean

@@ -84,6 +84,8 @@ public class Transaction {
 
     private Long transferTransactionId;
 
+    private Long revisionId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "budgetId", insertable = false, updatable = false)
     private Budget budget;

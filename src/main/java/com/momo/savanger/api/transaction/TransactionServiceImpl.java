@@ -334,8 +334,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void reviseTransactions(Long budgetId) {
-        this.transactionRepository.setRevisedTrue(budgetId);
+    public void reviseTransactions(Long budgetId, Long revisionId) {
+        this.transactionRepository.setRevisionId(budgetId, revisionId);
     }
 
     @Override
@@ -395,4 +395,10 @@ public class TransactionServiceImpl implements TransactionService {
 
         return this.transactionRepository.sumAndCount(specification);
     }
+
+    @Override
+    public List<Transaction> getTransactionsByRevisionId(Long revisionId) {
+        return this.transactionRepository.findByRevisionId(revisionId);
+    }
+
 }
