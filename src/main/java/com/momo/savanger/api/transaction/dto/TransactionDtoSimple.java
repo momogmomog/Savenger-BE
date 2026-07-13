@@ -18,7 +18,7 @@ public class TransactionDtoSimple {
 
     private String comment;
 
-    private Boolean revised;
+    private Long revisionId;
 
     private Long userId;
 

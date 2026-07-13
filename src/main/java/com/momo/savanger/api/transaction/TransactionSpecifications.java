@@ -42,8 +42,8 @@ public final class TransactionSpecifications {
         return QuerySpecifications.containsIfPresent(Transaction_.comment, comment);
     }
 
-    public static Specification<Transaction> maybeRevised(final Boolean revised) {
-        return QuerySpecifications.equalIfPresent(Transaction_.revised, revised);
+    public static Specification<Transaction> maybeRevised() {
+        return ((root, query, criteriaBuilder) -> root.get(Transaction_.revisionId).isNotNull());
     }
 
     public static Specification<Transaction> categoryIdEquals(final Long categoryId) {

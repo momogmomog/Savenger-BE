@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface TransactionRepository extends JpaRepository<Transaction, Long>,
         TransactionRepositoryFragment {
 
-    boolean existsByIdAndRevisedFalse(Long id);
+    boolean existsByIdAndRevisionIdNotNull(Long id);
 
     List<Transaction> findByTransferTransactionId(Long transferTransactionId);
 
@@ -33,14 +33,14 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     boolean existOwnerOrParticipant(Long transactionId, Long userId);
 
     @Query("select coalesce(sum(t.amount), 0)  from Transaction t "
-            + " where t.budgetId = :budgetId and t.revised = false "
+            + " where t.budgetId = :budgetId and t.revisionId is null"
             + " and t.type = :type"
             + " and t.debtId is null ")
     BigDecimal sumAmountByBudgetIdAndTypeOfNonRevisedNonDebt(Long budgetId,
             TransactionType type);
 
     @Query("select coalesce(sum(t.amount), 0) from Transaction t "
-            + " where t.budgetId = :budgetId and t.revised = false and t.type = :type and t.debtId is not null ")
+            + " where t.budgetId = :budgetId and t.revisionId is null and t.type = :type and t.debtId is not null ")
     BigDecimal sumDebtAmountByBudgetIdAndTypeOfNonRevised(Long budgetId, TransactionType type);
 
     @Query("select coalesce(sum(t.amount), 0) from Transaction t where t.type = :type and t.prepaymentId = :prepaymentId")

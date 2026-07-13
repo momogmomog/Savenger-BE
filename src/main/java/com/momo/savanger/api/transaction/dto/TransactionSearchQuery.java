@@ -33,13 +33,13 @@ public class TransactionSearchQuery {
 
     private String comment;
 
-    private Boolean revised;
-
     private List<Long> categoryIds;
 
     private List<Long> userIds;
 
     private Long debtId;
+
+    private Long revisionId;
 
     private Boolean noDebtTransactions;
 
@@ -58,10 +58,10 @@ public class TransactionSearchQuery {
         query.setAmount(q.getAmount());
         query.setDateCreated(q.getDateCreated());
         query.setComment(q.getComment());
-        query.setRevised(q.getRevised());
         query.setCategoryIds(q.getCategoryIds());
         query.setUserIds(q.getUserIds());
         query.setDebtId(q.getDebtId());
+        query.setRevisionId(q.getRevisionId());
         query.setNoDebtTransactions(q.getNoDebtTransactions());
         query.setBudgetId(q.getBudgetId());
         query.setTagIds(q.getTagIds());

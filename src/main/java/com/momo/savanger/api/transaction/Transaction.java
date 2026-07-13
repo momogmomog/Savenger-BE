@@ -60,9 +60,6 @@ public class Transaction {
 
     private String comment;
 
-    @Column(nullable = false)
-    private Boolean revised;
-
     private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
