@@ -73,7 +73,7 @@ public class RevisionServiceIt {
         dto.setBalance(BigDecimal.valueOf(23.32));
         dto.setBudgetId(1001L);
 
-        assertEquals(BigDecimal.valueOf(123.32).setScale(2, RoundingMode.HALF_DOWN),
+        assertEquals(BigDecimal.valueOf(540).setScale(2, RoundingMode.HALF_DOWN),
                 this.transactionService.getEarningsAmount(dto.getBudgetId())
                         .setScale(2, RoundingMode.HALF_DOWN));
 
@@ -96,11 +96,11 @@ public class RevisionServiceIt {
         assertEquals(budget.getDateStarted().truncatedTo(ChronoUnit.SECONDS),
                 revision.getRevisionDate().truncatedTo(ChronoUnit.SECONDS));
         assertEquals(false, revision.getAutoRevise());
-        assertEquals(BigDecimal.valueOf(123.32),
+        assertEquals(BigDecimal.valueOf(540).setScale(2, RoundingMode.HALF_DOWN),
                 revision.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.valueOf(45.00).setScale(2, RoundingMode.HALF_DOWN),
                 revision.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(-78.00).setScale(2, RoundingMode.HALF_DOWN),
+        assertEquals(BigDecimal.valueOf(-494.68).setScale(2, RoundingMode.HALF_DOWN),
                 revision.getCompensationAmount().setScale(2, RoundingMode.HALF_DOWN));
     }
 
@@ -125,11 +125,11 @@ public class RevisionServiceIt {
         assertEquals(budget.getDateStarted().truncatedTo(ChronoUnit.SECONDS),
                 revision.getRevisionDate().truncatedTo(ChronoUnit.SECONDS));
         assertEquals(false, revision.getAutoRevise());
-        assertEquals(BigDecimal.valueOf(123.32),
+        assertEquals(BigDecimal.valueOf(540).setScale(2, RoundingMode.HALF_DOWN),
                 revision.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.valueOf(45.00).setScale(2, RoundingMode.HALF_DOWN),
                 revision.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(138.00).setScale(2, RoundingMode.HALF_DOWN),
+        assertEquals(BigDecimal.valueOf(-278.68).setScale(2, RoundingMode.HALF_DOWN),
                 revision.getCompensationAmount().setScale(2, RoundingMode.HALF_DOWN));
     }
 
@@ -146,14 +146,14 @@ public class RevisionServiceIt {
 
         Budget budget = this.budgetService.findById(revision.getBudgetId());
 
-        assertEquals(BigDecimal.valueOf(101.32),
+        assertEquals(BigDecimal.valueOf(518).setScale(2, RoundingMode.HALF_DOWN),
                 revision.getBalance().setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(1001L, revision.getBudgetId());
         assertEquals(budget.getBudgetCap(), revision.getBudgetCap());
         assertEquals(budget.getDateStarted().truncatedTo(ChronoUnit.SECONDS),
                 revision.getRevisionDate().truncatedTo(ChronoUnit.SECONDS));
         assertEquals(false, revision.getAutoRevise());
-        assertEquals(BigDecimal.valueOf(123.32),
+        assertEquals(BigDecimal.valueOf(540).setScale(2, RoundingMode.HALF_DOWN),
                 revision.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.valueOf(45.00).setScale(2, RoundingMode.HALF_DOWN),
                 revision.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
@@ -194,15 +194,25 @@ public class RevisionServiceIt {
         query.setSort(sortQuery);
         query.setPage(pageQuery);
         query.setBudgetId(dto.getBudgetId());
-        query.setRevised(true);
+        query.setRevisionId(1001L);
 
         Page<Transaction> revisedTransactions = this.transactionService.searchTransactions(query,
                 user);
 
-        assertEquals(1, revisedTransactions.getTotalElements());
+        assertEquals(2, revisedTransactions.getTotalElements());
+        assertEquals(1001, revisedTransactions.getContent().getFirst().getRevisionId());
+        assertEquals(1001, revisedTransactions.getContent().get(1).getRevisionId());
 
         this.revisionService.create(dto);
 
+        query.setRevisionId(1L);
+        revisedTransactions = this.transactionService.searchTransactions(query, user);
+
+        assertEquals(2, revisedTransactions.getTotalElements());
+        assertEquals(1, revisedTransactions.getContent().getFirst().getRevisionId());
+        assertEquals(1, revisedTransactions.getContent().get(1).getRevisionId());
+
+        query.setRevisionId(null);
         revisedTransactions = this.transactionService.searchTransactions(query, user);
 
         assertEquals(4, revisedTransactions.getTotalElements());

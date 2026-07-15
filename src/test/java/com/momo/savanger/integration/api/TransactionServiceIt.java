@@ -146,7 +146,7 @@ public class TransactionServiceIt {
         assertEquals(1001L, transaction.getCategoryId());
         assertEquals(1, transaction.getTags().size());
         assertEquals(user.getId(), transaction.getUserId());
-        assertFalse(transaction.getRevised());
+        //:TODO Add revision id check
     }
 
     @Test
@@ -181,7 +181,7 @@ public class TransactionServiceIt {
 
         TransactionSearchQuery query = new TransactionSearchQuery();
 
-        PageQuery pageQuery = new PageQuery(0, 3);
+        PageQuery pageQuery = new PageQuery(0, 2);
 
         SortQuery sortQuery = new SortQuery("ds", SortDirection.ASC);
 
@@ -196,21 +196,20 @@ public class TransactionServiceIt {
         Page<Transaction> transactions = this.transactionService.searchTransactions(query,
                 user);
 
-        assertEquals(3, transactions.getTotalElements());
+        assertEquals(2, transactions.getTotalElements());
 
         assertEquals(1001L, transactions.getContent().getFirst().getId());
         assertEquals(1002L, transactions.getContent().get(1).getId());
-        assertEquals(1003L, transactions.getContent().get(2).getId());
 
         //Test page 2
-        pageQuery.setPageNumber(2);
+        pageQuery.setPageNumber(1);
         pageQuery.setPageSize(1);
 
         query.setPage(pageQuery);
 
         transactions = this.transactionService.searchTransactions(query, user);
 
-        assertEquals(1003L, transactions.getContent().getFirst().getId());
+        assertEquals(1002L, transactions.getContent().getFirst().getId());
 
         //Test page 0
 
@@ -226,7 +225,7 @@ public class TransactionServiceIt {
         pageQuery.setPageSize(3);
 
         // Search by budgetId, Type and Revised
-        query.setRevised(true);
+        query.setRevisionId(1001L);
 
         sortQuery = new SortQuery("id", SortDirection.ASC);
 
@@ -234,10 +233,11 @@ public class TransactionServiceIt {
 
         transactions = this.transactionService.searchTransactions(query, user);
 
-        assertEquals(1, transactions.getTotalElements());
-        assertEquals(1003L, transactions.getContent().getFirst().getId());
+        assertEquals(2, transactions.getTotalElements());
+        assertEquals(1001L, transactions.getContent().getFirst().getId());
+        assertEquals(1002L, transactions.getContent().get(1).getId());
 
-        query.setRevised(null);
+        query.setRevisionId(1001L);
 
         // Search by budgetId, Type and comment
         query.setComment("Hrana");
@@ -282,6 +282,8 @@ public class TransactionServiceIt {
         assertEquals(1002L, transactions.getContent().getFirst().getId());
 
         // Search by budgetId, type, amount, date and categoryId
+        this.transactionService.reviseTransactions(1001L, 1001L);
+
         query.setCategoryIds(List.of(1002L));
         amount = new BetweenQuery<>(BigDecimal.ZERO, BigDecimal.valueOf(600));
         query.setAmount(amount);
@@ -377,11 +379,13 @@ public class TransactionServiceIt {
 
     }
 
+
+    //This get only not revised transactions
     @Test
     public void testGetEarningsAmount_validId_shouldReturnEarningsAmount() {
         BigDecimal earningsAmount = this.transactionService.getEarningsAmount(1001L);
 
-        assertEquals(BigDecimal.valueOf(123.32),
+        assertEquals(BigDecimal.valueOf(540.00).setScale(2, RoundingMode.HALF_DOWN),
                 earningsAmount.setScale(2, RoundingMode.HALF_DOWN));
     }
 

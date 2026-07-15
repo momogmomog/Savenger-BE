@@ -1,2 +1,2 @@
 DELETE
-FROM transactions;
+FROM prepayments;

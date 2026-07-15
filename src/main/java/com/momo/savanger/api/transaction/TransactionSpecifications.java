@@ -46,6 +46,10 @@ public final class TransactionSpecifications {
         return ((root, query, criteriaBuilder) -> root.get(Transaction_.revisionId).isNotNull());
     }
 
+    public static Specification<Transaction> revisionIdEquals(final Long revisionId) {
+        return QuerySpecifications.equalIfPresent(Transaction_.revisionId, revisionId);
+    }
+
     public static Specification<Transaction> categoryIdEquals(final Long categoryId) {
         return QuerySpecifications.equalIfPresent(Transaction_.categoryId, categoryId);
     }

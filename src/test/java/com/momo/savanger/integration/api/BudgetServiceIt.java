@@ -53,6 +53,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Sql("classpath:/sql/category-it-data.sql")
 @Sql("classpath:/sql/transaction-it-data.sql")
 @Sql("classpath:/sql/revision-it-data.sql")
+@Sql("classpath:/sql/prepayment-it-data.sql")
+@Sql("classpath:/sql/debt/debt-it-data.sql")
+@Sql(value = "classpath:/sql/debt/del-debt-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/del-prepayment-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-revision-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-transaction-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(value = "classpath:/sql/del-category-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
@@ -417,14 +421,14 @@ public class BudgetServiceIt {
         BudgetStatistics statistics = this.budgetService.getStatistics(1001L);
 
         assertNotNull(statistics);
-        assertEquals(BigDecimal.valueOf(123.32),
+        assertEquals(BigDecimal.valueOf(540.00).setScale(2, RoundingMode.HALF_DOWN),
                 statistics.getEarningsAmount().setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.valueOf(45.00).setScale(2, RoundingMode.HALF_DOWN),
                 statistics.getExpensesAmount().setScale(2, RoundingMode.HALF_DOWN));
-        assertEquals(BigDecimal.valueOf(101.32),
+        assertEquals(BigDecimal.valueOf(518).setScale(2, RoundingMode.HALF_DOWN),
                 statistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.ZERO, statistics.getDebtLendedAmount());
-        assertEquals(BigDecimal.ZERO, statistics.getDebtReceivedAmount());
+        assertEquals(BigDecimal.valueOf(302.09), statistics.getDebtReceivedAmount());
     }
 
     @Test
@@ -494,7 +498,7 @@ public class BudgetServiceIt {
         assertEquals(1001L, statistics.getBudget().getId());
         assertEquals("Food", statistics.getBudget().getBudgetName());
 
-        assertEquals(BigDecimal.valueOf(101.32), statistics.getRealBalance());
+        assertEquals(BigDecimal.valueOf(620.09), statistics.getRealBalance());
     }
 
     @Test
