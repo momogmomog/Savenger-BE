@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.context.jdbc.SqlMergeMode.MergeMode.MERGE;
@@ -146,7 +147,7 @@ public class TransactionServiceIt {
         assertEquals(1001L, transaction.getCategoryId());
         assertEquals(1, transaction.getTags().size());
         assertEquals(user.getId(), transaction.getUserId());
-        //:TODO Add revision id check
+        assertNull(transaction.getRevisionId());
     }
 
     @Test
@@ -661,6 +662,21 @@ public class TransactionServiceIt {
     public void testExistByIdAndRevisedFalse_invalid() {
 
         assertFalse(this.transactionService.existsByIdAndRevisedFalse(2001L));
+    }
+
+    @Test
+    public void testGetTransactionsByRevisionId_validId() {
+        List<Transaction> transaction = this.transactionService.getTransactionsByRevisionId(1001L);
+
+        assertEquals(2, transaction.size());
+    }
+
+    @Test
+    public void testGetTransactionsByRevisionId_invalidId() {
+        List<Transaction> transaction = this.transactionService.getTransactionsByRevisionId(
+                109901L);
+
+        assertEquals(0, transaction.size());
     }
 
 
