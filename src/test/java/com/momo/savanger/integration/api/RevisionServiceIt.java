@@ -203,14 +203,14 @@ public class RevisionServiceIt {
         assertEquals(1001, revisedTransactions.getContent().getFirst().getRevisionId());
         assertEquals(1001, revisedTransactions.getContent().get(1).getRevisionId());
 
-        this.revisionService.create(dto);
+        Revision revision = this.revisionService.create(dto);
 
-        query.setRevisionId(1L);
+        query.setRevisionId(revision.getId());
         revisedTransactions = this.transactionService.searchTransactions(query, user);
 
         assertEquals(2, revisedTransactions.getTotalElements());
-        assertEquals(1, revisedTransactions.getContent().getFirst().getRevisionId());
-        assertEquals(1, revisedTransactions.getContent().get(1).getRevisionId());
+        assertEquals(revision.getId(), revisedTransactions.getContent().getFirst().getRevisionId());
+        assertEquals(revision.getId(), revisedTransactions.getContent().get(1).getRevisionId());
 
         query.setRevisionId(null);
         revisedTransactions = this.transactionService.searchTransactions(query, user);
