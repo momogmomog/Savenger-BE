@@ -94,4 +94,8 @@ public class Transaction {
             inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
     private List<Tag> tags;
 
+
+    public boolean isRevised() {
+        return this.revisionId != null;
+    }
 }

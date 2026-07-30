@@ -20,9 +20,16 @@ public class TransactionDtoSimple {
 
     private Long revisionId;
 
+    private boolean revised;
+
     private Long userId;
 
     private Long categoryId;
 
     private Long budgetId;
+
+
+    public boolean isRevised() {
+        return this.revisionId != null;
+    }
 }

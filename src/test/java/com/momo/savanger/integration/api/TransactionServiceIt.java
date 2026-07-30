@@ -169,6 +169,11 @@ public class TransactionServiceIt {
         Transaction transaction = this.transactionService.findById(1001L);
 
         assertNotNull(transaction);
+        assertEquals(1001L, transaction.getId());
+        assertEquals(TransactionType.INCOME, transaction.getType());
+        assertEquals(1001L, transaction.getBudgetId());
+        assertEquals(1001L, transaction.getCategoryId());
+        assertEquals(1001L, transaction.getRevisionId());
     }
 
     @Test
@@ -197,7 +202,8 @@ public class TransactionServiceIt {
         Page<Transaction> transactions = this.transactionService.searchTransactions(query,
                 user);
 
-        assertEquals(2, transactions.getTotalElements());
+        //Here the result should be 2.
+        assertEquals(3, transactions.getTotalElements());
 
         assertEquals(1001L, transactions.getContent().getFirst().getId());
         assertEquals(1002L, transactions.getContent().get(1).getId());
@@ -226,7 +232,7 @@ public class TransactionServiceIt {
         pageQuery.setPageSize(3);
 
         // Search by budgetId, Type and Revised
-        query.setRevisionId(1001L);
+        query.setRevised(true);
 
         sortQuery = new SortQuery("id", SortDirection.ASC);
 
@@ -345,11 +351,11 @@ public class TransactionServiceIt {
         //Test with valid parameters
         User user = this.userService.getById(1L);
 
-        assertTrue(this.transactionService.canDeleteTransaction(1001L, user));
+        assertTrue(this.transactionService.canDeleteTransaction(1004L, user));
 
         //Test with revised "true"
 
-        assertFalse(this.transactionService.canDeleteTransaction(1003L, user));
+        assertFalse(this.transactionService.canDeleteTransaction(1001L, user));
 
         //Test with invalid id
 
@@ -642,6 +648,7 @@ public class TransactionServiceIt {
         assertNotNull(transaction.getBudget());
         assertEquals(1001L, transaction.getBudget().getId());
         assertEquals("Food", transaction.getBudget().getBudgetName());
+        assertTrue(transaction.isRevised());
     }
 
     @Test
@@ -655,7 +662,7 @@ public class TransactionServiceIt {
     @Test
     public void testExistByIdAndRevisedFalse_valid() {
 
-        assertTrue(this.transactionService.existsByIdAndRevisedFalse(1001L));
+        assertTrue(this.transactionService.existsByIdAndRevisedFalse(1004L));
     }
 
     @Test

@@ -9,4 +9,8 @@ on t.revised = true
     set t.revision_id = r.id;
 
 alter table transactions
+drop
+column revised;
+
+alter table transactions
     add constraint FK_Revisions_Transactions foreign key (revision_id) references revisions (id);

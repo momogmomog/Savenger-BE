@@ -260,7 +260,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .and(TransactionSpecifications.betweenDate(query.getDateCreated()))
                 .and(TransactionSpecifications.categoryIdContains(query.getCategoryIds()))
                 .and(TransactionSpecifications.typeEquals(query.getType()))
-                .and(TransactionSpecifications.maybeRevised())
+                .and(TransactionSpecifications.maybeRevised(query.getRevised()))
                 .and(TransactionSpecifications.revisionIdEquals(query.getRevisionId()))
                 .and(TransactionSpecifications.userIdContains(query.getUserIds()))
                 .and(TransactionSpecifications.debtIdEquals(query.getDebtId()))
@@ -291,7 +291,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Boolean existsByIdAndRevisedFalse(Long id) {
-        return this.transactionRepository.existsByIdAndRevisionIdNotNull(id);
+        return this.transactionRepository.existsByIdAndRevisionIdNull(id);
     }
 
     @Override
@@ -299,8 +299,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         final TransferTransactionPair pair = this.getTransferTransactionPair(transferTransactionId);
 
-        if (pair.getSourceTransaction().getRevisionId() != null
-                || pair.getReceiverTransaction().getRevisionId() != null) {
+        if (pair.getSourceTransaction().isRevised()
+                || pair.getReceiverTransaction().isRevised()) {
             throw ApiException.with(ApiErrorCode.ERR_0021);
         }
 
@@ -319,7 +319,7 @@ public class TransactionServiceImpl implements TransactionService {
         final Specification<Transaction> specification = TransactionSpecifications
                 .idEquals(transactionId)
                 .and(TransactionSpecifications.userIdEquals(user.getId()))
-                .and(TransactionSpecifications.maybeRevised())
+                .and(TransactionSpecifications.maybeRevised(false))
                 .and(TransactionSpecifications.noDebtTransactions(true))
                 .and(TransactionSpecifications.noPrepaymentTransaction())
                 .and(TransactionSpecifications.noTransferTransaction());

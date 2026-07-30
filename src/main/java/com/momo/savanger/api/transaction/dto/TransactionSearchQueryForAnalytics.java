@@ -34,6 +34,8 @@ public class TransactionSearchQueryForAnalytics {
 
     private Long revisionId;
 
+    private Boolean revised;
+
     private Boolean noDebtTransactions;
 
     @NotNull

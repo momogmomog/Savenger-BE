@@ -9,13 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long>,
         TransactionRepositoryFragment {
 
-    boolean existsByIdAndRevisionIdNotNull(Long id);
+    boolean existsByIdAndRevisionIdNull(Long id);
 
     List<Transaction> findByTransferTransactionId(Long transferTransactionId);
 
@@ -47,7 +46,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     BigDecimal sumByPrepaymentIdAndType(TransactionType type, Long prepaymentId);
 
     @Modifying
-    @Transactional
     @Query("update Transaction t "
             + " set t.revisionId = :revisionId "
             + " where t.revisionId is null and t.budgetId = :budgetId")
