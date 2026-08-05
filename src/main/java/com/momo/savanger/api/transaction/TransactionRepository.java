@@ -18,8 +18,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
 
     List<Transaction> findByTransferTransactionId(Long transferTransactionId);
 
-    List<Transaction> findByRevisionId(Long revisionId);
-
     void deleteByTransferTransactionId(Long transferTransactionId);
 
     @EntityGraph(EntityGraphs.TRANSACTION_DETAILED)

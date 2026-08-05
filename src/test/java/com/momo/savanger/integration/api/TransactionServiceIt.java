@@ -203,6 +203,7 @@ public class TransactionServiceIt {
                 user);
 
         //Here the result should be 2.
+        //TODO: check why the result is 3
         assertEquals(3, transactions.getTotalElements());
 
         assertEquals(1001L, transactions.getContent().getFirst().getId());
@@ -670,21 +671,5 @@ public class TransactionServiceIt {
 
         assertFalse(this.transactionService.existsByIdAndRevisedFalse(2001L));
     }
-
-    @Test
-    public void testGetTransactionsByRevisionId_validId() {
-        List<Transaction> transaction = this.transactionService.getTransactionsByRevisionId(1001L);
-
-        assertEquals(2, transaction.size());
-    }
-
-    @Test
-    public void testGetTransactionsByRevisionId_invalidId() {
-        List<Transaction> transaction = this.transactionService.getTransactionsByRevisionId(
-                109901L);
-
-        assertEquals(0, transaction.size());
-    }
-
 
 }

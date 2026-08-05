@@ -20,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -95,6 +96,7 @@ public class Transaction {
     private List<Tag> tags;
 
 
+    @Transient
     public boolean isRevised() {
         return this.revisionId != null;
     }

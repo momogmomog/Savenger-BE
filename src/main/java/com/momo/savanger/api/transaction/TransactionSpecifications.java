@@ -49,11 +49,18 @@ public final class TransactionSpecifications {
         }
 
         if (revised) {
-            return ((root, query, criteriaBuilder) -> root.get(Transaction_.revisionId)
-                    .isNotNull());
+            return revisionIsNotNull();
         } else {
-            return ((root, query, criteriaBuilder) -> root.get(Transaction_.revisionId).isNull());
+            return revisionIsNull();
         }
+    }
+
+    public static Specification<Transaction> revisionIsNull() {
+        return ((root, query, criteriaBuilder) -> root.get(Transaction_.revisionId).isNull());
+    }
+
+    public static Specification<Transaction> revisionIsNotNull() {
+        return ((root, query, criteriaBuilder) -> root.get(Transaction_.revisionId).isNotNull());
     }
 
     public static Specification<Transaction> revisionIdEquals(final Long revisionId) {

@@ -28,8 +28,4 @@ public class TransactionDtoSimple {
 
     private Long budgetId;
 
-
-    public boolean isRevised() {
-        return this.revisionId != null;
-    }
 }

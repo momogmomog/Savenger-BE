@@ -396,9 +396,4 @@ public class TransactionServiceImpl implements TransactionService {
         return this.transactionRepository.sumAndCount(specification);
     }
 
-    @Override
-    public List<Transaction> getTransactionsByRevisionId(Long revisionId) {
-        return this.transactionRepository.findByRevisionId(revisionId);
-    }
-
 }

@@ -66,7 +66,5 @@ public interface TransactionService {
             Long transferTransactionId, Transfer transfer);
 
     TransferTransactionPair getTransferTransactionPair(Long transferTransactionId);
-
-    List<Transaction> getTransactionsByRevisionId(Long revisionId);
 }
 
