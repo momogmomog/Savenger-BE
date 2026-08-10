@@ -62,7 +62,6 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         transaction.setUserId(userId);
-        transaction.setRevised(false);
 
         if (!dto.getTagIds().isEmpty()) {
             transaction.setTags(this.tagService.findByBudgetAndIdContaining(
@@ -262,6 +261,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .and(TransactionSpecifications.categoryIdContains(query.getCategoryIds()))
                 .and(TransactionSpecifications.typeEquals(query.getType()))
                 .and(TransactionSpecifications.maybeRevised(query.getRevised()))
+                .and(TransactionSpecifications.revisionIdEquals(query.getRevisionId()))
                 .and(TransactionSpecifications.userIdContains(query.getUserIds()))
                 .and(TransactionSpecifications.debtIdEquals(query.getDebtId()))
                 .and(TransactionSpecifications.noDebtTransactions(query.getNoDebtTransactions()))
@@ -291,7 +291,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Boolean existsByIdAndRevisedFalse(Long id) {
-        return this.transactionRepository.existsByIdAndRevisedFalse(id);
+        return this.transactionRepository.existsByIdAndRevisionIdNull(id);
     }
 
     @Override
@@ -299,8 +299,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         final TransferTransactionPair pair = this.getTransferTransactionPair(transferTransactionId);
 
-        if (pair.getSourceTransaction().getRevised()
-                || pair.getReceiverTransaction().getRevised()) {
+        if (pair.getSourceTransaction().isRevised()
+                || pair.getReceiverTransaction().isRevised()) {
             throw ApiException.with(ApiErrorCode.ERR_0021);
         }
 
@@ -334,8 +334,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void reviseTransactions(Long budgetId) {
-        this.transactionRepository.setRevisedTrue(budgetId);
+    public void reviseTransactions(Long budgetId, Long revisionId) {
+        this.transactionRepository.setRevisionId(budgetId, revisionId);
     }
 
     @Override
@@ -395,4 +395,5 @@ public class TransactionServiceImpl implements TransactionService {
 
         return this.transactionRepository.sumAndCount(specification);
     }
+
 }

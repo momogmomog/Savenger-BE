@@ -24,6 +24,8 @@ public class TransactionDtoDetailed {
 
     private Boolean revised;
 
+    private Long revisionId;
+
     private Long userId;
 
     private Long categoryId;

@@ -26,13 +26,15 @@ public class TransactionSearchQueryForAnalytics {
 
     private String comment;
 
-    private Boolean revised;
-
     private List<Long> categoryIds;
 
     private List<Long> userIds;
 
     private Long debtId;
+
+    private Long revisionId;
+
+    private Boolean revised;
 
     private Boolean noDebtTransactions;
 

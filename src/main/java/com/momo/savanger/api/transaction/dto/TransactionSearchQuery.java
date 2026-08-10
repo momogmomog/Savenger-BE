@@ -35,6 +35,8 @@ public class TransactionSearchQuery {
 
     private Boolean revised;
 
+    private Long revisionId;
+
     private List<Long> categoryIds;
 
     private List<Long> userIds;
@@ -59,6 +61,7 @@ public class TransactionSearchQuery {
         query.setDateCreated(q.getDateCreated());
         query.setComment(q.getComment());
         query.setRevised(q.getRevised());
+        query.setRevisionId(q.getRevisionId());
         query.setCategoryIds(q.getCategoryIds());
         query.setUserIds(q.getUserIds());
         query.setDebtId(q.getDebtId());

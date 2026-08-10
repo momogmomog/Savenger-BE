@@ -43,7 +43,28 @@ public final class TransactionSpecifications {
     }
 
     public static Specification<Transaction> maybeRevised(final Boolean revised) {
-        return QuerySpecifications.equalIfPresent(Transaction_.revised, revised);
+
+        if (revised == null) {
+            return (((root, query, criteriaBuilder) -> criteriaBuilder.conjunction()));
+        }
+
+        if (revised) {
+            return revisionIsNotNull();
+        } else {
+            return revisionIsNull();
+        }
+    }
+
+    public static Specification<Transaction> revisionIsNull() {
+        return ((root, query, criteriaBuilder) -> root.get(Transaction_.revisionId).isNull());
+    }
+
+    public static Specification<Transaction> revisionIsNotNull() {
+        return ((root, query, criteriaBuilder) -> root.get(Transaction_.revisionId).isNotNull());
+    }
+
+    public static Specification<Transaction> revisionIdEquals(final Long revisionId) {
+        return QuerySpecifications.equalIfPresent(Transaction_.revisionId, revisionId);
     }
 
     public static Specification<Transaction> categoryIdEquals(final Long categoryId) {

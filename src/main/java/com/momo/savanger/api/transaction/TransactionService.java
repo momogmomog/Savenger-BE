@@ -42,7 +42,7 @@ public interface TransactionService {
 
     boolean canViewTransaction(Long transactionId, Long userId);
 
-    void reviseTransactions(Long budgetId);
+    void reviseTransactions(Long budgetId, Long revisionId);
 
     BigDecimal getExpensesAmount(Long budgetId);
 

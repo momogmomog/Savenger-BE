@@ -82,7 +82,7 @@ public class RevisionServiceImpl implements RevisionService {
 
         this.budgetService.updateBudgetAfterRevision(revision.getBudgetId(), revision);
 
-        this.transactionService.reviseTransactions(dto.getBudgetId());
+        this.transactionService.reviseTransactions(dto.getBudgetId(), revision.getId());
 
         return this.findById(revision.getId());
     }

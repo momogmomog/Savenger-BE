@@ -20,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -60,9 +61,6 @@ public class Transaction {
 
     private String comment;
 
-    @Column(nullable = false)
-    private Boolean revised;
-
     private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -84,6 +82,8 @@ public class Transaction {
 
     private Long transferTransactionId;
 
+    private Long revisionId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "budgetId", insertable = false, updatable = false)
     private Budget budget;
@@ -95,4 +95,9 @@ public class Transaction {
             inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
     private List<Tag> tags;
 
+
+    @Transient
+    public boolean isRevised() {
+        return this.revisionId != null;
+    }
 }

@@ -306,7 +306,7 @@ public class TransactionControllerIt extends BaseControllerIt {
         dto.setTagIds(ids);
         dto.setDateCreated(LocalDateTime.now());
 
-        super.put("/transactions/1003",
+        super.put("/transactions/1001",
                 dto,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
@@ -326,7 +326,7 @@ public class TransactionControllerIt extends BaseControllerIt {
 
         assertEquals(4, transactions.size());
 
-        super.deleteOK("/transactions/1001", null);
+        super.deleteOK("/transactions/1004", null);
 
         transactions = this.transactionRepository.findAll();
 
@@ -354,7 +354,7 @@ public class TransactionControllerIt extends BaseControllerIt {
                 jsonPath("fieldErrors.[?(@.field == \"id\" && "
                         + "@.constraintName == \"CanDeleteTransaction\")]").exists());
 
-        super.delete("/transactions/1003", null
+        super.delete("/transactions/1001", null
                 , HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
                 jsonPath("fieldErrors.[?(@.field == \"id\" && "
