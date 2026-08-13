@@ -1,5 +1,6 @@
 package com.momo.savanger.api.transaction;
 
+import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
@@ -8,6 +9,7 @@ import com.momo.savanger.api.transaction.dto.TransactionDtoSimple;
 import com.momo.savanger.api.transaction.dto.TransactionSearchResponseDto;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
@@ -15,6 +17,7 @@ public interface TransactionMapper {
 
     CreateTransactionServiceDto toCreateServiceDto(CreateTransactionDto createCategoryDto);
 
+    @Mapping(target = "tagIds", source = "tags")
     CreateTransactionServiceDto toCreateServiceDto(RecurringTransaction recurringTransaction);
 
     Transaction toTransaction(CreateTransactionServiceDto createCategoryDto);
@@ -32,4 +35,13 @@ public interface TransactionMapper {
             CreateTransactionDto dto,
             @MappingTarget CreateTransactionServiceDto serviceDto
     );
+
+    default Long tagToId(final Tag tag) {
+        if (tag == null) {
+            return null;
+        }
+
+        return tag.getId();
+    }
+
 }
