@@ -237,7 +237,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @Test
     @Transactional
     @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
-    public void execute() throws Exception {
+    public void execute_validId() throws Exception {
 
         CreateTransactionDto overridesDto = new CreateTransactionDto();
         overridesDto.setBudgetId(1001L);
@@ -261,5 +261,31 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
             assertEquals(1001L, transaction.getTags().getFirst().getId());
         }
 
+    }
+
+    @Test
+    @Transactional
+    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    public void execute_invalidId() throws Exception {
+
+        CreateTransactionDto overridesDto = new CreateTransactionDto();
+        overridesDto.setBudgetId(1001L);
+        overridesDto.setAmount(BigDecimal.TEN);
+        overridesDto.setType(TransactionType.INCOME);
+        overridesDto.setCategoryId(1001L);
+        overridesDto.setTagIds(List.of(1001L));
+        overridesDto.setDateCreated(LocalDateTime.now());
+
+        //This returns rTransaction before override
+        super.post("/recurring-transactions/10013/execute",
+                overridesDto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"rTransactionId\" && "
+                                + "@.constraintName == \"ValidRecurringTransaction\" &&"
+                                + "@.message == \"Recurring transaction with this id and budget id does not exist.\")]").exists()
+
+        );
     }
 }
