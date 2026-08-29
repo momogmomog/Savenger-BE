@@ -5,13 +5,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.momo.savanger.api.prepayment.CreatePrepaymentDto;
+import com.momo.savanger.api.transaction.Transaction;
 import com.momo.savanger.api.transaction.TransactionRepository;
 import com.momo.savanger.api.transaction.TransactionType;
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionRepository;
 import com.momo.savanger.constants.Endpoints;
+import com.momo.savanger.web.RecurringTransactionController;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -54,6 +59,9 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
 
     @Autowired
     private TransactionRepository transactionRepository;
+
+    @Autowired
+    private RecurringTransactionController recurringTransactionController;
 
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
@@ -224,5 +232,60 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
 
         );
 
+    }
+
+    @Test
+    @Transactional
+    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    public void execute_validId() throws Exception {
+
+        CreateTransactionDto overridesDto = new CreateTransactionDto();
+        overridesDto.setBudgetId(1001L);
+        overridesDto.setAmount(BigDecimal.TEN);
+        overridesDto.setType(TransactionType.INCOME);
+        overridesDto.setCategoryId(1001L);
+        overridesDto.setTagIds(List.of(1001L));
+        overridesDto.setDateCreated(LocalDateTime.now());
+
+        //This returns rTransaction before override
+        super.postOK("/recurring-transactions/1001/execute",
+                overridesDto
+        );
+
+        Transaction transaction = this.transactionRepository.findById(1L).orElse(null);
+
+        if (transaction != null) {
+            assertEquals(BigDecimal.TEN, transaction.getAmount());
+            assertEquals(TransactionType.INCOME, transaction.getType());
+            assertEquals(1, transaction.getTags().size());
+            assertEquals(1001L, transaction.getTags().getFirst().getId());
+        }
+
+    }
+
+    @Test
+    @Transactional
+    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    public void execute_invalidId() throws Exception {
+
+        CreateTransactionDto overridesDto = new CreateTransactionDto();
+        overridesDto.setBudgetId(1001L);
+        overridesDto.setAmount(BigDecimal.TEN);
+        overridesDto.setType(TransactionType.INCOME);
+        overridesDto.setCategoryId(1001L);
+        overridesDto.setTagIds(List.of(1001L));
+        overridesDto.setDateCreated(LocalDateTime.now());
+
+        //This returns rTransaction before override
+        super.post("/recurring-transactions/10013/execute",
+                overridesDto,
+                HttpStatus.BAD_REQUEST,
+                jsonPath("fieldErrors.length()", is(1)),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"rTransactionId\" && "
+                                + "@.constraintName == \"ValidRecurringTransaction\" &&"
+                                + "@.message == \"Recurring transaction with this id and budget id does not exist.\")]").exists()
+
+        );
     }
 }
