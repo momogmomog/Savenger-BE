@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
@@ -277,11 +278,13 @@ public class TransactionServiceImpl implements TransactionService {
                 this.findById(id)
         );
 
-        if (!dto.getTagIds().isEmpty()) {
+        if (!CollectionUtils.isEmpty(dto.getTagIds())) {
             transaction.setTags(this.tagService.findByBudgetAndIdContaining(
                     dto.getTagIds(),
                     dto.getBudgetId()
             ));
+        } else {
+            transaction.getTags().clear();
         }
 
         this.transactionRepository.saveAndFlush(transaction);
