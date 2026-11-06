@@ -1,5 +1,6 @@
 package com.momo.savanger.api.analytics;
 
+import com.momo.savanger.api.analytics.dto.AnalyticsSummaryDto;
 import com.momo.savanger.api.analytics.dto.CategoryAnalytic;
 import com.momo.savanger.api.analytics.dto.TagAnalytic;
 import com.momo.savanger.api.analytics.dto.TimeSeriesMetricDto;
@@ -9,9 +10,10 @@ import java.util.List;
 
 public interface AnalyticsService {
 
-    List<CategoryAnalytic> fetchCategoryAnalytics(TransactionSearchQueryForAnalytics query);
+    AnalyticsSummaryDto<CategoryAnalytic> fetchCategoryAnalytics(
+            TransactionSearchQueryForAnalytics query);
 
-    List<TagAnalytic> fetchTagAnalytics(TransactionSearchQueryForAnalytics query);
+    AnalyticsSummaryDto<TagAnalytic> fetchTagAnalytics(TransactionSearchQueryForAnalytics query);
 
     //TODO: Placeholder
     List<TimeSeriesMetricDto> fetchMetricsByTime(TimeSeriesMetricQuery query);

@@ -3,6 +3,7 @@ package com.momo.savanger.api.transaction;
 import static com.momo.savanger.api.util.QuerySpecificationUtils.getOrCreateJoin;
 
 import com.momo.savanger.api.tag.Tag_;
+import com.momo.savanger.api.transaction.dto.TransactionBasicDto;
 import com.momo.savanger.api.transaction.dto.TransactionSumAndCount;
 import com.momo.savanger.api.util.SpecificationExecutorImpl;
 import jakarta.persistence.EntityManager;
@@ -55,8 +56,8 @@ public class TransactionRepositoryFragmentImpl extends
     @Transactional
     public TransactionSumAndCount sumAndCount(Specification<Transaction> specification) {
         final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        final CriteriaQuery<TransactionSumAndCount> query = cb.createQuery(
-                TransactionSumAndCount.class);
+        final CriteriaQuery<TransactionBasicDto> query = cb.createQuery(
+                TransactionBasicDto.class);
         final Root<Transaction> root = query.from(Transaction.class);
 
         final Subquery<Long> subquery = query.subquery(Long.class);
@@ -69,11 +70,19 @@ public class TransactionRepositoryFragmentImpl extends
         query.where(root.get(Transaction_.id).in(subquery));
 
         query.select(cb.construct(
-                TransactionSumAndCount.class,
-                cb.coalesce(cb.sum(root.get(Transaction_.amount)), BigDecimal.ZERO),
-                cb.count(root)
+                TransactionBasicDto.class,
+                root.get(Transaction_.id),
+                root.get(Transaction_.amount),
+                root.get(Transaction_.type)
         ));
 
-        return entityManager.createQuery(query).getSingleResult();
+        final List<TransactionBasicDto> transactions = entityManager.createQuery(query)
+                .getResultList();
+
+        final BigDecimal sum = transactions.stream()
+                .map(TransactionBasicDto::amount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return new TransactionSumAndCount(sum, (long) transactions.size(), transactions);
     }
 }

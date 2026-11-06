@@ -1,5 +1,7 @@
 package com.momo.savanger.api.analytics;
 
+import com.momo.savanger.api.analytics.dto.AnalyticDto;
+import com.momo.savanger.api.analytics.dto.AnalyticsSummaryDto;
 import com.momo.savanger.api.analytics.dto.CategoryAnalytic;
 import com.momo.savanger.api.analytics.dto.TagAnalytic;
 import com.momo.savanger.api.analytics.dto.TimeSeriesMetricDto;
@@ -12,11 +14,15 @@ import com.momo.savanger.api.tag.TagMapper;
 import com.momo.savanger.api.tag.TagService;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.TransactionType;
+import com.momo.savanger.api.transaction.dto.TransactionBasicDto;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQuery;
 import com.momo.savanger.api.transaction.dto.TransactionSearchQueryForAnalytics;
 import com.momo.savanger.api.transaction.dto.TransactionSumAndCount;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,7 +44,8 @@ public class AnalyticServiceImpl implements AnalyticsService {
     private final TagMapper tagMapper;
 
     @Override
-    public List<CategoryAnalytic> fetchCategoryAnalytics(TransactionSearchQueryForAnalytics q) {
+    public AnalyticsSummaryDto<CategoryAnalytic> fetchCategoryAnalytics(
+            TransactionSearchQueryForAnalytics q) {
         final TransactionSearchQuery query = TransactionSearchQuery.fromAnalyticsQuery(q);
 
         final List<Long> categoryIds;
@@ -52,7 +59,7 @@ public class AnalyticServiceImpl implements AnalyticsService {
 
         if (categoryIds.isEmpty()) {
             log.info("No category IDs found, aborting!");
-            return List.of();
+            return AnalyticsSummaryDto.empty();
         }
 
         final List<Category> categories = this.categoryService.findAll(
@@ -62,7 +69,7 @@ public class AnalyticServiceImpl implements AnalyticsService {
 
         if (categories.isEmpty()) {
             log.info("No categories found, aborting!");
-            return List.of();
+            return AnalyticsSummaryDto.empty();
         }
 
         final List<CategoryAnalytic> result = new ArrayList<>();
@@ -82,11 +89,12 @@ public class AnalyticServiceImpl implements AnalyticsService {
             ));
         }
 
-        return result;
+        return this.buildSummary(result);
     }
 
     @Override
-    public List<TagAnalytic> fetchTagAnalytics(TransactionSearchQueryForAnalytics q) {
+    public AnalyticsSummaryDto<TagAnalytic> fetchTagAnalytics(
+            TransactionSearchQueryForAnalytics q) {
         final TransactionSearchQuery query = TransactionSearchQuery.fromAnalyticsQuery(q);
         final List<Long> tagIds;
         if (!CollectionUtils.isEmpty(query.getTagIds())) {
@@ -99,7 +107,7 @@ public class AnalyticServiceImpl implements AnalyticsService {
 
         if (tagIds.isEmpty()) {
             log.info("No tag IDs found, aborting!");
-            return List.of();
+            return AnalyticsSummaryDto.empty();
         }
 
         final List<Tag> tags = this.tagService.findByBudgetAndIdContaining(
@@ -108,7 +116,7 @@ public class AnalyticServiceImpl implements AnalyticsService {
         );
         if (tags.isEmpty()) {
             log.info("No tags found, aborting!");
-            return List.of();
+            return AnalyticsSummaryDto.empty();
         }
 
         final List<TagAnalytic> result = new ArrayList<>();
@@ -128,11 +136,54 @@ public class AnalyticServiceImpl implements AnalyticsService {
             ));
         }
 
-        return result;
+        return this.buildSummary(result);
     }
 
     @Override
     public List<TimeSeriesMetricDto> fetchMetricsByTime(TimeSeriesMetricQuery query) {
         return List.of();
+    }
+
+    private <T extends AnalyticDto> AnalyticsSummaryDto<T> buildSummary(List<T> items) {
+        final List<TransactionBasicDto> distinctTransactions = items.stream()
+                .flatMap(item -> Stream.of(item.getIncomes(), item.getExpenses()))
+                .filter(Objects::nonNull)
+                .map(TransactionSumAndCount::transactions)
+                .filter(Objects::nonNull)
+                .flatMap(List::stream)
+                .distinct()
+                .toList();
+
+        final BigDecimal incomesSum = distinctTransactions.stream()
+                .filter(t -> t.type() == TransactionType.INCOME)
+                .map(TransactionBasicDto::amount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        final BigDecimal expensesSum = distinctTransactions.stream()
+                .filter(t -> t.type() == TransactionType.EXPENSE)
+                .map(TransactionBasicDto::amount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        final BigDecimal total = incomesSum.subtract(expensesSum);
+
+        final long incomesCount = distinctTransactions.stream()
+                .filter(t -> t.type() == TransactionType.INCOME)
+                .count();
+
+        final long expensesCount = distinctTransactions.stream()
+                .filter(t -> t.type() == TransactionType.EXPENSE)
+                .count();
+
+        final long totalCount = distinctTransactions.size();
+
+        return new AnalyticsSummaryDto<>(
+                incomesSum,
+                expensesSum,
+                total,
+                incomesCount,
+                expensesCount,
+                totalCount,
+                items
+        );
     }
 }

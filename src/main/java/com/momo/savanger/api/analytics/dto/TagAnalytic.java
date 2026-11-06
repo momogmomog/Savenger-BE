@@ -5,7 +5,7 @@ import com.momo.savanger.api.transaction.dto.TransactionSumAndCount;
 import lombok.Data;
 
 @Data
-public class TagAnalytic {
+public class TagAnalytic implements AnalyticDto {
 
     private final TagDto tag;
 
