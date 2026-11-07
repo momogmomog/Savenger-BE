@@ -304,7 +304,7 @@ public class TransactionServiceIt {
 
     @Test
     @Transactional
-    public void testEditTransaction_validPayload_shouldEditTransaction() {
+    public void testEditTransaction_validPayloadWithTags_shouldEditTransaction() {
         Transaction before = this.transactionService.findById(1001L);
         assertEquals(before.getType(), TransactionType.INCOME);
 
@@ -329,6 +329,30 @@ public class TransactionServiceIt {
                 .hasSameElementsAs(
                         transaction.getTags().stream().map(Tag::getId).toList()
                 );
+    }
+    @Test
+    @Transactional
+    public void testEditTransaction_validPayloadWithEmptyTags_shouldEditTransaction() {
+        Transaction before = this.transactionService.findById(1001L);
+        assertEquals(before.getType(), TransactionType.INCOME);
+
+        EditTransactionDto dto = new EditTransactionDto();
+        dto.setType(TransactionType.EXPENSE);
+        dto.setAmount(BigDecimal.valueOf(254.99));
+        dto.setComment("Kupih si vafli");
+        dto.setCategoryId(1002L);
+        dto.setDateCreated(LocalDateTime.now());
+        dto.setBudgetId(1002L);
+        dto.setTagIds(null);
+
+        Transaction transaction = this.transactionService.edit(1001L, dto);
+
+        assertEquals(TransactionType.EXPENSE, transaction.getType());
+        assertEquals(BigDecimal.valueOf(254.99), transaction.getAmount());
+        assertEquals("Kupih si vafli", transaction.getComment());
+        assertEquals(1002L, transaction.getBudgetId());
+        assertEquals(1002L, transaction.getCategoryId());
+        assertEquals(0, transaction.getTags().size());
     }
 
     @Test
