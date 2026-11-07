@@ -5,7 +5,7 @@ import com.momo.savanger.api.transaction.dto.TransactionSumAndCount;
 import lombok.Data;
 
 @Data
-public class CategoryAnalytic {
+public class CategoryAnalytic implements AnalyticDto {
 
     private final CategoryDto category;
 
