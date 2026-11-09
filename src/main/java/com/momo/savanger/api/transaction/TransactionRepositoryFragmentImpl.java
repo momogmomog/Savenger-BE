@@ -73,7 +73,9 @@ public class TransactionRepositoryFragmentImpl extends
                 TransactionBasicDto.class,
                 root.get(Transaction_.id),
                 root.get(Transaction_.amount),
-                root.get(Transaction_.type)
+                root.get(Transaction_.type),
+                root.get(Transaction_.dateCreated),
+                cb.isNotNull(root.get(Transaction_.revisionId))
         ));
 
         final List<TransactionBasicDto> transactions = entityManager.createQuery(query)
