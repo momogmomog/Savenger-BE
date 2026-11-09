@@ -131,7 +131,7 @@ public class PrepaymentServiceIt {
 
         assertEquals(1, this.recurringTransactionRepository.findAll().size());
 
-        assertEquals(1001L, this.recurringTransactionService.findById(1001L).getPrepaymentId());
+        assertEquals(1001L, this.recurringTransactionService.findById(9001L).getPrepaymentId());
 
         //Test with existing recurring transaction id
         CreatePrepaymentDto createPrepaymentDto = new CreatePrepaymentDto();
@@ -139,7 +139,7 @@ public class PrepaymentServiceIt {
         createPrepaymentDto.setBudgetId(1001L);
         createPrepaymentDto.setName("NETI");
         createPrepaymentDto.setPaidUntil(LocalDateTime.now().plusMonths(6));
-        createPrepaymentDto.setRecurringTransactionId(1001L);
+        createPrepaymentDto.setRecurringTransactionId(9001L);
 
         final Prepayment prepayment = this.prepaymentService.create(createPrepaymentDto);
 
@@ -148,11 +148,11 @@ public class PrepaymentServiceIt {
         assertEquals(1, this.recurringTransactionRepository.findAll().size());
 
         //Test addPrepaymentId method
-        assertNotEquals(1001L, this.recurringTransactionService.findById(1001L).getPrepaymentId());
+        assertNotEquals(1001L, this.recurringTransactionService.findById(9001L).getPrepaymentId());
 
         //Test prepaymentId in rTransaction is correct after change
         final RecurringTransaction recurringTransaction = this.recurringTransactionService.findById(
-                1001L);
+                9001L);
         assertEquals(prepayment.getId(), recurringTransaction.getPrepaymentId());
     }
 
@@ -195,7 +195,7 @@ public class PrepaymentServiceIt {
         createPrepaymentDto.setBudgetId(1001L);
         createPrepaymentDto.setName("NETI");
         createPrepaymentDto.setPaidUntil(LocalDateTime.now().plusMonths(6));
-        createPrepaymentDto.setRecurringTransactionId(1001L);
+        createPrepaymentDto.setRecurringTransactionId(9001L);
 
         this.prepaymentService.create(createPrepaymentDto);
 

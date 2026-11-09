@@ -20,6 +20,8 @@ public class TransactionDtoSimple {
 
     private Long revisionId;
 
+    private Long recurringTransactionId;
+
     private boolean revised;
 
     private Long userId;

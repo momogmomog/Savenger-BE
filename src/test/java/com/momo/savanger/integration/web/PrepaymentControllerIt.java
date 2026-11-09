@@ -58,7 +58,7 @@ public class PrepaymentControllerIt extends BaseControllerIt {
         assertEquals(2, this.prepaymentRepository.findAll().size());
 
         CreatePrepaymentDto dto = new CreatePrepaymentDto();
-        dto.setRecurringTransactionId(1001L);
+        dto.setRecurringTransactionId(9001L);
         dto.setAmount(BigDecimal.valueOf(10));
         dto.setBudgetId(1001L);
         dto.setName("PArno");
@@ -121,7 +121,7 @@ public class PrepaymentControllerIt extends BaseControllerIt {
 
         //Test one of rTransaction fields should be null
         prepaymentDto.setAmount(BigDecimal.valueOf(10));
-        prepaymentDto.setRecurringTransactionId(1001L);
+        prepaymentDto.setRecurringTransactionId(9001L);
 
         super.post(Endpoints.PREPAYMENTS,
                 prepaymentDto,
@@ -173,7 +173,7 @@ public class PrepaymentControllerIt extends BaseControllerIt {
 
         //Test user has access to budget
 
-        prepaymentDto.setRecurringTransactionId(1001L);
+        prepaymentDto.setRecurringTransactionId(9001L);
         prepaymentDto.setBudgetId(1003L);
 
         super.post(Endpoints.PREPAYMENTS,

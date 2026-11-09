@@ -18,6 +18,7 @@ public interface TransactionMapper {
     CreateTransactionServiceDto toCreateServiceDto(CreateTransactionDto createCategoryDto);
 
     @Mapping(target = "tagIds", source = "tags")
+    @Mapping(target = "recurringTransactionId", source = "id")
     CreateTransactionServiceDto toCreateServiceDto(RecurringTransaction recurringTransaction);
 
     Transaction toTransaction(CreateTransactionServiceDto createCategoryDto);

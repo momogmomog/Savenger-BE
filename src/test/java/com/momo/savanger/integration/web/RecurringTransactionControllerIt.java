@@ -2,6 +2,7 @@ package com.momo.savanger.integration.web;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.momo.savanger.api.prepayment.CreatePrepaymentDto;
@@ -156,7 +157,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
 
         final CreatePrepaymentDto prepaymentDto = new CreatePrepaymentDto();
         prepaymentDto.setAmount(BigDecimal.valueOf(100));
-        prepaymentDto.setRecurringTransactionId(1001L);
+        prepaymentDto.setRecurringTransactionId(9001L);
         prepaymentDto.setBudgetId(1001L);
         prepaymentDto.setName("kroki");
         prepaymentDto.setPaidUntil(LocalDateTime.now().plusMonths(10));
@@ -177,9 +178,18 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testPay_validPayload_shouldPayTransaction() throws Exception {
 
-        super.postOK("/prepayments/pay/1001", null);
+        super.postOK("/prepayments/pay/9001", null);
 
         assertEquals(2, this.transactionRepository.findAll().size());
+
+        Transaction transaction = this.transactionRepository.findAll().stream()
+                .filter(t -> t.getRecurringTransactionId() != null)
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(transaction);
+        assertEquals(9001L, transaction.getRecurringTransactionId());
+        assertEquals(1001L, transaction.getPrepaymentId());
 
     }
 
@@ -187,7 +197,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @WithLocalMockedUser(username = Constants.THIRD_USER_USERNAME)
     public void testPay_invalidBudgetOwner_shouldThrowException() throws Exception {
 
-        super.post("/prepayments/pay/1001",
+        super.post("/prepayments/pay/9001",
                 null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
@@ -215,13 +225,13 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         );
 
         // 1st payment
-        super.postOK("/prepayments/pay/1001", null);
+        super.postOK("/prepayments/pay/9001", null);
 
         // 2nd payment - remaining amount should be now 0
-        super.postOK("/prepayments/pay/1001", null);
+        super.postOK("/prepayments/pay/9001", null);
 
         // prepayment is already completed
-        super.post("/prepayments/pay/1001",
+        super.post("/prepayments/pay/9001",
                 null,
                 HttpStatus.BAD_REQUEST,
                 jsonPath("fieldErrors.length()", is(1)),
@@ -248,18 +258,21 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         overridesDto.setDateCreated(LocalDateTime.now());
 
         //This returns rTransaction before override
-        super.postOK("/recurring-transactions/1001/execute",
+        super.postOK("/recurring-transactions/9001/execute",
                 overridesDto
         );
 
-        Transaction transaction = this.transactionRepository.findById(1L).orElse(null);
+        Transaction transaction = this.transactionRepository.findAll().stream()
+                .filter(t -> t.getRecurringTransactionId() != null)
+                .findFirst()
+                .orElse(null);
 
-        if (transaction != null) {
-            assertEquals(BigDecimal.TEN, transaction.getAmount());
-            assertEquals(TransactionType.INCOME, transaction.getType());
-            assertEquals(1, transaction.getTags().size());
-            assertEquals(1001L, transaction.getTags().getFirst().getId());
-        }
+        assertNotNull(transaction);
+        assertEquals(9001L, transaction.getRecurringTransactionId());
+        assertEquals(BigDecimal.TEN, transaction.getAmount());
+        assertEquals(TransactionType.INCOME, transaction.getType());
+        assertEquals(1, transaction.getTags().size());
+        assertEquals(1001L, transaction.getTags().getFirst().getId());
 
     }
 

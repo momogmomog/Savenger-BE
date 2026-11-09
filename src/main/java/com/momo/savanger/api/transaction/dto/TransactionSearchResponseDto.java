@@ -24,6 +24,8 @@ public class TransactionSearchResponseDto {
 
     private Long revisionId;
 
+    private Long recurringTransactionId;
+
     private Long userId;
 
     private Long categoryId;

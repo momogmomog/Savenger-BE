@@ -29,6 +29,8 @@ public class CreateTransactionServiceDto {
 
     private Long transferTransactionId;
 
+    private Long recurringTransactionId;
+
     private List<Long> tagIds;
 
     public List<Long> getTagIds() {

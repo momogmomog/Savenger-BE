@@ -263,6 +263,8 @@ public class TransactionServiceImpl implements TransactionService {
                 .and(TransactionSpecifications.typeEquals(query.getType()))
                 .and(TransactionSpecifications.maybeRevised(query.getRevised()))
                 .and(TransactionSpecifications.revisionIdEquals(query.getRevisionId()))
+                .and(TransactionSpecifications.recurringTransactionIdEquals(
+                        query.getRecurringTransactionId()))
                 .and(TransactionSpecifications.userIdContains(query.getUserIds()))
                 .and(TransactionSpecifications.debtIdEquals(query.getDebtId()))
                 .and(TransactionSpecifications.noDebtTransactions(query.getNoDebtTransactions()))

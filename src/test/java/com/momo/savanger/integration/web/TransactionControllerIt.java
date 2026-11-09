@@ -171,8 +171,16 @@ public class TransactionControllerIt extends BaseControllerIt {
         query.setBudgetId(1001L);
         query.setUserIds(List.of(1L));
         query.setType(TransactionType.INCOME);
+        query.setRecurringTransactionId(9001L);
 
-        super.postOK(Endpoints.TRANSACTIONS_SEARCH, query);
+        super.postOK(
+                Endpoints.TRANSACTIONS_SEARCH,
+                query,
+                jsonPath("$.content.length()", is(1)),
+                jsonPath("$.content[0].id", is(1001)),
+                jsonPath("$.content[0].revisionId", is(1001)),
+                jsonPath("$.content[0].recurringTransactionId", is(9001))
+        );
     }
 
     @Test
@@ -379,6 +387,8 @@ public class TransactionControllerIt extends BaseControllerIt {
                 , HttpStatus.OK,
                 jsonPath("id", is(1001)),
                 jsonPath("budgetId", is(1001)),
+                jsonPath("revisionId", is(1001)),
+                jsonPath("recurringTransactionId", is(9001)),
                 jsonPath("tags.length()", is(1)),
                 jsonPath("tags[0].tagName", is("DM")),
                 jsonPath("category.categoryName", is("Home")),

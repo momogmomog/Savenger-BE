@@ -67,6 +67,14 @@ public final class TransactionSpecifications {
         return QuerySpecifications.equalIfPresent(Transaction_.revisionId, revisionId);
     }
 
+    public static Specification<Transaction> recurringTransactionIdEquals(
+            final Long recurringTransactionId) {
+        return QuerySpecifications.equalIfPresent(
+                Transaction_.recurringTransactionId,
+                recurringTransactionId
+        );
+    }
+
     public static Specification<Transaction> categoryIdEquals(final Long categoryId) {
         return QuerySpecifications.equalIfPresent(Transaction_.categoryId, categoryId);
     }
