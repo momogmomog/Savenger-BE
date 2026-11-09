@@ -36,6 +36,8 @@ public class TransactionSearchQueryForAnalytics {
 
     private Long recurringTransactionId;
 
+    private Long prepaymentId;
+
     private Boolean revised;
 
     private Boolean noDebtTransactions;

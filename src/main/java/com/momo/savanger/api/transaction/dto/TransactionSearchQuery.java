@@ -39,6 +39,8 @@ public class TransactionSearchQuery {
 
     private Long recurringTransactionId;
 
+    private Long prepaymentId;
+
     private List<Long> categoryIds;
 
     private List<Long> userIds;

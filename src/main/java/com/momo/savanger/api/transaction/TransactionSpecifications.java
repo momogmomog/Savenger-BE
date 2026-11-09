@@ -113,6 +113,14 @@ public final class TransactionSpecifications {
         return (root, query, criteriaBuilder) -> root.get(Transaction_.prepaymentId).isNull();
     }
 
+    public static Specification<Transaction> prepaymentIdEquals(
+            final Long prepaymentId) {
+        return QuerySpecifications.equalIfPresent(
+                Transaction_.prepaymentId,
+                prepaymentId
+        );
+    }
+
     public static Specification<Transaction> debtIdEquals(Long debtId) {
         return QuerySpecifications.equalIfPresent(Transaction_.debtId, debtId);
     }
