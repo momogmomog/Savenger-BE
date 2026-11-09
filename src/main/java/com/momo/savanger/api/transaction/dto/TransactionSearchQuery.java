@@ -67,6 +67,7 @@ public class TransactionSearchQuery {
         query.setRevised(q.getRevised());
         query.setRevisionId(q.getRevisionId());
         query.setRecurringTransactionId(q.getRecurringTransactionId());
+        query.setPrepaymentId(q.getPrepaymentId());
         query.setCategoryIds(q.getCategoryIds());
         query.setUserIds(q.getUserIds());
         query.setDebtId(q.getDebtId());

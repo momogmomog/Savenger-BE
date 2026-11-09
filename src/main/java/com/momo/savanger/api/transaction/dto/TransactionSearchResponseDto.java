@@ -32,5 +32,7 @@ public class TransactionSearchResponseDto {
 
     private Long budgetId;
 
+    private Long prepaymentId;
+
     private List<TagDto> tags;
 }

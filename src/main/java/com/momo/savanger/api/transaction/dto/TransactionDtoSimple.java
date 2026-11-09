@@ -18,16 +18,18 @@ public class TransactionDtoSimple {
 
     private String comment;
 
+    private boolean revised;
+
     private Long revisionId;
 
     private Long recurringTransactionId;
-
-    private boolean revised;
 
     private Long userId;
 
     private Long categoryId;
 
     private Long budgetId;
+
+    private Long prepaymentId;
 
 }

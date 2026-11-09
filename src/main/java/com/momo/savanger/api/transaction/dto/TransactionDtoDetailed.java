@@ -34,6 +34,8 @@ public class TransactionDtoDetailed {
 
     private Long budgetId;
 
+    private Long prepaymentId;
+
     private List<TagDto> tags;
 
     private CategoryDto category;
