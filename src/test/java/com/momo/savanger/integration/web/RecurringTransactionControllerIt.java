@@ -2,19 +2,26 @@ package com.momo.savanger.integration.web;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.momo.savanger.api.prepayment.CreatePrepaymentDto;
+import com.momo.savanger.api.prepayment.Prepayment;
+import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.transaction.Transaction;
 import com.momo.savanger.api.transaction.TransactionRepository;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
+import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionRepository;
+import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
 import com.momo.savanger.constants.Endpoints;
 import com.momo.savanger.web.RecurringTransactionController;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -57,6 +64,12 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
 
     @Autowired
     private RecurringTransactionRepository recurringTransactionRepository;
+
+    @Autowired
+    private RecurringTransactionService recurringTransactionService;
+
+    @Autowired
+    private PrepaymentService prepaymentService;
 
     @Autowired
     private TransactionRepository transactionRepository;
@@ -253,6 +266,17 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
     @Transactional
     @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
     public void execute_validId() throws Exception {
+        CreateRecurringTransactionDto createDto = new CreateRecurringTransactionDto();
+        createDto.setBudgetId(1001L);
+        createDto.setType(TransactionType.EXPENSE);
+        createDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
+        createDto.setCategoryId(1001L);
+        createDto.setAutoExecute(false);
+        createDto.setAmount(BigDecimal.valueOf(100));
+
+        RecurringTransaction rTransactionWithoutPrepayment = this.recurringTransactionService.create(
+                createDto
+        );
 
         CreateTransactionDto overridesDto = new CreateTransactionDto();
         overridesDto.setBudgetId(1001L);
@@ -263,6 +287,44 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         overridesDto.setDateCreated(LocalDateTime.now());
 
         //This returns rTransaction before override
+        super.postOK(
+                "/recurring-transactions/" + rTransactionWithoutPrepayment.getId() + "/execute",
+                overridesDto
+        );
+
+        Transaction transaction = this.transactionRepository.findAll().stream()
+                .filter(t -> t.getRecurringTransactionId() != null)
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(transaction);
+        assertEquals(
+                rTransactionWithoutPrepayment.getId(),
+                transaction.getRecurringTransactionId()
+        );
+        assertNull(transaction.getPrepaymentId());
+        assertEquals(BigDecimal.TEN, transaction.getAmount());
+        assertEquals(TransactionType.INCOME, transaction.getType());
+        assertEquals(1, transaction.getTags().size());
+        assertEquals(1001L, transaction.getTags().getFirst().getId());
+
+    }
+
+    @Test
+    @Transactional
+    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    public void execute_withPrepaymentAttached_shouldApplyOverridesAndUpdatePrepayment()
+            throws Exception {
+
+        CreateTransactionDto overridesDto = new CreateTransactionDto();
+        overridesDto.setBudgetId(1001L);
+        overridesDto.setAmount(BigDecimal.TEN);
+        overridesDto.setType(TransactionType.EXPENSE);
+        overridesDto.setCategoryId(1001L);
+        overridesDto.setTagIds(List.of(1001L));
+        overridesDto.setComment("Executed prepayment override");
+        overridesDto.setDateCreated(LocalDateTime.now());
+
         super.postOK("/recurring-transactions/9001/execute",
                 overridesDto
         );
@@ -274,11 +336,19 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
 
         assertNotNull(transaction);
         assertEquals(9001L, transaction.getRecurringTransactionId());
+        assertEquals(1001L, transaction.getPrepaymentId());
         assertEquals(BigDecimal.TEN, transaction.getAmount());
-        assertEquals(TransactionType.INCOME, transaction.getType());
+        assertEquals(TransactionType.EXPENSE, transaction.getType());
+        assertEquals("Executed prepayment override", transaction.getComment());
         assertEquals(1, transaction.getTags().size());
         assertEquals(1001L, transaction.getTags().getFirst().getId());
 
+        Prepayment prepayment = this.prepaymentService.findById(1001L);
+        assertEquals(
+                BigDecimal.valueOf(190).setScale(2, RoundingMode.HALF_DOWN),
+                prepayment.getRemainingAmount().setScale(2, RoundingMode.HALF_DOWN)
+        );
+        assertFalse(prepayment.getCompleted());
     }
 
     @Test
