@@ -74,6 +74,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         rTransactionDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
         rTransactionDto.setAmount(BigDecimal.valueOf(20));
         rTransactionDto.setBudgetId(1001L);
+        rTransactionDto.setCategoryId(1001L);
         rTransactionDto.setIncludeInBalance(false);
         rTransactionDto.setAutoExecute(false);
 
@@ -107,7 +108,7 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         super.post(Endpoints.PREPAYMENTS,
                 prepaymentDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(8)),
+                jsonPath("fieldErrors.length()", is(9)),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.type\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
@@ -116,6 +117,8 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
                         "fieldErrors.[?(@.field == \"recurringTransaction.autoExecute\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.amount\" && @.constraintName == \"NotNull\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringTransaction.categoryId\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
@@ -137,11 +140,13 @@ public class RecurringTransactionControllerIt extends BaseControllerIt {
         super.post(Endpoints.PREPAYMENTS,
                 prepaymentDto,
                 HttpStatus.BAD_REQUEST,
-                jsonPath("fieldErrors.length()", is(5)),
+                jsonPath("fieldErrors.length()", is(6)),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.recurringRule\" && @.constraintName == \"RRule\")]").exists(),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.amount\" && @.constraintName == \"MinValueZero\")]").exists(),
+                jsonPath(
+                        "fieldErrors.[?(@.field == \"recurringTransaction.categoryId\" && @.constraintName == \"NotNull\")]").exists(),
                 jsonPath(
                         "fieldErrors.[?(@.field == \"recurringTransaction.budgetId\" && @.constraintName == \"ValidPrepaymentDto\")]").exists(),
                 jsonPath(

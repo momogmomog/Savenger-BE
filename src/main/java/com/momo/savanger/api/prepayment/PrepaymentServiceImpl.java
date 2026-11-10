@@ -9,7 +9,11 @@ import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +40,24 @@ public class PrepaymentServiceImpl implements PrepaymentService {
     }
 
     @Override
+    public Optional<Prepayment> findByIdIfExists(Long id) {
+        return this.findByIdIfExists(id, false);
+    }
+
+    @Override
+    public Optional<Prepayment> findByIdIfExists(Long id, boolean allowCompleted) {
+        final Specification<Prepayment> specification = PrepaymentSpecifications
+                .idEquals(id)
+                .and(allowCompleted ? Specification.where(null)
+                        : PrepaymentSpecifications.isCompleted(false));
+
+        final List<Prepayment> prepayments = this.prepaymentRepository.findAll(
+                specification, null
+        );
+        return prepayments.stream().findFirst();
+    }
+
+    @Override
     @Transactional
     public Prepayment create(CreatePrepaymentDto dto) {
         final Prepayment prepayment = this.prepaymentMapper.toPrepayment(dto);
@@ -45,6 +67,35 @@ public class PrepaymentServiceImpl implements PrepaymentService {
                 dto.getAmount()
         );
 
+        return this.upsert(prepayment, dto);
+    }
+
+    @Override
+    @Transactional
+    public Prepayment edit(Long id, CreatePrepaymentDto dto) {
+        final Prepayment existingPrepayment = this.findById(id);
+
+        if (!existingPrepayment.getBudgetId().equals(dto.getBudgetId())) {
+            throw ApiException.with(ApiErrorCode.ERR_0024);
+        }
+
+        this.prepaymentMapper.mergeIntoPrepayment(dto, existingPrepayment);
+
+        final BigDecimal paidAmount = this.transactionService.getPrepaymentPaidAmount(id);
+        final BigDecimal remainingAmount = existingPrepayment.getAmount().subtract(paidAmount);
+
+        if (remainingAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            existingPrepayment.setRemainingAmount(BigDecimal.ZERO);
+            existingPrepayment.setCompleted(true);
+        } else {
+            existingPrepayment.setRemainingAmount(remainingAmount);
+            existingPrepayment.setCompleted(false);
+        }
+
+        return this.upsert(existingPrepayment, dto);
+    }
+
+    private Prepayment upsert(Prepayment prepayment, CreatePrepaymentDto dto) {
         this.prepaymentRepository.saveAndFlush(prepayment);
 
         final RecurringTransaction rTransaction;
@@ -65,6 +116,9 @@ public class PrepaymentServiceImpl implements PrepaymentService {
 
         if (rTransaction != null) {
             rTransaction.setPrepaymentId(prepayment.getId());
+            if (Boolean.TRUE.equals(prepayment.getCompleted())) {
+                rTransaction.setCompleted(true);
+            }
             this.recurringTransactionService.updateRecurringTransaction(rTransaction);
         }
 
@@ -101,5 +155,23 @@ public class PrepaymentServiceImpl implements PrepaymentService {
         prepayment.setUpdateDate(LocalDateTime.now());
 
         this.prepaymentRepository.save(prepayment);
+    }
+
+    @Override
+    public Page<Prepayment> search(PrepaymentQuery query) {
+        final Specification<Prepayment> spec = PrepaymentSpecifications
+                .sort(query.getSort())
+                .and(PrepaymentSpecifications.budgetIdEquals(query.getBudgetId()))
+                .and(PrepaymentSpecifications.betweenAmount(query.getAmount()))
+                .and(PrepaymentSpecifications.nameEquals(query.getName()))
+                .and(PrepaymentSpecifications.betweenPaidUntil(query.getPaidUntil()))
+                .and(PrepaymentSpecifications.isCompleted(query.getCompleted()))
+                .and(PrepaymentSpecifications.betweenRemainingAmount(query.getRemainingAmount()));
+
+        return this.prepaymentRepository.findAll(
+                spec,
+                query.getPage(),
+                null
+        );
     }
 }
