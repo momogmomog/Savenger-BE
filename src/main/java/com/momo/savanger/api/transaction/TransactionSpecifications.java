@@ -67,6 +67,14 @@ public final class TransactionSpecifications {
         return QuerySpecifications.equalIfPresent(Transaction_.revisionId, revisionId);
     }
 
+    public static Specification<Transaction> recurringTransactionIdEquals(
+            final Long recurringTransactionId) {
+        return QuerySpecifications.equalIfPresent(
+                Transaction_.recurringTransactionId,
+                recurringTransactionId
+        );
+    }
+
     public static Specification<Transaction> categoryIdEquals(final Long categoryId) {
         return QuerySpecifications.equalIfPresent(Transaction_.categoryId, categoryId);
     }
@@ -103,6 +111,14 @@ public final class TransactionSpecifications {
 
     public static Specification<Transaction> noPrepaymentTransaction() {
         return (root, query, criteriaBuilder) -> root.get(Transaction_.prepaymentId).isNull();
+    }
+
+    public static Specification<Transaction> prepaymentIdEquals(
+            final Long prepaymentId) {
+        return QuerySpecifications.equalIfPresent(
+                Transaction_.prepaymentId,
+                prepaymentId
+        );
     }
 
     public static Specification<Transaction> debtIdEquals(Long debtId) {

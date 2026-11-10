@@ -1,6 +1,6 @@
 INSERT INTO transactions(id, type, amount, date_created, comment, user_id,
-                         category_id, budget_id, transfer_transaction_id, revision_id)
+                         category_id, budget_id, transfer_transaction_id, revision_id, recurring_transaction_id)
 VALUES (205, 'INCOME', 50, TIMESTAMP '2018-12-30 19:34:52',
-        'Migla', 1, 304, 1002, 594, null),
+        'Migla', 1, 304, 1002, 594, null, null),
        (206, 'EXPENSE', 50, TIMESTAMP '2018-12-30 19:34:52',
-        'Migla', 1, 302, 1001, 594, null);
+        'Migla', 1, 302, 1001, 594, null, null);

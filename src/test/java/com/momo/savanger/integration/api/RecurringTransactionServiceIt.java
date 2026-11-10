@@ -8,8 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.momo.savanger.api.prepayment.CreatePrepaymentDto;
 import com.momo.savanger.api.prepayment.PrepaymentService;
+import com.momo.savanger.api.transaction.Transaction;
 import com.momo.savanger.api.transaction.TransactionRepository;
 import com.momo.savanger.api.transaction.TransactionType;
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionExecutionService;
@@ -145,7 +147,7 @@ public class RecurringTransactionServiceIt {
     @Test
     public void testFindById_validId_shouldReturnRTransaction() {
 
-        assertNotNull(this.rTransactionService.findById(1001L));
+        assertNotNull(this.rTransactionService.findById(9001L));
     }
 
     @Test
@@ -156,7 +158,7 @@ public class RecurringTransactionServiceIt {
 
     @Test
     public void testRecurringTransactionExist_valid_shouldReturnTrue() {
-        assertTrue(this.rTransactionService.recurringTransactionExists(1001L, 1001L));
+        assertTrue(this.rTransactionService.recurringTransactionExists(9001L, 1001L));
     }
 
     @Test
@@ -166,13 +168,13 @@ public class RecurringTransactionServiceIt {
 
     @Test
     public void testRecurringTransactionExist_invalidBudgetId_shouldReturnFalse() {
-        assertFalse(this.rTransactionService.recurringTransactionExists(1001L, 1002L));
+        assertFalse(this.rTransactionService.recurringTransactionExists(9001L, 1002L));
     }
 
 
     @Test
     public void testFindByIdIfExist_validId_shouldReturnRTransaction() {
-        assertNotNull(this.rTransactionService.findByIdIfExists(1001L));
+        assertNotNull(this.rTransactionService.findByIdIfExists(9001L));
     }
 
     @Test
@@ -182,7 +184,7 @@ public class RecurringTransactionServiceIt {
 
     @Test
     public void testUpdateRecurringTransaction_shouldUpdateRTransaction() {
-        RecurringTransaction recurringTransaction = this.rTransactionService.findById(1001L);
+        RecurringTransaction recurringTransaction = this.rTransactionService.findById(9001L);
 
         assertEquals(BigDecimal.valueOf(101).setScale(2, RoundingMode.HALF_DOWN),
                 recurringTransaction.getAmount());
@@ -191,7 +193,7 @@ public class RecurringTransactionServiceIt {
 
         this.rTransactionService.updateRecurringTransaction(recurringTransaction);
 
-        recurringTransaction = this.rTransactionService.findById(1001L);
+        recurringTransaction = this.rTransactionService.findById(9001L);
 
         assertEquals(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_DOWN),
                 recurringTransaction.getAmount());
@@ -202,7 +204,7 @@ public class RecurringTransactionServiceIt {
     public void testPay_validPayload_shouldCreateTransaction() {
 
         RecurringTransaction recurringTransaction = this.recurringTransactionExecutionService.payPrepayment(
-                1001L
+                9001L
         );
 
         //Test remaining amount
@@ -222,9 +224,17 @@ public class RecurringTransactionServiceIt {
         //Test transaction size
         assertEquals(2, this.transactionRepository.findAll().size());
 
+        Transaction createdTransaction = this.transactionRepository.findAll().stream()
+                .filter(t -> t.getRecurringTransactionId() != null)
+                .findFirst()
+                .orElse(null);
+        assertNotNull(createdTransaction);
+        assertEquals(9001L, createdTransaction.getRecurringTransactionId());
+        assertEquals(1001L, createdTransaction.getPrepaymentId());
+
         //Test if remaining amount is smaller than transaction amount
 
-        recurringTransaction = this.recurringTransactionExecutionService.payPrepayment(1001L);
+        recurringTransaction = this.recurringTransactionExecutionService.payPrepayment(9001L);
 
         assertEquals(BigDecimal.valueOf(0).setScale(2, RoundingMode.HALF_DOWN),
                 recurringTransaction.getPrepayment().getRemainingAmount());
@@ -236,7 +246,7 @@ public class RecurringTransactionServiceIt {
 
         assertThrows(
                 ApiException.class,
-                () -> this.recurringTransactionExecutionService.payPrepayment(1001L)
+                () -> this.recurringTransactionExecutionService.payPrepayment(9001L)
         );
     }
 
@@ -254,10 +264,10 @@ public class RecurringTransactionServiceIt {
     public void testFindByIdAndFetchAll_validId() {
 
         final RecurringTransaction recurringTransaction = this.rTransactionService.findByIdFetchAll(
-                1001L);
+                9001L);
 
         assertNotNull(recurringTransaction);
-        assertEquals(1001L, recurringTransaction.getId());
+        assertEquals(9001L, recurringTransaction.getId());
         assertNotNull(recurringTransaction.getPrepayment());
         assertEquals(1001L, recurringTransaction.getPrepayment().getId());
         assertEquals("netsurf", recurringTransaction.getPrepayment().getName());
@@ -269,6 +279,37 @@ public class RecurringTransactionServiceIt {
         AssertUtil.assertApiException(ApiErrorCode.ERR_0016,
                 () -> this.rTransactionService.findByIdFetchAll(1234L)
         );
+    }
+
+    @Test
+    @Transactional
+    public void testExecute_validPayload_shouldCreateTransactionWithRecurringTransactionId() {
+        CreateTransactionDto overrideDto = new CreateTransactionDto();
+        overrideDto.setBudgetId(1001L);
+        overrideDto.setCategoryId(1001L);
+        overrideDto.setType(TransactionType.EXPENSE);
+        overrideDto.setAmount(BigDecimal.valueOf(50));
+        overrideDto.setComment("Executed recurring");
+
+        RecurringTransaction executed = this.recurringTransactionExecutionService.execute(
+                9001L,
+                overrideDto
+        );
+
+        assertNotNull(executed);
+        assertEquals(1, executed.getOccurrences());
+        assertEquals(2, this.transactionRepository.findAll().size());
+
+        Transaction createdTransaction = this.transactionRepository.findAll().stream()
+                .filter(t -> t.getRecurringTransactionId() != null)
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(createdTransaction);
+        assertEquals(9001L, createdTransaction.getRecurringTransactionId());
+        assertEquals(1001L, createdTransaction.getPrepaymentId());
+        assertEquals(BigDecimal.valueOf(50), createdTransaction.getAmount());
+        assertEquals("Executed recurring", createdTransaction.getComment());
     }
 
 }

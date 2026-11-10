@@ -26,11 +26,15 @@ public class TransactionDtoDetailed {
 
     private Long revisionId;
 
+    private Long recurringTransactionId;
+
     private Long userId;
 
     private Long categoryId;
 
     private Long budgetId;
+
+    private Long prepaymentId;
 
     private List<TagDto> tags;
 

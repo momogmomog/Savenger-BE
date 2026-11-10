@@ -20,6 +20,7 @@ import com.momo.savanger.api.transaction.Transaction;
 import com.momo.savanger.api.transaction.TransactionRepository;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.TransactionType;
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.dto.EditTransactionDto;
 import com.momo.savanger.api.transaction.dto.TransactionDtoSimple;
@@ -148,6 +149,7 @@ public class TransactionServiceIt {
         assertEquals(1, transaction.getTags().size());
         assertEquals(user.getId(), transaction.getUserId());
         assertNull(transaction.getRevisionId());
+        assertNull(transaction.getRecurringTransactionId());
     }
 
     @Test
@@ -174,6 +176,7 @@ public class TransactionServiceIt {
         assertEquals(1001L, transaction.getBudgetId());
         assertEquals(1001L, transaction.getCategoryId());
         assertEquals(1001L, transaction.getRevisionId());
+        assertEquals(9001L, transaction.getRecurringTransactionId());
     }
 
     @Test
@@ -246,6 +249,7 @@ public class TransactionServiceIt {
         assertEquals(1002L, transactions.getContent().get(1).getId());
 
         query.setRevisionId(1001L);
+        query.setRecurringTransactionId(9001L);
 
         // Search by budgetId, Type and comment
         query.setComment("Hrana");
@@ -295,6 +299,12 @@ public class TransactionServiceIt {
         query.setCategoryIds(List.of(1002L));
         amount = new BetweenQuery<>(BigDecimal.ZERO, BigDecimal.valueOf(600));
         query.setAmount(amount);
+
+        transactions = this.transactionService.searchTransactions(query, user);
+
+        assertEquals(0, transactions.getTotalElements());
+
+        query.setRecurringTransactionId(null);
 
         transactions = this.transactionService.searchTransactions(query, user);
 
@@ -573,10 +583,49 @@ public class TransactionServiceIt {
     @Sql("classpath:/sql/prepayment/recurring_transaction-it-data.sql")
     public void testCreateFromRecurringTransaction_shouldSaveTransaction() {
 
-        this.transactionService.createFromRecurringTransaction(
-                recurringTransactionService.findById(1001L), null);
+        Transaction transaction = this.transactionService.createFromRecurringTransaction(
+                recurringTransactionService.findById(9001L), null);
 
         assertEquals(5, this.transactionRepository.findAll().size());
+        assertNotNull(transaction);
+        assertEquals(9001L, transaction.getRecurringTransactionId());
+        assertEquals(1001L, transaction.getPrepaymentId());
+        assertEquals(1001L, transaction.getBudgetId());
+        assertEquals(1001L, transaction.getCategoryId());
+        assertEquals(101L, transaction.getDebtId());
+        assertEquals(TransactionType.EXPENSE, transaction.getType());
+        assertEquals(BigDecimal.valueOf(101).setScale(2, RoundingMode.HALF_DOWN),
+                transaction.getAmount().setScale(2, RoundingMode.HALF_DOWN));
+    }
+
+    @Test
+    @Transactional
+    @Sql("classpath:/sql/prepayment/prepayment-it-data.sql")
+    @Sql("classpath:/sql/prepayment/recurring_transaction-it-data.sql")
+    public void testCreateFromRecurringTransaction_withOverride_shouldSaveTransaction() {
+        CreateTransactionDto overrideDto = new CreateTransactionDto();
+        overrideDto.setBudgetId(1001L);
+        overrideDto.setCategoryId(1002L);
+        overrideDto.setType(TransactionType.INCOME);
+        overrideDto.setAmount(BigDecimal.valueOf(55.50));
+        overrideDto.setComment("Overridden comment");
+        overrideDto.setTagIds(List.of(1001L));
+
+        Transaction transaction = this.transactionService.createFromRecurringTransaction(
+                recurringTransactionService.findById(9001L), overrideDto);
+
+        assertEquals(5, this.transactionRepository.findAll().size());
+        assertNotNull(transaction);
+        assertEquals(9001L, transaction.getRecurringTransactionId());
+        assertEquals(1001L, transaction.getPrepaymentId());
+        assertEquals(1001L, transaction.getBudgetId());
+        assertEquals(1002L, transaction.getCategoryId());
+        assertEquals(TransactionType.INCOME, transaction.getType());
+        assertEquals("Overridden comment", transaction.getComment());
+        assertEquals(BigDecimal.valueOf(55.50).setScale(2, RoundingMode.HALF_DOWN),
+                transaction.getAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(1, transaction.getTags().size());
+        assertEquals(1001L, transaction.getTags().getFirst().getId());
     }
 
     @Test

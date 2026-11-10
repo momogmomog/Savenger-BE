@@ -37,6 +37,10 @@ public class TransactionSearchQuery {
 
     private Long revisionId;
 
+    private Long recurringTransactionId;
+
+    private Long prepaymentId;
+
     private List<Long> categoryIds;
 
     private List<Long> userIds;
@@ -62,6 +66,8 @@ public class TransactionSearchQuery {
         query.setComment(q.getComment());
         query.setRevised(q.getRevised());
         query.setRevisionId(q.getRevisionId());
+        query.setRecurringTransactionId(q.getRecurringTransactionId());
+        query.setPrepaymentId(q.getPrepaymentId());
         query.setCategoryIds(q.getCategoryIds());
         query.setUserIds(q.getUserIds());
         query.setDebtId(q.getDebtId());

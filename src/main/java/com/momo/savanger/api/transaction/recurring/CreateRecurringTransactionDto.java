@@ -34,6 +34,7 @@ public class CreateRecurringTransactionDto {
     @MinValueZero
     private BigDecimal amount;
 
+    @NotNull
     private Long categoryId;
 
     @Length(max = Lengths.MAX_VARCHAR, message = ValidationMessages.TEXT_MUST_BE_BETWEEN)
