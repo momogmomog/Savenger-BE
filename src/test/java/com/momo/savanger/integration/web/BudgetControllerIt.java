@@ -430,7 +430,15 @@ public class BudgetControllerIt extends BaseControllerIt {
     @Test
     @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
     public void testGetBudgetStatistics_validId_shouldReturnStatistics() throws Exception {
-        super.getOK("/budgets/1001/statistics");
+        super.getOK("/budgets/1001/statistics",
+                jsonPath("balance", is(23.0)),
+                jsonPath("expensesAmount", is(0)),
+                jsonPath("earningsAmount", is(0)),
+                jsonPath("debtLendedAmount", is(0)),
+                jsonPath("debtReceivedAmount", is(0)),
+                jsonPath("prepaymentsAmount", is(0)),
+                jsonPath("realBalance", is(23.0))
+        );
     }
 
     @Test

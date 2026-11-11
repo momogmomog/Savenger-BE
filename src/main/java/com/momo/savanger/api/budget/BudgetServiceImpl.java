@@ -243,6 +243,7 @@ public class BudgetServiceImpl implements BudgetService {
         statisticDto.setExpensesAmount(expenses);
         statisticDto.setDebtLendedAmount(debtLendedSum);
         statisticDto.setDebtReceivedAmount(debtReceivedSum);
+        statisticDto.setPrepaymentsAmount(prepaymentsAmount);
 
         statisticDto.setBalance(
                 budget.getBalance()
