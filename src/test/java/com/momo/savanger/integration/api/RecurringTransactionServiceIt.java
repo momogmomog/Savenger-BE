@@ -3,6 +3,7 @@ package com.momo.savanger.integration.api;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -284,6 +285,18 @@ public class RecurringTransactionServiceIt {
     @Test
     @Transactional
     public void testExecute_validPayload_shouldCreateTransactionWithRecurringTransactionId() {
+        CreateRecurringTransactionDto createDto = new CreateRecurringTransactionDto();
+        createDto.setBudgetId(1001L);
+        createDto.setType(TransactionType.EXPENSE);
+        createDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
+        createDto.setCategoryId(1001L);
+        createDto.setAutoExecute(false);
+        createDto.setAmount(BigDecimal.valueOf(100));
+
+        RecurringTransaction rTransactionWithoutPrepayment = this.rTransactionService.create(
+                createDto
+        );
+
         CreateTransactionDto overrideDto = new CreateTransactionDto();
         overrideDto.setBudgetId(1001L);
         overrideDto.setCategoryId(1001L);
@@ -292,12 +305,53 @@ public class RecurringTransactionServiceIt {
         overrideDto.setComment("Executed recurring");
 
         RecurringTransaction executed = this.recurringTransactionExecutionService.execute(
+                rTransactionWithoutPrepayment.getId(),
+                overrideDto
+        );
+
+        assertNotNull(executed);
+        assertNull(executed.getPrepaymentId());
+        assertEquals(1, executed.getOccurrences());
+        assertEquals(2, this.transactionRepository.findAll().size());
+
+        Transaction createdTransaction = this.transactionRepository.findAll().stream()
+                .filter(t -> t.getRecurringTransactionId() != null)
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(createdTransaction);
+        assertEquals(
+                rTransactionWithoutPrepayment.getId(),
+                createdTransaction.getRecurringTransactionId()
+        );
+        assertNull(createdTransaction.getPrepaymentId());
+        assertEquals(BigDecimal.valueOf(50), createdTransaction.getAmount());
+        assertEquals("Executed recurring", createdTransaction.getComment());
+    }
+
+    @Test
+    @Transactional
+    public void testExecute_withPrepaymentAttached_shouldApplyOverrideAndUpdatePrepayment() {
+        CreateTransactionDto overrideDto = new CreateTransactionDto();
+        overrideDto.setBudgetId(1001L);
+        overrideDto.setCategoryId(1001L);
+        overrideDto.setType(TransactionType.EXPENSE);
+        overrideDto.setAmount(BigDecimal.valueOf(50));
+        overrideDto.setComment("Executed recurring prepayment");
+
+        RecurringTransaction executed = this.recurringTransactionExecutionService.execute(
                 9001L,
                 overrideDto
         );
 
         assertNotNull(executed);
+        assertEquals(1001L, executed.getPrepaymentId());
         assertEquals(1, executed.getOccurrences());
+        assertEquals(
+                BigDecimal.valueOf(150).setScale(2, RoundingMode.HALF_DOWN),
+                executed.getPrepayment().getRemainingAmount().setScale(2, RoundingMode.HALF_DOWN)
+        );
+        assertFalse(executed.getPrepayment().getCompleted());
         assertEquals(2, this.transactionRepository.findAll().size());
 
         Transaction createdTransaction = this.transactionRepository.findAll().stream()
@@ -309,7 +363,18 @@ public class RecurringTransactionServiceIt {
         assertEquals(9001L, createdTransaction.getRecurringTransactionId());
         assertEquals(1001L, createdTransaction.getPrepaymentId());
         assertEquals(BigDecimal.valueOf(50), createdTransaction.getAmount());
-        assertEquals("Executed recurring", createdTransaction.getComment());
+        assertEquals("Executed recurring prepayment", createdTransaction.getComment());
+
+        // Execute again with override amount (180) exceeding remaining prepayment amount (150)
+        overrideDto.setAmount(BigDecimal.valueOf(180));
+        executed = this.recurringTransactionExecutionService.execute(9001L, overrideDto);
+
+        assertEquals(
+                BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
+                executed.getPrepayment().getRemainingAmount().setScale(2, RoundingMode.HALF_DOWN)
+        );
+        assertTrue(executed.getPrepayment().getCompleted());
+        assertTrue(executed.getCompleted());
     }
 
 }

@@ -31,7 +31,7 @@ public final class PrepaymentSpecifications {
         return QuerySpecifications.between(Prepayment_.paidUntil, query);
     }
 
-    public static Specification<Prepayment> isCompleted(final boolean isCompleted) {
+    public static Specification<Prepayment> isCompleted(final Boolean isCompleted) {
         return QuerySpecifications.equalIfPresent(Prepayment_.completed, isCompleted);
     }
 

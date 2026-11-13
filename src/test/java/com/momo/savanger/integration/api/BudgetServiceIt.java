@@ -429,6 +429,8 @@ public class BudgetServiceIt {
                 statistics.getBalance().setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.ZERO, statistics.getDebtLendedAmount());
         assertEquals(BigDecimal.valueOf(302.09), statistics.getDebtReceivedAmount());
+        assertEquals(BigDecimal.valueOf(200.00).setScale(2, RoundingMode.HALF_DOWN),
+                statistics.getPrepaymentsAmount().setScale(2, RoundingMode.HALF_DOWN));
     }
 
     @Test
@@ -498,6 +500,8 @@ public class BudgetServiceIt {
         assertEquals(1001L, statistics.getBudget().getId());
         assertEquals("Food", statistics.getBudget().getBudgetName());
 
+        assertEquals(BigDecimal.valueOf(200.00).setScale(2, RoundingMode.HALF_DOWN),
+                statistics.getPrepaymentsAmount().setScale(2, RoundingMode.HALF_DOWN));
         assertEquals(BigDecimal.valueOf(620.09), statistics.getRealBalance());
     }
 

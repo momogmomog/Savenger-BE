@@ -18,5 +18,7 @@ public class BudgetStatisticsDto {
 
     private BigDecimal debtReceivedAmount;
 
+    private BigDecimal prepaymentsAmount;
+
     private BigDecimal realBalance;
 }

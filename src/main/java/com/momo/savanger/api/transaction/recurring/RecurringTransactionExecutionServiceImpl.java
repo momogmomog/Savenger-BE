@@ -22,16 +22,32 @@ public class RecurringTransactionExecutionServiceImpl implements
     @Override
     @Transactional
     public RecurringTransaction payPrepayment(Long recurringTransactionId) {
-        final RecurringTransaction recurringTransaction = this.recurringTransactionService
-                .findByIdFetchAll(recurringTransactionId);
+        return this.payPrepayment(
+                this.recurringTransactionService.findByIdFetchAll(recurringTransactionId),
+                null
+        );
+    }
 
+    private RecurringTransaction payPrepayment(
+            RecurringTransaction recurringTransaction,
+            CreateTransactionDto transactionOverride
+    ) {
         final Prepayment prepayment = recurringTransaction.getPrepayment();
 
         if (prepayment.getRemainingAmount().compareTo(recurringTransaction.getAmount()) < 0) {
             recurringTransaction.setAmount(prepayment.getRemainingAmount());
         }
 
-        final var updatedRecurringTransaction = this.execute(recurringTransaction, null);
+        if (transactionOverride != null
+                && transactionOverride.getAmount() != null
+                && prepayment.getRemainingAmount().compareTo(transactionOverride.getAmount()) < 0) {
+            transactionOverride.setAmount(prepayment.getRemainingAmount());
+        }
+
+        final var updatedRecurringTransaction = this.execute(
+                recurringTransaction,
+                transactionOverride
+        );
 
         this.prepaymentService.updatePrepaymentAfterPay(prepayment);
 
@@ -58,8 +74,15 @@ public class RecurringTransactionExecutionServiceImpl implements
         // Recurring transaction is completed if the rrule has max occurrences
         // The occurrences field is incremented
         // Next Date is generated properly according to rrule
+
+        final var rTransaction = this.recurringTransactionService.findByIdFetchAll(
+                recurringTransactionId);
+
+        if (rTransaction.getPrepaymentId() != null) {
+            return this.payPrepayment(rTransaction, transactionOverride);
+        }
         return this.execute(
-                this.recurringTransactionService.findByIdFetchAll(recurringTransactionId),
+                rTransaction,
                 transactionOverride
         );
     }

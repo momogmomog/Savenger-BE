@@ -113,6 +113,10 @@ public class BudgetStatisticTestIt {
                 ZERO,
                 toScale(b1Stat.getExpensesAmount()).setScale(2, RoundingMode.HALF_DOWN)
         );
+        assertEquals(
+                ZERO,
+                toScale(b1Stat.getPrepaymentsAmount())
+        );
 
         //Test with received debt
 
@@ -146,6 +150,10 @@ public class BudgetStatisticTestIt {
         assertEquals(
                 toScale(0),
                 toScale(b1Stat.getExpensesAmount())
+        );
+        assertEquals(
+                toScale(0),
+                toScale(b1Stat.getPrepaymentsAmount())
         );
 
         //Test with received and lent debt
@@ -181,6 +189,10 @@ public class BudgetStatisticTestIt {
                 toScale(0),
                 toScale(b1Stat.getExpensesAmount())
         );
+        assertEquals(
+                toScale(0),
+                toScale(b1Stat.getPrepaymentsAmount())
+        );
 
         //Test with 2 received and 1 lent debt
 
@@ -214,6 +226,10 @@ public class BudgetStatisticTestIt {
         assertEquals(
                 toScale(0),
                 toScale(b1Stat.getExpensesAmount())
+        );
+        assertEquals(
+                toScale(0),
+                toScale(b1Stat.getPrepaymentsAmount())
         );
         //Test with 2 received and 1 lent debt and expense and earning transaction
 
@@ -249,6 +265,10 @@ public class BudgetStatisticTestIt {
                 toScale(10),
                 toScale(b1Stat.getExpensesAmount())
         );
+        assertEquals(
+                toScale(0),
+                toScale(b1Stat.getPrepaymentsAmount())
+        );
 
         //Test with 2 received and 1 lent debt, 1 expense and 1 earning transaction, 1 prepayment
 
@@ -283,6 +303,10 @@ public class BudgetStatisticTestIt {
                 toScale(10),
                 toScale(b1Stat.getExpensesAmount())
         );
+        assertEquals(
+                toScale(25),
+                toScale(b1Stat.getPrepaymentsAmount())
+        );
 
         //Test pay debt
         this.payDebt(b3ToB1.getId(), BigDecimal.valueOf(20));
@@ -314,6 +338,10 @@ public class BudgetStatisticTestIt {
         assertEquals(
                 toScale(10),
                 toScale(b1Stat.getExpensesAmount())
+        );
+        assertEquals(
+                toScale(25),
+                toScale(b1Stat.getPrepaymentsAmount())
         );
 
         //Receiver pay to you
@@ -347,6 +375,10 @@ public class BudgetStatisticTestIt {
         assertEquals(
                 toScale(10),
                 toScale(b1Stat.getExpensesAmount())
+        );
+        assertEquals(
+                toScale(25),
+                toScale(b1Stat.getPrepaymentsAmount())
         );
 
         // Test transaction with real numbers
@@ -392,6 +424,10 @@ public class BudgetStatisticTestIt {
                 toScale(20.50),
                 toScale(b1Stat.getExpensesAmount())
         );
+        assertEquals(
+                toScale(25),
+                toScale(b1Stat.getPrepaymentsAmount())
+        );
 
         //Test what if realBalance is 0
 
@@ -426,6 +462,10 @@ public class BudgetStatisticTestIt {
                 toScale(525),
                 toScale(b1Stat.getExpensesAmount())
         );
+        assertEquals(
+                toScale(25),
+                toScale(b1Stat.getPrepaymentsAmount())
+        );
 
         //Real balance is 0, now create expense transaction
 
@@ -459,6 +499,10 @@ public class BudgetStatisticTestIt {
         assertEquals(
                 toScale(535),
                 toScale(b1Stat.getExpensesAmount())
+        );
+        assertEquals(
+                toScale(25),
+                toScale(b1Stat.getPrepaymentsAmount())
         );
     }
 
@@ -496,6 +540,10 @@ public class BudgetStatisticTestIt {
                 toScale(0),
                 toScale(b2sStat.getExpensesAmount())
         );
+        assertEquals(
+                toScale(0),
+                toScale(b2sStat.getPrepaymentsAmount())
+        );
 
         //Test with received debt
 
@@ -526,6 +574,10 @@ public class BudgetStatisticTestIt {
         assertEquals(
                 toScale(0),
                 toScale(b2sStat.getExpensesAmount())
+        );
+        assertEquals(
+                toScale(0),
+                toScale(b2sStat.getPrepaymentsAmount())
         );
 
         //Test with received and lent debt
@@ -558,6 +610,10 @@ public class BudgetStatisticTestIt {
                 toScale(0),
                 toScale(b2sStat.getExpensesAmount())
         );
+        assertEquals(
+                toScale(0),
+                toScale(b2sStat.getPrepaymentsAmount())
+        );
 
         //Test with 2 received and 1 lent debt
 
@@ -588,6 +644,10 @@ public class BudgetStatisticTestIt {
         assertEquals(
                 toScale(0),
                 toScale(b2sStat.getExpensesAmount())
+        );
+        assertEquals(
+                toScale(0),
+                toScale(b2sStat.getPrepaymentsAmount())
         );
 
         //Test with 2 received and 1 lent debt and expense and earning transaction
@@ -621,6 +681,10 @@ public class BudgetStatisticTestIt {
                 toScale(10),
                 toScale(b2sStat.getExpensesAmount())
         );
+        assertEquals(
+                toScale(0),
+                toScale(b2sStat.getPrepaymentsAmount())
+        );
 
         //Test with 2 received and 1 lent debt, 1 expense and 1 earning transaction, 1 prepayment
 
@@ -652,6 +716,10 @@ public class BudgetStatisticTestIt {
                 toScale(10),
                 toScale(b2sStat.getExpensesAmount())
         );
+        assertEquals(
+                toScale(25),
+                toScale(b2sStat.getPrepaymentsAmount())
+        );
 
         //Test pay debt
         this.payDebt(b3ToB2.getId(), BigDecimal.valueOf(20));
@@ -680,6 +748,10 @@ public class BudgetStatisticTestIt {
         assertEquals(
                 toScale(10),
                 toScale(b2sStat.getExpensesAmount())
+        );
+        assertEquals(
+                toScale(25),
+                toScale(b2sStat.getPrepaymentsAmount())
         );
 
         //Receiver pay to you
@@ -710,6 +782,10 @@ public class BudgetStatisticTestIt {
         assertEquals(
                 toScale(10),
                 toScale(b2sStat.getExpensesAmount())
+        );
+        assertEquals(
+                toScale(25),
+                toScale(b2sStat.getPrepaymentsAmount())
         );
 
         // Test transaction with real number
@@ -745,6 +821,10 @@ public class BudgetStatisticTestIt {
                 toScale(20.50),
                 toScale(b2sStat.getExpensesAmount())
         );
+        assertEquals(
+                toScale(25),
+                toScale(b2sStat.getPrepaymentsAmount())
+        );
 
         //Test what if realBalance is 0
 
@@ -779,6 +859,10 @@ public class BudgetStatisticTestIt {
                 toScale(625),
                 toScale(b2sStat.getExpensesAmount())
         );
+        assertEquals(
+                toScale(25),
+                toScale(b2sStat.getPrepaymentsAmount())
+        );
 
         //Real balance is 0, now create expense transaction
 
@@ -812,6 +896,10 @@ public class BudgetStatisticTestIt {
         assertEquals(
                 toScale(635),
                 toScale(b2sStat.getExpensesAmount())
+        );
+        assertEquals(
+                toScale(25),
+                toScale(b2sStat.getPrepaymentsAmount())
         );
     }
 

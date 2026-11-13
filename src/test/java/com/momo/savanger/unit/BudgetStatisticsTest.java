@@ -73,6 +73,7 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.ZERO, stats.getExpensesAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtLendedAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtReceivedAmount());
+        assertEquals(BigDecimal.ZERO, stats.getPrepaymentsAmount());
         assertEquals(BigDecimal.ZERO, stats.getRealBalance());
         assertEquals(BigDecimal.ZERO, stats.getBalance());
     }
@@ -95,6 +96,7 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.valueOf(200), stats.getExpensesAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtLendedAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtReceivedAmount());
+        assertEquals(BigDecimal.ZERO, stats.getPrepaymentsAmount());
 
         assertEquals(BigDecimal.valueOf(-200), stats.getRealBalance());
         assertEquals(BigDecimal.valueOf(-200), stats.getBalance());
@@ -118,6 +120,7 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.ZERO, stats.getExpensesAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtLendedAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtReceivedAmount());
+        assertEquals(BigDecimal.ZERO, stats.getPrepaymentsAmount());
         assertEquals(BigDecimal.valueOf(1000), stats.getRealBalance());
         assertEquals(BigDecimal.valueOf(1000), stats.getBalance());
     }
@@ -140,6 +143,7 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.valueOf(200), stats.getExpensesAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtLendedAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtReceivedAmount());
+        assertEquals(BigDecimal.ZERO, stats.getPrepaymentsAmount());
         assertEquals(BigDecimal.valueOf(800), stats.getRealBalance());
         assertEquals(BigDecimal.valueOf(800), stats.getBalance());
     }
@@ -162,6 +166,7 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.valueOf(200), stats.getExpensesAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtLendedAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtReceivedAmount());
+        assertEquals(BigDecimal.valueOf(230), stats.getPrepaymentsAmount());
         assertEquals(BigDecimal.valueOf(570), stats.getRealBalance());
         assertEquals(BigDecimal.valueOf(800), stats.getBalance());
     }
@@ -185,6 +190,7 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.valueOf(200), stats.getExpensesAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtLendedAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtReceivedAmount());
+        assertEquals(BigDecimal.valueOf(230), stats.getPrepaymentsAmount());
         assertEquals(BigDecimal.valueOf(1570), stats.getRealBalance());
         assertEquals(BigDecimal.valueOf(1800), stats.getBalance());
     }
@@ -207,6 +213,7 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.valueOf(200), stats.getExpensesAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtLendedAmount());
         assertEquals(BigDecimal.valueOf(50), stats.getDebtReceivedAmount());
+        assertEquals(BigDecimal.valueOf(230), stats.getPrepaymentsAmount());
         assertEquals(BigDecimal.valueOf(620), stats.getRealBalance());
         assertEquals(BigDecimal.valueOf(800), stats.getBalance());
     }
@@ -229,6 +236,7 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.valueOf(200), stats.getExpensesAmount());
         assertEquals(BigDecimal.valueOf(100), stats.getDebtLendedAmount());
         assertEquals(BigDecimal.ZERO, stats.getDebtReceivedAmount());
+        assertEquals(BigDecimal.valueOf(230), stats.getPrepaymentsAmount());
         assertEquals(BigDecimal.valueOf(470), stats.getRealBalance());
         assertEquals(BigDecimal.valueOf(800), stats.getBalance());
     }
@@ -260,6 +268,7 @@ public class BudgetStatisticsTest {
         assertEquals(BigDecimal.valueOf(200), stats.getExpensesAmount());
         assertEquals(BigDecimal.valueOf(100), stats.getDebtLendedAmount());
         assertEquals(BigDecimal.valueOf(50), stats.getDebtReceivedAmount());
+        assertEquals(BigDecimal.valueOf(230), stats.getPrepaymentsAmount());
         assertEquals(BigDecimal.valueOf(520), stats.getRealBalance());
         assertEquals(BigDecimal.valueOf(800), stats.getBalance());
     }
