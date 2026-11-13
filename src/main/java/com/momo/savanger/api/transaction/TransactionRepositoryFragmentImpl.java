@@ -75,7 +75,10 @@ public class TransactionRepositoryFragmentImpl extends
                 root.get(Transaction_.amount),
                 root.get(Transaction_.type),
                 root.get(Transaction_.dateCreated),
-                cb.isNotNull(root.get(Transaction_.revisionId))
+                cb.isNotNull(root.get(Transaction_.revisionId)),
+                root.get(Transaction_.recurringTransactionId),
+                root.get(Transaction_.prepaymentId),
+                root.get(Transaction_.debtId)
         ));
 
         final List<TransactionBasicDto> transactions = entityManager.createQuery(query)
