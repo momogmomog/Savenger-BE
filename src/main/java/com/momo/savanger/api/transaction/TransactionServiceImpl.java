@@ -123,33 +123,87 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public void payDebtTransaction(Debt debt, BigDecimal amount) {
+        this.payDebtTransaction(debt, amount, null, null);
+    }
+
+    @Override
+    @Transactional
+    public void payDebtTransaction(
+            Debt debt,
+            BigDecimal amount,
+            RecurringTransaction recurringTransaction,
+            CreateTransactionDto transactionOverride
+    ) {
         final Long userId = SecurityUtils.getCurrentUser().getId();
 
         this.create(
-                this.createTransactionDtoForDebt(amount,
+                this.createTransactionDtoForDebt(
+                        amount,
                         debt.getId(),
                         TransactionType.EXPENSE,
-                        debt.getReceiverBudgetId())
-                , userId
+                        debt.getReceiverBudgetId(),
+                        recurringTransaction,
+                        transactionOverride
+                ),
+                userId
         );
 
         this.create(
-                this.createTransactionDtoForDebt(amount,
+                this.createTransactionDtoForDebt(
+                        amount,
                         debt.getId(),
                         TransactionType.INCOME,
-                        debt.getLenderBudgetId())
-                , userId
+                        debt.getLenderBudgetId(),
+                        recurringTransaction,
+                        transactionOverride
+                ),
+                userId
         );
     }
 
     private CreateTransactionServiceDto createTransactionDtoForDebt(BigDecimal amount, Long debtId,
             TransactionType transactionType, Long budgetId) {
 
-        return CreateTransactionServiceDto.debtDto(amount,
+        return this.createTransactionDtoForDebt(
+                amount,
+                debtId,
+                transactionType,
+                budgetId,
+                null,
+                null
+        );
+    }
+
+    private CreateTransactionServiceDto createTransactionDtoForDebt(
+            BigDecimal amount,
+            Long debtId,
+            TransactionType transactionType,
+            Long budgetId,
+            RecurringTransaction recurringTransaction,
+            CreateTransactionDto transactionOverride
+    ) {
+        final CreateTransactionServiceDto createDto = CreateTransactionServiceDto.debtDto(
+                amount,
                 debtId,
                 transactionType,
                 budgetId
         );
+
+        if (recurringTransaction != null) {
+            final CreateTransactionServiceDto recurringDto = this.transactionMapper
+                    .toCreateServiceDto(recurringTransaction);
+
+            if (transactionOverride != null) {
+                this.transactionMapper.mergeIntoServiceDto(transactionOverride, recurringDto);
+            }
+
+            createDto.setRecurringTransactionId(recurringTransaction.getId());
+            createDto.setComment(recurringDto.getComment());
+            createDto.setCategoryId(recurringDto.getCategoryId());
+            createDto.setTagIds(recurringDto.getTagIds());
+        }
+
+        return createDto;
     }
 
     private CreateTransactionServiceDto createTransactionDtoForTransfer(BigDecimal amount,

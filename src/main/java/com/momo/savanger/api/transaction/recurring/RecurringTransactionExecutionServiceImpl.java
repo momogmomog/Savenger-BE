@@ -1,11 +1,15 @@
 package com.momo.savanger.api.transaction.recurring;
 
+import com.momo.savanger.api.debt.Debt;
+import com.momo.savanger.api.debt.DebtService;
+import com.momo.savanger.api.debt.PayDebtDto;
 import com.momo.savanger.api.prepayment.Prepayment;
 import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +20,7 @@ public class RecurringTransactionExecutionServiceImpl implements
         RecurringTransactionExecutionService {
 
     private final PrepaymentService prepaymentService;
+    private final DebtService debtService;
     private final RecurringTransactionService recurringTransactionService;
     private final TransactionService transactionService;
 
@@ -81,9 +86,45 @@ public class RecurringTransactionExecutionServiceImpl implements
         if (rTransaction.getPrepaymentId() != null) {
             return this.payPrepayment(rTransaction, transactionOverride);
         }
+
+        if (rTransaction.getDebtId() != null) {
+            return this.payDebt(rTransaction, transactionOverride);
+        }
+
         return this.execute(
                 rTransaction,
                 transactionOverride
+        );
+    }
+
+    private RecurringTransaction payDebt(
+            RecurringTransaction recurringTransaction,
+            CreateTransactionDto transactionOverride
+    ) {
+        final PayDebtDto payDebtDto = new PayDebtDto();
+        if (transactionOverride != null && transactionOverride.getAmount() != null) {
+            payDebtDto.setAmount(transactionOverride.getAmount());
+        } else {
+            payDebtDto.setAmount(recurringTransaction.getAmount());
+        }
+
+        final Debt debt = this.debtService.pay(
+                recurringTransaction.getDebtId(),
+                payDebtDto,
+                recurringTransaction,
+                transactionOverride
+        );
+
+        this.recurringTransactionService.advanceRecurringTransaction(
+                recurringTransaction
+        );
+
+        if (debt.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            recurringTransaction.setCompleted(true);
+        }
+
+        return this.recurringTransactionService.updateRecurringTransaction(
+                recurringTransaction
         );
     }
 

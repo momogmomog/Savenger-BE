@@ -7,12 +7,18 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.momo.savanger.api.budget.BudgetService;
+import com.momo.savanger.api.budget.dto.BudgetStatistics;
+import com.momo.savanger.api.debt.Debt;
+import com.momo.savanger.api.debt.DebtService;
 import com.momo.savanger.api.prepayment.CreatePrepaymentDto;
 import com.momo.savanger.api.prepayment.PrepaymentService;
 import com.momo.savanger.api.transaction.Transaction;
 import com.momo.savanger.api.transaction.TransactionRepository;
+import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
+import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
 import com.momo.savanger.api.transaction.recurring.CreateRecurringTransactionDto;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionExecutionService;
@@ -20,10 +26,13 @@ import com.momo.savanger.api.transaction.recurring.RecurringTransactionRepositor
 import com.momo.savanger.api.transaction.recurring.RecurringTransactionService;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
+import com.momo.savanger.integration.web.Constants;
+import com.momo.savanger.integration.web.WithLocalMockedUser;
 import com.momo.savanger.util.AssertUtil;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,6 +85,15 @@ public class RecurringTransactionServiceIt {
 
     @Autowired
     private TransactionRepository transactionRepository;
+
+    @Autowired
+    private DebtService debtService;
+
+    @Autowired
+    private BudgetService budgetService;
+
+    @Autowired
+    private TransactionService transactionService;
 
     @Test
     @Transactional
@@ -375,6 +393,213 @@ public class RecurringTransactionServiceIt {
         );
         assertTrue(executed.getPrepayment().getCompleted());
         assertTrue(executed.getCompleted());
+    }
+
+    @Test
+    @Transactional
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testExecute_withDebtAttached_shouldPayDebtAndCreateTransactions() {
+        CreateRecurringTransactionDto createDto = new CreateRecurringTransactionDto();
+        createDto.setBudgetId(1001L);
+        createDto.setDebtId(101L);
+        createDto.setType(TransactionType.EXPENSE);
+        createDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
+        createDto.setCategoryId(1001L);
+        createDto.setAutoExecute(false);
+        createDto.setIncludeInBalance(false);
+        createDto.setAmount(BigDecimal.valueOf(100));
+        createDto.setComment("Recurring debt payment");
+        createDto.setTagIds(List.of(1001L));
+
+        RecurringTransaction debtRTransaction = this.rTransactionService.create(createDto);
+
+        Debt debt = this.debtService.findById(101L);
+        BudgetStatistics lenderBudgetStats = this.budgetService.getStatistics(
+                debt.getLenderBudgetId());
+        BudgetStatistics receiverBudgetStats = this.budgetService.getStatistics(
+                debt.getReceiverBudgetId());
+
+        assertEquals(BigDecimal.valueOf(302.09),
+                debt.getAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.valueOf(197.91).setScale(2, RoundingMode.HALF_DOWN),
+                lenderBudgetStats.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.valueOf(422.09).setScale(2, RoundingMode.HALF_DOWN),
+                receiverBudgetStats.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
+
+        RecurringTransaction executed = this.recurringTransactionExecutionService.execute(
+                debtRTransaction.getId(),
+                null
+        );
+
+        assertNotNull(executed);
+        assertEquals(101L, executed.getDebtId());
+        assertEquals(1, executed.getOccurrences());
+        assertFalse(executed.getCompleted());
+
+        debt = this.debtService.findById(101L);
+        lenderBudgetStats = this.budgetService.getStatistics(debt.getLenderBudgetId());
+        receiverBudgetStats = this.budgetService.getStatistics(debt.getReceiverBudgetId());
+
+        assertEquals(BigDecimal.valueOf(202.09),
+                debt.getAmount().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.valueOf(297.91).setScale(2, RoundingMode.HALF_DOWN),
+                lenderBudgetStats.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.valueOf(322.09).setScale(2, RoundingMode.HALF_DOWN),
+                receiverBudgetStats.getRealBalance().setScale(2, RoundingMode.HALF_DOWN));
+
+        List<Transaction> debtTransactions = this.transactionRepository.findAll().stream()
+                .filter(t -> debtRTransaction.getId().equals(t.getRecurringTransactionId()))
+                .toList();
+        assertEquals(2, debtTransactions.size());
+
+        Transaction receiverTx = debtTransactions.stream()
+                .filter(t -> t.getType() == TransactionType.EXPENSE)
+                .findFirst()
+                .orElseThrow();
+        Transaction lenderTx = debtTransactions.stream()
+                .filter(t -> t.getType() == TransactionType.INCOME)
+                .findFirst()
+                .orElseThrow();
+
+        assertEquals(1001L, receiverTx.getBudgetId());
+        assertEquals(101L, receiverTx.getDebtId());
+        assertEquals(BigDecimal.valueOf(100), receiverTx.getAmount());
+        assertEquals("Recurring debt payment", receiverTx.getComment());
+        assertEquals(1001L, receiverTx.getCategoryId());
+        assertEquals(1, receiverTx.getTags().size());
+        assertEquals(1001L, receiverTx.getTags().getFirst().getId());
+
+        assertEquals(1002L, lenderTx.getBudgetId());
+        assertEquals(101L, lenderTx.getDebtId());
+        assertEquals(BigDecimal.valueOf(100), lenderTx.getAmount());
+        assertEquals("Recurring debt payment", lenderTx.getComment());
+    }
+
+    @Test
+    @Transactional
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testExecute_withDebtAttachedAndOverride_shouldApplyOverrideAndCompleteWhenPaid() {
+        CreateRecurringTransactionDto createDto = new CreateRecurringTransactionDto();
+        createDto.setBudgetId(1001L);
+        createDto.setDebtId(101L);
+        createDto.setType(TransactionType.EXPENSE);
+        createDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
+        createDto.setCategoryId(1001L);
+        createDto.setAutoExecute(false);
+        createDto.setIncludeInBalance(false);
+        createDto.setAmount(BigDecimal.valueOf(100));
+
+        RecurringTransaction debtRTransaction = this.rTransactionService.create(createDto);
+
+        CreateTransactionDto overrideDto = new CreateTransactionDto();
+        overrideDto.setBudgetId(1001L);
+        overrideDto.setCategoryId(1001L);
+        overrideDto.setType(TransactionType.EXPENSE);
+        overrideDto.setAmount(BigDecimal.valueOf(150));
+        overrideDto.setComment("Overridden debt payment");
+        overrideDto.setTagIds(List.of(1001L));
+
+        RecurringTransaction executed = this.recurringTransactionExecutionService.execute(
+                debtRTransaction.getId(),
+                overrideDto
+        );
+
+        assertFalse(executed.getCompleted());
+        assertEquals(1, executed.getOccurrences());
+
+        Debt debt = this.debtService.findById(101L);
+        assertEquals(BigDecimal.valueOf(152.09),
+                debt.getAmount().setScale(2, RoundingMode.HALF_DOWN));
+
+        // Execute again with override amount (200) larger than remaining debt (152.09)
+        overrideDto.setAmount(BigDecimal.valueOf(200));
+        executed = this.recurringTransactionExecutionService.execute(
+                debtRTransaction.getId(),
+                overrideDto
+        );
+
+        assertTrue(executed.getCompleted());
+        assertEquals(2, executed.getOccurrences());
+
+        debt = this.debtService.findById(101L);
+        assertEquals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_DOWN),
+                debt.getAmount().setScale(2, RoundingMode.HALF_DOWN));
+
+        BigDecimal lendedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(
+                1001L, TransactionType.EXPENSE);
+        BigDecimal receivedAmount = this.transactionRepository.sumDebtAmountByBudgetIdAndTypeOfNonRevised(
+                1002L, TransactionType.INCOME);
+
+        assertEquals(BigDecimal.valueOf(302.09), lendedAmount.setScale(2, RoundingMode.HALF_DOWN));
+        assertEquals(BigDecimal.valueOf(302.09),
+                receivedAmount.setScale(2, RoundingMode.HALF_DOWN));
+
+        // Executing again after completion should throw ERR_0016
+        AssertUtil.assertApiException(
+                ApiErrorCode.ERR_0016,
+                () -> this.recurringTransactionExecutionService.execute(
+                        debtRTransaction.getId(),
+                        overrideDto
+                )
+        );
+    }
+
+    @Test
+    @Transactional
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testExecute_withDebtAttached_amountBiggerThanRealBalance_shouldThrowException() {
+        // Reduce budget 1001 realBalance (422.09 -> 22.09)
+        CreateTransactionServiceDto expenseDto = new CreateTransactionServiceDto();
+        expenseDto.setAmount(BigDecimal.valueOf(400));
+        expenseDto.setType(TransactionType.EXPENSE);
+        expenseDto.setBudgetId(1001L);
+        this.transactionService.create(expenseDto, 1L);
+
+        CreateRecurringTransactionDto createDto = new CreateRecurringTransactionDto();
+        createDto.setBudgetId(1001L);
+        createDto.setDebtId(101L);
+        createDto.setType(TransactionType.EXPENSE);
+        createDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
+        createDto.setCategoryId(1001L);
+        createDto.setAutoExecute(false);
+        createDto.setIncludeInBalance(false);
+        createDto.setAmount(BigDecimal.valueOf(100));
+
+        RecurringTransaction debtRTransaction = this.rTransactionService.create(createDto);
+
+        AssertUtil.assertApiException(
+                ApiErrorCode.ERR_0014,
+                () -> this.recurringTransactionExecutionService.execute(
+                        debtRTransaction.getId(),
+                        null
+                )
+        );
+    }
+
+    @Test
+    @Transactional
+    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    public void testExecute_withDebtAttached_userNotPermittedOnOtherDebtBudget_shouldThrowException() {
+        CreateRecurringTransactionDto createDto = new CreateRecurringTransactionDto();
+        createDto.setBudgetId(1001L);
+        createDto.setDebtId(101L);
+        createDto.setType(TransactionType.EXPENSE);
+        createDto.setRecurringRule("FREQ=DAILY;INTERVAL=1");
+        createDto.setCategoryId(1001L);
+        createDto.setAutoExecute(false);
+        createDto.setIncludeInBalance(false);
+        createDto.setAmount(BigDecimal.valueOf(50));
+
+        RecurringTransaction debtRTransaction = this.rTransactionService.create(createDto);
+
+        // User 2 is participant on budget 1001, but not permitted on lender budget 1002
+        AssertUtil.assertApiException(
+                ApiErrorCode.ERR_0013,
+                () -> this.recurringTransactionExecutionService.execute(
+                        debtRTransaction.getId(),
+                        null
+                )
+        );
     }
 
 }
