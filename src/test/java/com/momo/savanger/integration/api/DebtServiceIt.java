@@ -5,10 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.momo.savanger.api.budget.Budget;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.debt.CreateDebtDto;
 import com.momo.savanger.api.debt.Debt;
+import com.momo.savanger.api.debt.DebtQuery;
 import com.momo.savanger.api.debt.DebtRepository;
 import com.momo.savanger.api.debt.DebtService;
 import com.momo.savanger.api.debt.PayDebtDto;
@@ -16,18 +18,24 @@ import com.momo.savanger.api.transaction.TransactionRepository;
 import com.momo.savanger.api.transaction.TransactionService;
 import com.momo.savanger.api.transaction.TransactionType;
 import com.momo.savanger.api.transaction.dto.CreateTransactionServiceDto;
+import com.momo.savanger.api.util.BetweenQuery;
+import com.momo.savanger.api.util.PageQuery;
+import com.momo.savanger.api.util.SortDirection;
+import com.momo.savanger.api.util.SortQuery;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.integration.web.Constants;
 import com.momo.savanger.integration.web.WithLocalMockedUser;
 import com.momo.savanger.util.AssertUtil;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -485,5 +493,105 @@ public class DebtServiceIt {
     public void testIsValid_withNotPermittedUser_shouldReturnFalse() {
 
         assertFalse(this.debtService.isValid(101L, 1001L));
+    }
+
+    @Test
+    public void testFindAndFetchDetails_validId_shouldReturnDebtWithDetailsForBudgets() {
+        final Debt debt = this.debtService.findAndFetchDetails(101L);
+
+        assertNotNull(debt);
+        assertEquals(101L, debt.getId());
+
+        final Budget receiverBudget = debt.getReceiverBudget();
+        final Budget lenderBudget = debt.getLenderBudget();
+
+        assertNotNull(receiverBudget);
+        assertNotNull(lenderBudget);
+
+        assertEquals(1001L, receiverBudget.getId());
+        assertEquals("bochko", receiverBudget.getBudgetName());
+        assertEquals(1002L, lenderBudget.getId());
+        assertEquals("Knigi", lenderBudget.getBudgetName());
+    }
+
+    @Test
+    public void testFindAndFetchDetails_invalidId_shouldThrowException() {
+        AssertUtil.assertApiException(ApiErrorCode.ERR_0013,
+                () -> this.debtService.findAndFetchDetails(99999L));
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.FIRST_USER_USERNAME)
+    public void testSearch_validFilters_shouldReturnMatchingDebtsWithBudgets() {
+        final CreateDebtDto dto = new CreateDebtDto();
+        dto.setDebtAmount(BigDecimal.valueOf(50));
+        dto.setLenderBudgetId(100111L);
+        dto.setReceiverBudgetId(100112L);
+        final Debt secondDebt = this.debtService.create(dto);
+
+        final DebtQuery query = new DebtQuery();
+        query.setPage(new PageQuery(0, 10));
+        query.setSort(new SortQuery("id", SortDirection.ASC));
+
+        // 1. No filter -> returns both debts for FIRST_USER (sorted by id DESC so 101L is first)
+        query.setSort(new SortQuery("id", SortDirection.DESC));
+        Page<Debt> result = this.debtService.search(query);
+        assertEquals(2, result.getTotalElements());
+        assertEquals(101L, result.getContent().getFirst().getId());
+        assertNotNull(result.getContent().getFirst().getReceiverBudget());
+        assertNotNull(result.getContent().getFirst().getLenderBudget());
+        assertEquals("bochko", result.getContent().getFirst().getReceiverBudget().getBudgetName());
+        assertEquals("Knigi", result.getContent().getFirst().getLenderBudget().getBudgetName());
+
+        // 2. Filter by receiverBudgetId
+        query.setReceiverBudgetId(1001L);
+        result = this.debtService.search(query);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(101L, result.getContent().getFirst().getId());
+
+        // 3. Filter by lenderBudgetId
+        query.setReceiverBudgetId(null);
+        query.setLenderBudgetId(100111L);
+        result = this.debtService.search(query);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(secondDebt.getId(), result.getContent().getFirst().getId());
+
+        // 4. Filter by participating budgetIds (matches receiver or lender)
+        query.setLenderBudgetId(null);
+        query.setBudgetIds(List.of(1002L));
+        result = this.debtService.search(query);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(101L, result.getContent().getFirst().getId());
+
+        query.setBudgetIds(List.of(1001L, 100111L));
+        result = this.debtService.search(query);
+        assertEquals(2, result.getTotalElements());
+
+        // 5. Filter by amount range
+        query.setBudgetIds(null);
+        query.setAmount(new BetweenQuery<>(BigDecimal.valueOf(100), BigDecimal.valueOf(400)));
+        result = this.debtService.search(query);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(101L, result.getContent().getFirst().getId());
+    }
+
+    @Test
+    @WithLocalMockedUser(username = Constants.SECOND_USER_USERNAME)
+    @Sql("classpath:/sql/user-it-data.sql")
+    @Sql("classpath:/sql/debt/budget-it-data.sql")
+    @Sql("classpath:/sql/debt/budgets_participants-it-data.sql")
+    @Sql("classpath:/sql/debt/debt-it-data.sql")
+    @Sql(value = "classpath:/sql/debt/del-debt-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+    @Sql(value = "classpath:/sql/debt/del-budgets_participants-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+    @Sql(value = "classpath:/sql/debt/del-budget-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+    @Sql(value = "classpath:/sql/del-user-it-data.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+    public void testSearch_userOnlyPermittedOnOneBudget_shouldNotReturnDebt() {
+        // SECOND_USER is participant in budget 1001 (receiver) but NOT permitted on budget 1002 (lender)
+        final DebtQuery query = new DebtQuery();
+        query.setPage(new PageQuery(0, 10));
+        query.setSort(new SortQuery("id", SortDirection.ASC));
+
+        final Page<Debt> result = this.debtService.search(query);
+        assertEquals(0, result.getTotalElements());
     }
 }
