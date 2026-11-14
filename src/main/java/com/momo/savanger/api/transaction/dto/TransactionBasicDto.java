@@ -9,6 +9,9 @@ public record TransactionBasicDto(
         BigDecimal amount,
         TransactionType type,
         LocalDateTime dateCreated,
-        Boolean revised) {
+        Boolean revised,
+        Long recurringTransactionId,
+        Long prepaymentId,
+        Long debtId) {
 
 }

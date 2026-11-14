@@ -1,6 +1,7 @@
 package com.momo.savanger.api.transaction.recurring;
 
 import com.momo.savanger.api.common.model.Audit;
+import com.momo.savanger.api.debt.Debt;
 import com.momo.savanger.api.prepayment.Prepayment;
 import com.momo.savanger.api.tag.Tag;
 import com.momo.savanger.api.transaction.TransactionType;
@@ -86,6 +87,10 @@ public class RecurringTransaction extends Audit {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prepaymentId", insertable = false, updatable = false)
     private Prepayment prepayment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "debtId", insertable = false, updatable = false)
+    private Debt debt;
 
     @Exclude
     @ManyToMany(fetch = FetchType.LAZY)

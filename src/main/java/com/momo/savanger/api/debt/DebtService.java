@@ -1,5 +1,7 @@
 package com.momo.savanger.api.debt;
 
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
+import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import java.util.Optional;
 
 public interface DebtService {
@@ -9,6 +11,13 @@ public interface DebtService {
     Debt create(CreateDebtDto dto);
 
     Debt pay(Long id, PayDebtDto dto);
+
+    Debt pay(
+            Long id,
+            PayDebtDto dto,
+            RecurringTransaction recurringTransaction,
+            CreateTransactionDto transactionOverride
+    );
 
     Optional<Debt> findDebt(Long receiverBudgetId, Long lenderBudgetId);
 

@@ -30,6 +30,8 @@ public class TransactionDtoDetailed {
 
     private Long userId;
 
+    private Long debtId;
+
     private Long categoryId;
 
     private Long budgetId;

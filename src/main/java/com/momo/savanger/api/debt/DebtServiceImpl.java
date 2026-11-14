@@ -3,6 +3,8 @@ package com.momo.savanger.api.debt;
 import com.momo.savanger.api.budget.BudgetService;
 import com.momo.savanger.api.budget.dto.BudgetStatistics;
 import com.momo.savanger.api.transaction.TransactionService;
+import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
+import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
 import com.momo.savanger.error.ApiErrorCode;
@@ -64,6 +66,16 @@ public class DebtServiceImpl implements DebtService {
 
     @Override
     public Debt pay(Long id, PayDebtDto dto) {
+        return this.pay(id, dto, null, null);
+    }
+
+    @Override
+    public Debt pay(
+            Long id,
+            PayDebtDto dto,
+            RecurringTransaction recurringTransaction,
+            CreateTransactionDto transactionOverride
+    ) {
 
         final Debt debt = this.findById(id);
 
@@ -86,7 +98,12 @@ public class DebtServiceImpl implements DebtService {
 
         this.debtRepository.save(debt);
 
-        this.transactionService.payDebtTransaction(debt, dto.getAmount());
+        this.transactionService.payDebtTransaction(
+                debt,
+                dto.getAmount(),
+                recurringTransaction,
+                transactionOverride
+        );
 
         return debt;
     }

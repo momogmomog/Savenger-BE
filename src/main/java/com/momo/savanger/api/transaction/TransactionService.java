@@ -52,6 +52,13 @@ public interface TransactionService {
 
     void payDebtTransaction(Debt debt, BigDecimal amount);
 
+    void payDebtTransaction(
+            Debt debt,
+            BigDecimal amount,
+            RecurringTransaction recurringTransaction,
+            CreateTransactionDto transactionOverride
+    );
+
     Transaction createCompensationTransaction(Long budgetId, BigDecimal amount);
 
     BigDecimal getPrepaymentPaidAmount(Long prepaymentId);
