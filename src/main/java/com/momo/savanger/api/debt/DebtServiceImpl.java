@@ -69,7 +69,7 @@ public class DebtServiceImpl implements DebtService {
 
         this.transactionService.createDebtTransactions(debt, dto.getDebtAmount());
 
-        return this.findById(debt.getId());
+        return this.findAndFetchDetails(debt.getId());
     }
 
     @Override
