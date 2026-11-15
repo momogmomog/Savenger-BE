@@ -228,6 +228,7 @@ public class DebtControllerIt extends BaseControllerIt {
         query.setSort(new SortQuery("id", SortDirection.ASC));
         query.setReceiverBudgetId(1001L);
         query.setLenderBudgetId(1002L);
+        query.setReceiverName("boch");
         query.setBudgetIds(List.of(1001L));
         query.setAmount(new BetweenQuery<>(BigDecimal.valueOf(100), BigDecimal.valueOf(400)));
 
@@ -243,6 +244,13 @@ public class DebtControllerIt extends BaseControllerIt {
                 jsonPath("$.content[0].receiverBudget.budgetName", is("bochko")),
                 jsonPath("$.content[0].lenderBudget.id", is(1002)),
                 jsonPath("$.content[0].lenderBudget.budgetName", is("Knigi"))
+        );
+
+        query.setReceiverName("Knigi");
+        super.postOK(Endpoints.DEBTS_SEARCH,
+                query,
+                jsonPath("$.page.totalElements", is(0)),
+                jsonPath("$.content.length()", is(0))
         );
     }
 

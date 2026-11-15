@@ -77,6 +77,34 @@ public final class QuerySpecifications {
         );
     }
 
+    public static <T, J> Specification<T> containsJoinIfPresent(
+            SingularAttribute<T, J> join,
+            SingularAttribute<J, String> attr,
+            String text) {
+        if (text == null || text.isEmpty()) {
+            return Specification.where(null);
+        }
+
+        return containsJoin(join, attr, text);
+    }
+
+    public static <T, J> Specification<T> containsJoin(
+            SingularAttribute<T, J> join,
+            SingularAttribute<J, String> attr,
+            String text) {
+        if (text == null || text.isEmpty()) {
+            return Specification.where(null);
+        }
+
+        return (root, query, criteriaBuilder)
+                -> contains(
+                        join.getDeclaringType().getJavaType(),
+                        getOrCreateJoin(root, join).get(attr),
+                        text
+                )
+                .toPredicate(root, query, criteriaBuilder);
+    }
+
     public static <T, V extends Comparable<? super V>> Specification<T> between(
             SingularAttribute<T, V> attribute,
             BetweenQuery<V> query,

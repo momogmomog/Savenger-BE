@@ -573,6 +573,22 @@ public class DebtServiceIt {
         result = this.debtService.search(query);
         assertEquals(1, result.getTotalElements());
         assertEquals(101L, result.getContent().getFirst().getId());
+
+        // 6. Filter by receiverName (case-insensitive partial match on joined receiverBudget)
+        query.setAmount(null);
+        query.setReceiverName("OCH");
+        result = this.debtService.search(query);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(101L, result.getContent().getFirst().getId());
+
+        query.setReceiverName("knig");
+        result = this.debtService.search(query);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(secondDebt.getId(), result.getContent().getFirst().getId());
+
+        query.setReceiverName("nonexistent");
+        result = this.debtService.search(query);
+        assertEquals(0, result.getTotalElements());
     }
 
     @Test

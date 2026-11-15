@@ -34,6 +34,14 @@ public class DebtSpecifications {
         return QuerySpecifications.equalIfPresent(Debt_.lenderBudgetId, lenderBudgetId);
     }
 
+    public static Specification<Debt> receiverNameContains(final String receiverName) {
+        return QuerySpecifications.containsJoin(
+                Debt_.receiverBudget,
+                Budget_.budgetName,
+                receiverName
+        );
+    }
+
     public static Specification<Debt> budgetIdIn(final Collection<Long> budgetIds) {
         if (CollectionUtils.isEmpty(budgetIds)) {
             return Specification.where(null);

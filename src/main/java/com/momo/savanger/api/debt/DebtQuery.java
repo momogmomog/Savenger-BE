@@ -27,6 +27,8 @@ public class DebtQuery {
     @CanAccessBudget
     private Long lenderBudgetId;
 
+    private String receiverName;
+
     private List<Long> budgetIds;
 
     private BetweenQuery<BigDecimal> amount;
