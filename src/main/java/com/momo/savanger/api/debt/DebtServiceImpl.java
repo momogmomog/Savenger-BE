@@ -7,12 +7,14 @@ import com.momo.savanger.api.transaction.dto.CreateTransactionDto;
 import com.momo.savanger.api.transaction.recurring.RecurringTransaction;
 import com.momo.savanger.api.user.User;
 import com.momo.savanger.api.util.SecurityUtils;
+import com.momo.savanger.constants.EntityGraphs;
 import com.momo.savanger.error.ApiErrorCode;
 import com.momo.savanger.error.ApiException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,12 @@ public class DebtServiceImpl implements DebtService {
     @Override
     public Debt findById(Long id) {
         return this.debtRepository.findById(id)
+                .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0013));
+    }
+
+    @Override
+    public Debt findAndFetchDetails(Long id) {
+        return this.debtRepository.findDebtById(id)
                 .orElseThrow(() -> ApiException.with(ApiErrorCode.ERR_0013));
     }
 
@@ -61,7 +69,7 @@ public class DebtServiceImpl implements DebtService {
 
         this.transactionService.createDebtTransactions(debt, dto.getDebtAmount());
 
-        return this.findById(debt.getId());
+        return this.findAndFetchDetails(debt.getId());
     }
 
     @Override
@@ -147,5 +155,26 @@ public class DebtServiceImpl implements DebtService {
                 null
         );
         return debts.stream().findFirst();
+    }
+
+    @Override
+    public Page<Debt> search(DebtQuery query) {
+        final Long userId = SecurityUtils.getCurrentUser().getId();
+        final Specification<Debt> specification = DebtSpecifications
+                .sort(query.getSort())
+                .and(DebtSpecifications.receiverBudgetIdEquals(query.getReceiverBudgetId()))
+                .and(DebtSpecifications.lenderBudgetIdEquals(query.getLenderBudgetId()))
+                .and(DebtSpecifications.receiverNameContains(query.getReceiverName()))
+                .and(DebtSpecifications.lenderNameContains(query.getLenderName()))
+                .and(DebtSpecifications.budgetIdIn(query.getBudgetIds()))
+                .and(DebtSpecifications.betweenAmount(query.getAmount()))
+                .and(DebtSpecifications.canAccessReceiverBudget(userId))
+                .and(DebtSpecifications.canAccessLenderBudget(userId));
+
+        return this.debtRepository.findAll(
+                specification,
+                query.getPage(),
+                EntityGraphs.DEBT_ALL
+        );
     }
 }

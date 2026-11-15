@@ -19,6 +19,8 @@ public class Endpoints {
     public static final String TRANSACTION = "transactions/{id}";
     public static final String REVISIONS = "/revisions";
     public static final String DEBTS = "/debts";
+    public static final String DEBT = "/debts/{id}";
+    public static final String DEBTS_SEARCH = "/debts/search";
     public static final String PAY_DEBT = "/debts/{id}/pay";
     public static final String PREPAYMENTS = "/prepayments";
     public static final String PREPAYMENT = "/prepayments/{id}";
