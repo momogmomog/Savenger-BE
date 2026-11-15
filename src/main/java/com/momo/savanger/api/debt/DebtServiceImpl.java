@@ -165,6 +165,7 @@ public class DebtServiceImpl implements DebtService {
                 .and(DebtSpecifications.receiverBudgetIdEquals(query.getReceiverBudgetId()))
                 .and(DebtSpecifications.lenderBudgetIdEquals(query.getLenderBudgetId()))
                 .and(DebtSpecifications.receiverNameContains(query.getReceiverName()))
+                .and(DebtSpecifications.lenderNameContains(query.getLenderName()))
                 .and(DebtSpecifications.budgetIdIn(query.getBudgetIds()))
                 .and(DebtSpecifications.betweenAmount(query.getAmount()))
                 .and(DebtSpecifications.canAccessReceiverBudget(userId))

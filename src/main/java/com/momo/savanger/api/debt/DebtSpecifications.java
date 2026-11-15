@@ -42,6 +42,14 @@ public class DebtSpecifications {
         );
     }
 
+    public static Specification<Debt> lenderNameContains(final String receiverName) {
+        return QuerySpecifications.containsJoin(
+                Debt_.lenderBudget,
+                Budget_.budgetName,
+                receiverName
+        );
+    }
+
     public static Specification<Debt> budgetIdIn(final Collection<Long> budgetIds) {
         if (CollectionUtils.isEmpty(budgetIds)) {
             return Specification.where(null);

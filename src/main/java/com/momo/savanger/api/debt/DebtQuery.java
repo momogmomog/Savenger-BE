@@ -29,6 +29,8 @@ public class DebtQuery {
 
     private String receiverName;
 
+    private String lenderName;
+
     private List<Long> budgetIds;
 
     private BetweenQuery<BigDecimal> amount;
